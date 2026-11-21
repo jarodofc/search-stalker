@@ -9,77 +9,36 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0">
 <style>
   :root{
-    --bg-base:#09090b;
-    --glass-bg:rgba(255,255,255,0.03);
-    --glass-border:rgba(255,255,255,0.08);
-    --text-main:#f8fafc;
-    --text-muted:#94a3b8;
-    --accent-green:#10b981;
-    --accent-blue:#3b82f6;
-    --accent-purple:#8b5cf6;
+    --bg-base:#09090b; --glass-bg:rgba(255,255,255,0.03); --glass-border:rgba(255,255,255,0.08);
+    --text-main:#f8fafc; --text-muted:#94a3b8;
+    --accent-green:#10b981; --accent-blue:#3b82f6; --accent-purple:#8b5cf6;
   }
-  body.light{
-    --bg-base:#f1f5f9;
-    --glass-bg:rgba(255,255,255,0.7);
-    --glass-border:rgba(0,0,0,0.06);
-    --text-main:#0f172a;
-    --text-muted:#64748b;
-  }
+  body.light{ --bg-base:#f1f5f9; --glass-bg:rgba(255,255,255,0.7); --glass-border:rgba(0,0,0,0.06); --text-main:#0f172a; --text-muted:#64748b; }
   *{box-sizing:border-box}
-  body{
-    font-family:'Plus Jakarta Sans',sans-serif;
-    background-color:var(--bg-base);
-    color:var(--text-main);
-    margin:0;min-height:100vh;
-    transition:background-color .4s, color .4s;
-    overflow-x:hidden;
-  }
+  body{ font-family:'Plus Jakarta Sans',sans-serif; background-color:var(--bg-base); color:var(--text-main); margin:0; min-height:100vh; overflow-x:hidden; }
   
   /* Fundo Animado */
   .bg-orbs { position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
   .orb { position:absolute; border-radius:50%; filter:blur(100px); opacity:.35; animation:float 20s infinite ease-in-out alternate; }
   .orb-1 { width:600px; height:600px; background:var(--accent-green); top:-200px; left:-100px; }
   .orb-2 { width:500px; height:500px; background:var(--accent-blue); bottom:-100px; right:-100px; animation-delay:-5s; }
-  .orb-3 { width:400px; height:400px; background:var(--accent-purple); top:40%; left:40%; animation-delay:-10s; opacity:.2; }
-  body.light .orb { opacity:.15; }
   @keyframes float { 0%{transform:translate(0,0) scale(1);} 100%{transform:translate(50px,50px) scale(1.1);} }
 
-  /* Glassmorphism Classes */
-  .glass{
-    background:var(--glass-bg);
-    border:1px solid var(--glass-border);
-    backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
-    border-radius:20px;
-    box-shadow:0 8px 32px rgba(0,0,0,0.1);
-  }
+  /* Glassmorphism */
+  .glass{ background:var(--glass-bg); border:1px solid var(--glass-border); backdrop-filter:blur(20px); border-radius:20px; box-shadow:0 8px 32px rgba(0,0,0,0.1); }
   
-  /* Inputs e Botões */
-  .input-glass{
-    width:100%; padding:14px 16px; background:rgba(0,0,0,0.2);
-    border:1px solid var(--glass-border); border-radius:12px;
-    color:var(--text-main); outline:none; font-size:15px; transition:.3s;
-  }
+  .input-glass{ width:100%; padding:14px 16px; background:rgba(0,0,0,0.2); border:1px solid var(--glass-border); border-radius:12px; color:var(--text-main); outline:none; font-size:15px; transition:.3s; }
   body.light .input-glass { background:rgba(255,255,255,0.5); }
   .input-glass:focus{ border-color:var(--accent-green); box-shadow:0 0 0 3px rgba(16,185,129,0.15); }
   
-  .btn-primary{
-    background:linear-gradient(135deg, var(--accent-green), #059669);
-    color:#fff; font-weight:600; padding:14px 24px; border-radius:12px;
-    border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
-    transition:transform .2s, box-shadow .2s; width:100%;
-  }
-  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 8px 20px rgba(16,185,129,0.3); }
+  .btn-primary{ background:linear-gradient(135deg, var(--accent-green), #059669); color:#fff; font-weight:600; padding:14px 24px; border-radius:12px; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:transform .2s; width:100%; }
+  .btn-primary:hover{ transform:translateY(-2px); }
   .btn-primary:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
   /* Cards Dashboard */
-  .card-module{
-    display:flex; flex-direction:column; align-items:center; text-align:center;
-    padding:32px 24px; cursor:pointer; transition:.3s; position:relative; overflow:hidden;
-  }
+  .card-module{ display:flex; flex-direction:column; align-items:center; text-align:center; padding:32px 24px; cursor:pointer; transition:.3s; position:relative; overflow:hidden; }
   .card-module::before{ content:''; position:absolute; top:0; left:0; width:100%; height:4px; background:transparent; transition:.3s; }
-  .card-module:hover{ transform:translateY(-5px); border-color:var(--glass-border); box-shadow:0 15px 30px rgba(0,0,0,0.15); }
-  
+  .card-module:hover{ transform:translateY(-5px); }
   .card-cnpj:hover::before{ background:var(--accent-blue); }
   .card-cpf:hover::before{ background:var(--accent-green); }
   .card-placa:hover::before{ background:var(--accent-purple); }
@@ -89,134 +48,99 @@
   .icon-cpf{ background:rgba(16,185,129,0.1); color:var(--accent-green); }
   .icon-placa{ background:rgba(139,92,246,0.1); color:var(--accent-purple); }
 
-  /* Data Rows */
-  .data-row{ display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--glass-border); gap:20px; font-size:14px; }
-  .data-row:last-child{ border-bottom:none; }
-  .data-label{ color:var(--text-muted); font-weight:500; text-transform:capitalize; }
-  .data-value{ color:var(--text-main); font-weight:600; text-align:right; word-break:break-word; }
-
-  /* Loader & Modal */
+  /* Grid de Resultados */
+  .result-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px; }
+  .data-item{ display:flex; align-items:flex-start; gap:12px; padding:12px; background:rgba(255,255,255,0.02); border-radius:12px; border:1px solid var(--glass-border); }
+  body.light .data-item{ background:rgba(0,0,0,0.02); }
+  .data-icon{ color:var(--accent-green); opacity:0.8; font-size:20px; margin-top:2px; }
+  .data-content{ display:flex; flex-direction:column; overflow:hidden; }
+  .data-label{ font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); font-weight:600; margin-bottom:2px; }
+  .data-value{ font-size:14px; font-weight:500; word-break:break-word; }
+  
+  /* Loader */
   .spinner{ animation:spin 1s linear infinite; }
   @keyframes spin{ 100%{ transform:rotate(360deg); } }
-  
-  .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(5px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:.3s; z-index:100; padding:20px; }
-  .modal-overlay.show{ opacity:1; pointer-events:all; }
-  .modal-box{ width:100%; max-width:800px; max-height:85vh; display:flex; flex-direction:column; transform:scale(.95); transition:.3s; }
-  .modal-overlay.show .modal-box{ transform:scale(1); }
-  .custom-scroll::-webkit-scrollbar{ width:6px; }
-  .custom-scroll::-webkit-scrollbar-thumb{ background:var(--glass-border); border-radius:10px; }
 </style>
 </head>
 <body>
 
-<!-- Fundo Animado -->
-<div class="bg-orbs">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-</div>
+<div class="bg-orbs"><div class="orb orb-1"></div><div class="orb orb-2"></div></div>
 
-<!-- Top Navigation -->
 <header class="w-full border-b border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-md sticky top-0 z-50">
-  <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+  <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
     <div class="flex items-center gap-3 cursor-pointer" onclick="navigate('')">
-      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white shadow-lg">
-        <span class="material-symbols-rounded">radar</span>
+      <!-- Ícone do Site: Impressão Digital Branca -->
+      <div class="w-10 h-10 rounded-xl bg-white/10 border border-white/20 shadow-[0_0_15px_rgba(255,255,255,0.1)] flex items-center justify-center text-white">
+        <span class="material-symbols-rounded text-2xl">fingerprint</span>
       </div>
       <span class="font-bold text-xl tracking-tight">Data<span class="text-[var(--accent-green)]">Search</span></span>
     </div>
     <button onclick="toggleTheme()" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/10 transition">
-      <span class="material-symbols-rounded" id="themeIcon">dark_mode</span>
+      <span class="material-symbols-rounded text-xl" id="themeIcon">dark_mode</span>
     </button>
   </div>
 </header>
 
-<!-- Main Content -->
-<main class="max-w-6xl mx-auto px-6 py-12 min-h-[calc(100vh-80px)]">
-  <div id="view" class="w-full flex flex-col items-center justify-center"></div>
+<main class="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-80px)] flex flex-col justify-center">
+  <div id="view" class="w-full"></div>
 </main>
-
-<!-- Modal JSON -->
-<div class="modal-overlay" id="modal">
-  <div class="modal-box glass">
-    <div class="p-6 border-b border-[var(--glass-border)] flex justify-between items-center">
-      <h2 class="font-bold text-lg flex items-center gap-2">
-        <span class="material-symbols-rounded text-blue-400">data_object</span> Dados Brutos (JSON)
-      </h2>
-      <button onclick="document.getElementById('modal').classList.remove('show')" class="w-8 h-8 rounded-full hover:bg-black/10 flex items-center justify-center transition">
-        <span class="material-symbols-rounded">close</span>
-      </button>
-    </div>
-    <div class="p-6 overflow-auto custom-scroll">
-      <pre id="modalBody" class="text-sm leading-relaxed" style="color:var(--text-muted); font-family:monospace;"></pre>
-    </div>
-  </div>
-</div>
 
 <script>
 // ==========================================
 // CONFIGURAÇÃO
 // ==========================================
 const CONFIG = {
-  // Chave da CPFHub embutida
   cpfKey: '778433e124468b1aa60f2681919cd918f852afe1761056985813881cb72a550f',
-  // Configurações da API de Placa (Substitua os valores abaixo)
   placaBaseUrl: 'https://sua-api-de-placa.com/v1/',
   placaKey: 'SUA_CHAVE_DE_PLACA_AQUI'
 };
 
+// Mapeamento de Ícones por palavra-chave do campo
+const ICON_MAP = {
+  'cnpj': 'badge', 'cpf': 'fingerprint', 'placa': 'directions_car',
+  'nome': 'person', 'razao': 'business', 'fantasia': 'storefront',
+  'email': 'mail', 'telefone': 'call', 'celular': 'smartphone', 'whatsapp': 'chat',
+  'uf': 'map', 'estado': 'map', 'pais': 'public', 'municipio': 'location_city', 'cidade': 'location_city',
+  'cep': 'markunread_mailbox', 'logradouro': 'signpost', 'rua': 'signpost', 'numero': 'numbers', 'bairro': 'holiday_village',
+  'data': 'calendar_today', 'nascimento': 'cake', 'abertura': 'event',
+  'situacao': 'info', 'status': 'check_circle', 'capital': 'attach_money', 'renda': 'payments',
+  'cnae': 'category', 'natureza': 'gavel', 'porte': 'pie_chart', 'simples': 'receipt_long',
+  'marca': 'local_offer', 'modelo': 'commute', 'ano': 'update', 'cor': 'palette', 'chassi': 'tag',
+  'combustivel': 'local_gas_station', 'motor': 'settings'
+};
+
+function getIcon(key) {
+  const k = key.toLowerCase();
+  for (const [search, icon] of Object.entries(ICON_MAP)) {
+    if (k.includes(search)) return icon;
+  }
+  return 'info'; // Ícone padrão
+}
+
 const MODULES = [
   { 
-    id: 'cnpj', 
-    name: 'CNPJ', 
-    desc: 'Consulta de Empresas',
-    icon: 'domain', 
-    colorClass: 'icon-cnpj',
-    cardClass: 'card-cnpj',
-    placeholder: 'Apenas números (14 dígitos)', 
-    max: 14, 
-    digits: true,
+    id: 'cnpj', name: 'CNPJ', desc: 'Consulta de Empresas', icon: 'domain', colorClass: 'icon-cnpj', cardClass: 'card-cnpj', placeholder: 'Apenas números (14 dígitos)', max: 14, digits: true,
     fetchApi: async (v) => {
-      // Usando MinhaReceita como fonte mais estável
       const res = await fetch(`https://minhareceita.org/${v.replace(/\D/g,'')}`);
       if(!res.ok) throw new Error('CNPJ não encontrado ou inválido');
       return await res.json();
     }
   },
   { 
-    id: 'cpf', 
-    name: 'CPF', 
-    desc: 'Consulta de Pessoas',
-    icon: 'fingerprint', 
-    colorClass: 'icon-cpf',
-    cardClass: 'card-cpf',
-    placeholder: 'Apenas números (11 dígitos)', 
-    max: 11, 
-    digits: true,
+    id: 'cpf', name: 'CPF', desc: 'Consulta de Pessoas', icon: 'fingerprint', colorClass: 'icon-cpf', cardClass: 'card-cpf', placeholder: 'Apenas números (11 dígitos)', max: 11, digits: true,
     fetchApi: async (v) => {
-      const res = await fetch(`https://api.cpfhub.io/cpf/${v.replace(/\D/g,'')}`, {
-        headers: { 'x-api-key': CONFIG.cpfKey, 'Accept': 'application/json' }
-      });
-      const data = await res.json();
+      const res = await fetch(`https://api.cpfhub.io/cpf/${v.replace(/\D/g,'')}`, { headers: { 'x-api-key': CONFIG.cpfKey, 'Accept': 'application/json' } });
+      let data = await res.json();
       if(!res.ok) throw new Error(data.message || data.error || 'Erro ao consultar CPF');
+      // Desempacota se a API retornar { success: true, data: {...} }
+      if (data && data.success === true && data.data) return data.data;
       return data;
     }
   },
   { 
-    id: 'placa', 
-    name: 'Placa', 
-    desc: 'Consulta de Veículos',
-    icon: 'directions_car', 
-    colorClass: 'icon-placa',
-    cardClass: 'card-placa',
-    placeholder: 'ABC1D23', 
-    max: 7, 
-    digits: false,
+    id: 'placa', name: 'Placa', desc: 'Consulta de Veículos', icon: 'directions_car', colorClass: 'icon-placa', cardClass: 'card-placa', placeholder: 'ABC1D23', max: 7, digits: false,
     fetchApi: async (v) => {
-      // Configuração para sua API de placa
-      const res = await fetch(`${CONFIG.placaBaseUrl}${v.replace(/[^A-Za-z0-9]/g,'').toUpperCase()}`, {
-        headers: { 'Authorization': `Bearer ${CONFIG.placaKey}` }
-      });
+      const res = await fetch(`${CONFIG.placaBaseUrl}${v.replace(/[^A-Za-z0-9]/g,'').toUpperCase()}`, { headers: { 'Authorization': `Bearer ${CONFIG.placaKey}` } });
       if(!res.ok) throw new Error('Erro ao consultar placa. Verifique a chave.');
       return await res.json();
     }
@@ -228,75 +152,77 @@ const MODULES = [
 // ==========================================
 function toggleTheme() {
   document.body.classList.toggle('light');
-  const isLight = document.body.classList.contains('light');
-  document.getElementById('themeIcon').textContent = isLight ? 'light_mode' : 'dark_mode';
-  localStorage.setItem('theme', isLight ? 'light' : 'dark');
+  document.getElementById('themeIcon').textContent = document.body.classList.contains('light') ? 'light_mode' : 'dark_mode';
+  localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
 }
 
-function navigate(id) {
-  window.location.hash = id ? '#' + id : '';
-}
+function navigate(id) { window.location.hash = id ? '#' + id : ''; }
 
 function render() {
   const view = document.getElementById('view');
   const hash = window.location.hash.replace('#', '');
 
-  // Animação de entrada
   view.style.opacity = 0;
   view.style.transform = 'translateY(10px)';
   
   setTimeout(() => {
     if (!hash) {
-      // DASHBOARD CENTRALIZADO
+      // DASHBOARD
       let cards = MODULES.map(m => `
         <div class="glass card-module ${m.cardClass}" onclick="navigate('${m.id}')">
-          <div class="icon-box ${m.colorClass}">
-            <span class="material-symbols-rounded text-4xl">${m.icon}</span>
-          </div>
+          <div class="icon-box ${m.colorClass}"><span class="material-symbols-rounded text-4xl">${m.icon}</span></div>
           <h3 class="text-xl font-bold mb-2">${m.name}</h3>
           <p class="text-sm" style="color:var(--text-muted)">${m.desc}</p>
         </div>
       `).join('');
 
       view.innerHTML = `
-        <div class="w-full max-w-4xl text-center mb-12">
+        <div class="w-full max-w-4xl mx-auto text-center mb-10">
           <h1 class="text-4xl font-bold mb-4 tracking-tight">O que você deseja <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">consultar?</span></h1>
-          <p class="text-lg" style="color:var(--text-muted)">Selecione um dos módulos abaixo para iniciar.</p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">${cards}</div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl mx-auto">${cards}</div>
       `;
     } else {
-      // FORMULÁRIO CENTRALIZADO
+      // CONSULTA (LADO A LADO)
       const m = MODULES.find(x => x.id === hash);
       if (!m) return navigate('');
       
       view.innerHTML = `
-        <div class="w-full max-w-lg">
-          <button onclick="navigate('')" class="flex items-center gap-1 text-sm mb-6 hover:opacity-70 transition" style="color:var(--text-muted)">
-            <span class="material-symbols-rounded text-sm">arrow_back</span> Voltar ao painel
-          </button>
-          
-          <div class="glass p-8">
-            <div class="flex flex-col items-center text-center mb-8">
-              <div class="icon-box ${m.colorClass} mb-4">
-                <span class="material-symbols-rounded text-4xl">${m.icon}</span>
+        <button onclick="navigate('')" class="flex items-center gap-1 text-sm mb-6 hover:opacity-70 transition" style="color:var(--text-muted)">
+          <span class="material-symbols-rounded text-sm">arrow_back</span> Voltar ao painel
+        </button>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <!-- Coluna da Esquerda: Formulário -->
+          <div class="lg:col-span-4 glass p-6">
+            <div class="flex flex-col items-center text-center mb-6">
+              <div class="icon-box ${m.colorClass} mb-4 !w-16 !h-16">
+                <span class="material-symbols-rounded text-3xl">${m.icon}</span>
               </div>
-              <h2 class="text-2xl font-bold mb-1">Consulta de ${m.name}</h2>
-              <p class="text-sm" style="color:var(--text-muted)">${m.desc}</p>
+              <h2 class="text-xl font-bold mb-1">Consulta ${m.name}</h2>
+              <p class="text-xs" style="color:var(--text-muted)">${m.desc}</p>
             </div>
             
             <form id="searchForm" onsubmit="handleSearch(event, '${m.id}')">
-              <div class="mb-6">
-                <label class="block text-sm font-medium mb-2 ml-1">Documento</label>
+              <div class="mb-4">
+                <label class="block text-xs font-semibold mb-2 ml-1" style="color:var(--text-muted)">DOCUMENTO</label>
                 <input type="text" id="searchInput" class="input-glass" placeholder="${m.placeholder}" maxlength="${m.max}" required autocomplete="off">
               </div>
               <button type="submit" class="btn-primary">
-                <span class="material-symbols-rounded">search</span> Realizar Consulta
+                <span class="material-symbols-rounded">search</span> Consultar
               </button>
             </form>
           </div>
           
-          <div id="result" class="mt-6 hidden"></div>
+          <!-- Coluna da Direita: Resultados -->
+          <div class="lg:col-span-8">
+            <div id="result" class="h-full min-h-[300px] flex flex-col">
+              <div class="glass p-8 flex-1 flex flex-col items-center justify-center text-center border-dashed border-2" style="border-color:var(--glass-border); background:transparent">
+                <span class="material-symbols-rounded text-5xl mb-4" style="color:var(--text-muted); opacity:0.5">manage_search</span>
+                <p style="color:var(--text-muted)">Aguardando consulta...</p>
+              </div>
+            </div>
+          </div>
         </div>
       `;
 
@@ -307,7 +233,6 @@ function render() {
       }
     }
     
-    // Reset animation
     view.style.transition = 'all .4s ease';
     view.style.opacity = 1;
     view.style.transform = 'translateY(0)';
@@ -323,68 +248,93 @@ async function handleSearch(e, id) {
 
   btn.disabled = true;
   btn.innerHTML = '<span class="material-symbols-rounded spinner">refresh</span> Buscando...';
-  resDiv.classList.add('hidden');
+  
+  resDiv.innerHTML = `
+    <div class="glass p-8 flex-1 flex flex-col items-center justify-center">
+      <span class="material-symbols-rounded spinner text-4xl mb-4 text-[var(--accent-green)]">refresh</span>
+      <p class="font-medium">Consultando base de dados...</p>
+    </div>
+  `;
 
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
-    
-    // Executa a função da API correspondente
     const data = await m.fetchApi(val);
-    clearTimeout(timeoutId);
 
-    // Formata os dados bonitinho
-    let formattedRows = '';
-    if (data && typeof data === 'object') {
-      const ignoreKeys = ['raw', 'json', 'html', 'response']; // Ignora campos muito complexos
-      
-      formattedRows = Object.keys(data)
-        .filter(k => !ignoreKeys.includes(k) && (typeof data[k] !== 'object' || data[k] === null))
-        .slice(0, 20) // Limita a 20 campos
-        .map(k => {
-          let v = data[k];
-          if (v === true) v = 'Sim'; if (v === false) v = 'Não';
-          if (v === null || v === '') v = 'Não informado';
-          return `<div class="data-row"><span class="data-label">${k.replace(/_/g,' ')}</span><span class="data-value">${v}</span></div>`;
-        }).join('');
+    // Renderiza os dados como Grid de Cards
+    let htmlResult = '';
+    
+    // Se for um array (múltiplos resultados)
+    if (Array.isArray(data)) {
+       htmlResult = data.map((item, idx) => `
+         <div class="mb-4">
+            <h4 class="text-sm font-bold mb-2 text-[var(--accent-green)]">Resultado ${idx + 1}</h4>
+            ${renderDataGrid(item)}
+         </div>
+       `).join('');
+    } else {
+       htmlResult = renderDataGrid(data);
     }
 
     resDiv.innerHTML = `
-      <div class="glass p-6 border-t-4" style="border-top-color:var(--accent-green)">
-        <div class="flex justify-between items-center mb-4 border-b border-[var(--glass-border)] pb-4">
-          <h3 class="font-bold text-lg flex items-center gap-2">
-            <span class="material-symbols-rounded text-green-500">verified</span> Sucesso
-          </h3>
-          <button onclick="showJson()" class="text-xs bg-blue-500/10 text-blue-400 px-3 py-1 rounded-md hover:bg-blue-500/20 transition">Ver JSON</button>
+      <div class="glass p-6">
+        <div class="flex items-center gap-2 mb-4 pb-4 border-b" style="border-color:var(--glass-border)">
+          <span class="material-symbols-rounded text-green-500 text-2xl">check_circle</span>
+          <h3 class="font-bold text-lg">Informações Encontradas</h3>
         </div>
-        <div class="space-y-1">${formattedRows || '<p class="text-center text-sm py-4" style="color:var(--text-muted)">Nenhum dado simples para exibir. Verifique o JSON.</p>'}</div>
+        ${htmlResult}
       </div>
     `;
-    
-    window._currentJson = data;
-    resDiv.classList.remove('hidden');
 
   } catch (err) {
-    let msg = err.name === 'AbortError' ? 'A API demorou muito para responder.' : err.message;
+    let msg = err.message;
+    if (err.name === 'AbortError') msg = 'Tempo limite excedido.';
     
     resDiv.innerHTML = `
-      <div class="glass p-6 border-t-4" style="border-top-color:#ef4444">
-        <h3 class="font-bold text-lg flex items-center gap-2 mb-2 text-red-500">
-          <span class="material-symbols-rounded">error</span> Falha na Consulta
-        </h3>
+      <div class="glass p-8 flex-1 flex flex-col items-center justify-center text-center border border-red-500/30">
+        <span class="material-symbols-rounded text-5xl mb-4 text-red-500">error</span>
+        <h3 class="font-bold text-lg mb-2">Falha na Consulta</h3>
         <p class="text-sm" style="color:var(--text-muted)">${msg}</p>
       </div>
     `;
-    resDiv.classList.remove('hidden');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<span class="material-symbols-rounded">search</span> Realizar Consulta';
+    btn.innerHTML = '<span class="material-symbols-rounded">search</span> Consultar';
   }
 }
 
-function showJson() {
-  document.getElementById('modalBody').innerText = JSON.stringify(window._currentJson, null, 2);
-  document.getElementById('modal').classList.add('show');
+// Função que cria o Grid de informações com ícones
+function renderDataGrid(data) {
+  if (!data || typeof data !== 'object') return '';
+  
+  const ignoreKeys = ['raw', 'json', 'html', 'response', 'message']; 
+  
+  // Filtra chaves de objetos complexos e nulos
+  const keys = Object.keys(data).filter(k => 
+    !ignoreKeys.includes(k.toLowerCase()) && 
+    (typeof data[k] !== 'object' || data[k] === null) && 
+    data[k] !== ''
+  );
+
+  if (keys.length === 0) return '<p class="text-sm" style="color:var(--text-muted)">Nenhum dado detalhado para exibir.</p>';
+
+  return `
+    <div class="result-grid">
+      ${keys.map(k => {
+        let v = data[k];
+        if (v === true) v = 'Sim';
+        if (v === false) v = 'Não';
+        
+        return `
+          <div class="data-item">
+            <span class="material-symbols-rounded data-icon">${getIcon(k)}</span>
+            <div class="data-content">
+              <span class="data-label">${k.replace(/_/g,' ')}</span>
+              <span class="data-value">${v}</span>
+            </div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
 }
 
 // Inicialização
