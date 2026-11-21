@@ -41,44 +41,33 @@ body {
 }
 body.theme-dark { background: radial-gradient(1200px 600px at 10% 0%, rgba(34,197,94,.06), transparent 60%), #0a0f1e; }
 body.theme-light { background: radial-gradient(1200px 600px at 10% 0%, rgba(34,197,94,.08), transparent 60%), #f4f6fb; }
-
 .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; user-select: none; font-size: 1.25rem; line-height: 1; vertical-align: middle; }
 .icon-sm { font-size: 1rem; } .icon-lg { font-size: 1.5rem; } .icon-xl { font-size: 2rem; } .icon-2xl { font-size: 2.5rem; }
 .icon-fill { font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-
 .text-1 { color: var(--text-1); } .text-2 { color: var(--text-2); } .text-3 { color: var(--text-3); }
 .border-default { border-color: var(--border); } .border-hi { border-color: var(--border-hi); }
 :focus-visible { outline: 2px solid #22c55e; outline-offset: 2px; border-radius: 4px; }
-
 .ripple-host { position: relative; overflow: hidden; isolation: isolate; }
 .ripple { position: absolute; border-radius: 50%; background: currentColor; opacity: .25; transform: scale(0); animation: rippleOut var(--dur-xl) var(--ease-std) forwards; pointer-events: none; z-index: 0; }
 @keyframes rippleOut { to { transform: scale(2.6); opacity: 0; } }
-
 .lift { transition: transform var(--dur-m) var(--ease-emph), box-shadow var(--dur-m) var(--ease-emph), background-color var(--dur-s) var(--ease-std), border-color var(--dur-s) var(--ease-std); will-change: transform; }
 .lift:hover { transform: translateY(-2px); box-shadow: var(--elev-3); }
 .lift:active { transform: translateY(0); box-shadow: var(--elev-1); }
-
 .view-enter { animation: viewEnter var(--dur-l) var(--ease-emph) both; }
 @keyframes viewEnter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 .stagger-item { opacity: 0; animation: staggerIn var(--dur-l) var(--ease-emph) forwards; }
 @keyframes staggerIn { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-
 .skeleton { background: linear-gradient(90deg, rgba(148,163,184,.06) 25%, rgba(148,163,184,.14) 50%, rgba(148,163,184,.06) 75%); background-size: 200% 100%; animation: shimmer 1.4s var(--ease-std) infinite; border-radius: 8px; }
 @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: background-color var(--dur-s) var(--ease-std), border-color var(--dur-s) var(--ease-std); }
-
 .btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; padding: .75rem 1.5rem; background: #22c55e; color: #0a0f1e; font-weight: 600; font-size: .9375rem; border: none; border-radius: 9999px; cursor: pointer; transition: background-color var(--dur-s) var(--ease-std), box-shadow var(--dur-s) var(--ease-std), transform var(--dur-s) var(--ease-std); }
 .btn-primary:hover { background: #16a34a; box-shadow: var(--elev-2); }
 .btn-primary:active { transform: scale(.98); }
 .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
-
 .btn-ghost { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; padding: .5rem 1rem; background: transparent; color: var(--text-2); border: 1px solid var(--border); border-radius: 9999px; font-size: .875rem; font-weight: 500; cursor: pointer; transition: background var(--dur-s) var(--ease-std), border-color var(--dur-s) var(--ease-std), color var(--dur-s) var(--ease-std); }
 .btn-ghost:hover { background: var(--state-hover); border-color: var(--border-hi); color: var(--text-1); }
-
 .icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: transparent; border: none; border-radius: 50%; color: var(--text-2); cursor: pointer; transition: background var(--dur-s) var(--ease-std), color var(--dur-s) var(--ease-std); }
 .icon-btn:hover { background: var(--state-hover); color: var(--text-1); }
-
 .md-field { position: relative; margin-bottom: 1rem; }
 .md-field input, .md-field select { width: 100%; padding: 1rem .875rem .5rem; background: var(--input-bg); border: 1px solid var(--border-hi); border-radius: 8px; color: var(--text-1); font-size: .9375rem; transition: border-color var(--dur-s) var(--ease-std); }
 .md-field input::placeholder { color: transparent; }
@@ -89,69 +78,48 @@ body.theme-light { background: radial-gradient(1200px 600px at 10% 0%, rgba(34,1
 .md-field .chevron { position: absolute; right: .75rem; top: 50%; transform: translateY(-50%); color: var(--text-3); pointer-events: none; font-size: 1.25rem; }
 .md-field select option { background: var(--surface-max); color: var(--text-1); }
 .hint { font-size: .75rem; color: var(--text-3); margin-top: .375rem; }
-
 .nav-item { display: flex; align-items: center; gap: .5rem; padding: .5rem .625rem; border-radius: 8px; color: var(--text-3); text-decoration: none; font-size: .8125rem; transition: background var(--dur-s) var(--ease-std), color var(--dur-s) var(--ease-std); position: relative; }
 .nav-item:hover { background: var(--state-hover); color: var(--text-1); }
 .nav-item.active { background: rgba(34,197,94,.14); color: #22c55e; font-weight: 500; }
 .nav-item.active::before { content: ''; position: absolute; left: 0; top: 25%; bottom: 25%; width: 3px; background: #22c55e; border-radius: 0 3px 3px 0; }
 .nav-bullet { width: 4px; height: 4px; border-radius: 50%; background: var(--text-3); flex-shrink: 0; transition: background var(--dur-s) var(--ease-std); }
 .nav-item.active .nav-bullet { background: #22c55e; }
-
 #sidebar { transition: transform var(--dur-l) var(--ease-emph); }
 #sidebar-overlay { opacity: 0; visibility: hidden; transition: opacity var(--dur-m) var(--ease-std), visibility var(--dur-m) var(--ease-std); backdrop-filter: blur(2px); }
 #sidebar-overlay.visible { opacity: 1; visibility: visible; }
 #header { transition: box-shadow var(--dur-m) var(--ease-std); }
 #header.scrolled { box-shadow: var(--elev-2); }
-
 #analiticModal { display: flex; opacity: 0; visibility: hidden; transition: opacity var(--dur-m) var(--ease-std), visibility var(--dur-m) var(--ease-std); align-items: center; justify-content: center; padding: 1rem; background: rgba(2,6,23,.7); backdrop-filter: blur(6px); }
 #analiticModal.open { opacity: 1; visibility: visible; }
 #analiticModal .modal-content { transform: scale(.96) translateY(12px); opacity: 0; transition: transform var(--dur-l) var(--ease-emph), opacity var(--dur-l) var(--ease-std); }
 #analiticModal.open .modal-content { transform: scale(1) translateY(0); opacity: 1; }
-
 .search-wrap { position: relative; }
 .search-wrap .material-symbols-outlined { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-3); pointer-events: none; }
 .search-input { width: 100%; padding: .875rem 1rem .875rem 3rem; background: var(--surface); border: 1px solid var(--border); border-radius: 9999px; color: var(--text-1); font-size: .9375rem; transition: border-color var(--dur-s) var(--ease-std); }
 .search-input:focus { outline: none; border-color: #22c55e; }
 .search-input::placeholder { color: var(--text-3); }
-
 .empty-state { text-align: center; padding: 3rem 1.5rem; }
 .empty-state .material-symbols-outlined { color: var(--text-3); opacity: .6; margin-bottom: 1rem; }
-
 #progressBar { position: fixed; top: 0; left: 0; height: 3px; background: #22c55e; width: 0; z-index: 9999; transition: width var(--dur-m) var(--ease-std), opacity var(--dur-m) var(--ease-std); opacity: 0; box-shadow: 0 0 8px #22c55e; }
 #progressBar.active { opacity: 1; }
-
 .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 .status-dot.online { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
 .status-dot.offline { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
 .status-dot.checking { background: #f59e0b; animation: pulseStatus 1s infinite; }
 @keyframes pulseStatus { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
-
 .result-table { width: 100%; border-collapse: collapse; font-size: .8125rem; }
 .result-table th, .result-table td { padding: .5rem .625rem; text-align: left; border-bottom: 1px solid var(--border); }
 .result-table th { color: var(--text-3); font-weight: 500; font-size: .75rem; text-transform: uppercase; letter-spacing: .025em; }
 .result-table tr:last-child td { border-bottom: none; }
 .result-table tr:hover td { background: var(--state-hover); }
-
 .kv-row { display: flex; justify-content: space-between; padding: .5rem 0; border-bottom: 1px solid var(--border); font-size: .875rem; gap: 1rem; }
 .kv-row:last-child { border-bottom: none; }
 .kv-key { color: var(--text-3); }
 .kv-val { color: var(--text-1); font-weight: 500; text-align: right; word-break: break-word; }
-
 .banner-warn { display: flex; align-items: flex-start; gap: .75rem; padding: .875rem 1rem; border-radius: 12px; background: rgba(251,146,60,.1); border: 1px solid rgba(251,146,60,.3); color: #fb923c; }
 .banner-err { display: flex; align-items: flex-start; gap: .75rem; padding: .875rem 1rem; border-radius: 12px; background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); color: #f87171; }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
-  .lift:hover { transform: none; }
-}
-@media print {
-  body > *:not(#analiticModal) { display: none !important; }
-  #analiticModal { display: block !important; position: static; opacity: 1; visibility: visible; background: #fff; padding: 0; backdrop-filter: none; }
-  #analiticModal .modal-content { max-width: 100%; max-height: none; box-shadow: none; transform: none !important; opacity: 1 !important; }
-  #analiticModal .modal-header button { display: none !important; }
-  #analiticModal .modal-body { max-height: none; overflow: visible; }
-  #analiticModal, #analiticModal * { color: #000 !important; background: #fff !important; }
-}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } .lift:hover { transform: none; } }
+@media print { body > *:not(#analiticModal) { display: none !important; } #analiticModal { display: block !important; position: static; opacity: 1; visibility: visible; background: #fff; padding: 0; backdrop-filter: none; } #analiticModal .modal-content { max-width: 100%; max-height: none; box-shadow: none; transform: none !important; opacity: 1 !important; } #analiticModal .modal-header button { display: none !important; } #analiticModal .modal-body { max-height: none; overflow: visible; } #analiticModal, #analiticModal * { color: #000 !important; background: #fff !important; } }
 </style>
 </head>
 <body class="theme-dark min-h-screen">
@@ -169,9 +137,7 @@ body.theme-light { background: radial-gradient(1200px 600px at 10% 0%, rgba(34,1
           <img src="https://www.apii.rest/imagens/logo.png" alt="" class="w-8 h-8 object-contain">
           <span class="text-1 font-bold text-sm">API REST BRASIL</span>
         </div>
-        <button id="sidebar-close" class="icon-btn" aria-label="Fechar menu">
-          <span class="material-symbols-outlined">close</span>
-        </button>
+        <button id="sidebar-close" class="icon-btn" aria-label="Fechar menu"><span class="material-symbols-outlined">close</span></button>
       </div>
       <div class="flex-1 p-3 overflow-y-auto"><nav id="sidebar-nav" class="space-y-1"></nav></div>
       <div class="p-3 border-t" style="border-color: var(--border);">
@@ -192,25 +158,16 @@ body.theme-light { background: radial-gradient(1200px 600px at 10% 0%, rgba(34,1
     <header id="header" class="backdrop-blur-md border-b sticky top-0 z-50" style="background: var(--surface); border-color: var(--border);">
       <div class="px-4 py-2.5 flex justify-between items-center gap-2">
         <div class="flex items-center gap-2 min-w-0">
-          <button id="sidebar-toggle" class="icon-btn lg:hidden" aria-label="Abrir menu">
-            <span class="material-symbols-outlined">menu</span>
-          </button>
+          <button id="sidebar-toggle" class="icon-btn lg:hidden" aria-label="Abrir menu"><span class="material-symbols-outlined">menu</span></button>
           <div class="flex items-center gap-2 min-w-0">
             <img src="https://www.apii.rest/imagens/logo.png" alt="" class="w-8 h-8 object-contain flex-shrink-0">
-            <div class="truncate">
-              <span class="font-bold text-base sm:text-lg text-1">API REST</span>
-              <span class="text-accent font-bold text-base sm:text-lg" style="color:#22c55e;">BRASIL</span>
-            </div>
+            <div class="truncate"><span class="font-bold text-base sm:text-lg text-1">API REST</span> <span class="text-accent font-bold text-base sm:text-lg" style="color:#22c55e;">BRASIL</span></div>
           </div>
         </div>
         <div class="flex items-center gap-1">
-          <button id="theme-toggle" class="icon-btn" aria-label="Alternar tema">
-            <span class="material-symbols-outlined" id="themeIcon">light_mode</span>
-          </button>
+          <button id="theme-toggle" class="icon-btn" aria-label="Alternar tema"><span class="material-symbols-outlined" id="themeIcon">light_mode</span></button>
           <div class="relative">
-            <button id="user-menu-btn" class="icon-btn" aria-label="Menu do usuário">
-              <span class="material-symbols-outlined">person</span>
-            </button>
+            <button id="user-menu-btn" class="icon-btn" aria-label="Menu do usuário"><span class="material-symbols-outlined">person</span></button>
             <div id="user-menu" class="hidden absolute right-0 mt-2 w-48 rounded-xl shadow-xl overflow-hidden" style="background: var(--surface-max); border: 1px solid var(--border);">
               <a href="#" class="flex items-center gap-2 px-4 py-2.5 text-2 hover:text-1"><span class="material-symbols-outlined icon-sm">manage_accounts</span><span class="text-sm">Perfil</span></a>
               <a href="#" class="flex items-center gap-2 px-4 py-2.5 text-2 hover:text-1"><span class="material-symbols-outlined icon-sm">logout</span><span class="text-sm">Sair</span></a>
@@ -219,7 +176,6 @@ body.theme-light { background: radial-gradient(1200px 600px at 10% 0%, rgba(34,1
         </div>
       </div>
     </header>
-
     <main id="view" class="p-4 lg:p-6"></main>
   </div>
 </div>
@@ -227,10 +183,7 @@ body.theme-light { background: radial-gradient(1200px 600px at 10% 0%, rgba(34,1
 <div id="analiticModal" role="dialog" aria-modal="true">
   <div class="modal-content w-full max-w-3xl max-h-[92vh] flex flex-col rounded-2xl overflow-hidden" style="background: var(--surface-max); border: 1px solid var(--border);">
     <div class="modal-header flex items-center justify-between p-4 border-b" style="border-color: var(--border);">
-      <h2 class="font-semibold text-1 flex items-center gap-2">
-        <span class="material-symbols-outlined" style="color:#22c55e;">data_object</span>
-        Resultado completo
-      </h2>
+      <h2 class="font-semibold text-1 flex items-center gap-2"><span class="material-symbols-outlined" style="color:#22c55e;">data_object</span>Resultado completo</h2>
       <div class="flex gap-1">
         <button id="btnCopy" class="icon-btn" title="Copiar"><span class="material-symbols-outlined icon-sm">content_copy</span></button>
         <button id="btnPrint" class="icon-btn" title="Imprimir"><span class="material-symbols-outlined icon-sm">print</span></button>
@@ -243,132 +196,26 @@ body.theme-light { background: radial-gradient(1200px 600px at 10% 0%, rgba(34,1
 </div>
 
 <script>
-/* ============================================================
-   CONFIG
-   ============================================================ */
-const CONFIG = {
-  provider: 'public',
-  keys: {
-    feriadosapi: '' // Adicione a chave da Feriados API se tiver
-  }
-};
+const CONFIG = { provider: 'public', keys: { feriadosapi: '' } };
 
-/* ============================================================
-   MÓDULOS
-   ============================================================ */
 const MODULES = [
-  // -------- EMPRESAS (CNPJ) --------
-  {
-    id: 'cnpj_brasilapi', title: 'CNPJ (BrasilAPI)', desc: 'Empresa por CNPJ via BrasilAPI',
-    icon: 'domain', category: 'Empresas',
-    endpoints: ['https://brasilapi.com.br/api/cnpj/v1/{cnpj}'],
-    inputs: [{ key: 'cnpj', label: 'CNPJ', placeholder: '00000000000000', maxlength: 14, digits: true, validate: v => v.length === 14 || 'CNPJ deve ter 14 dígitos' }]
-  },
-  {
-    id: 'cnpj_receitaws', title: 'CNPJ (Receita WS)', desc: 'Fallback via Receita WS',
-    icon: 'domain', category: 'Empresas',
-    endpoints: ['https://receitaws.com.br/v1/cnpj/{cnpj}'],
-    inputs: [{ key: 'cnpj', label: 'CNPJ', placeholder: '00000000000000', maxlength: 14, digits: true, validate: v => v.length === 14 || 'CNPJ deve ter 14 dígitos' }]
-  },
-  {
-    id: 'cnpj_ws', title: 'CNPJ (CNPJ.ws)', desc: 'Fallback via CNPJ.ws (3 req/min)',
-    icon: 'domain', category: 'Empresas',
-    endpoints: ['https://publica.cnpj.ws/cnpj/{cnpj}'],
-    inputs: [{ key: 'cnpj', label: 'CNPJ', placeholder: '00000000000000', maxlength: 14, digits: true, validate: v => v.length === 14 || 'CNPJ deve ter 14 dígitos' }]
-  },
-
-  // -------- LOCALIZAÇÃO --------
-  {
-    id: 'cep', title: 'Consulta CEP', desc: 'BrasilAPI → ViaCEP (fallback)',
-    icon: 'location_on', category: 'Localização',
-    endpoints: ['https://brasilapi.com.br/api/cep/v2/{cep}', 'https://viacep.com.br/ws/{cep}/json/'],
-    inputs: [{ key: 'cep', label: 'CEP', placeholder: '01310100', maxlength: 8, digits: true, validate: v => v.length === 8 || 'CEP deve ter 8 dígitos' }]
-  },
-  {
-    id: 'ddd', title: 'Consulta DDD', desc: 'Estado e cidades por DDD',
-    icon: 'phone_in_talk', category: 'Localização',
-    endpoints: ['https://brasilapi.com.br/api/ddd/v1/{ddd}'],
-    inputs: [{ key: 'ddd', label: 'DDD', placeholder: '11', maxlength: 2, digits: true, validate: v => v.length === 2 || 'DDD deve ter 2 dígitos' }]
-  },
-  {
-    id: 'estados_ibge', title: 'Estados (IBGE)', desc: 'Lista de estados brasileiros',
-    icon: 'map', category: 'Localização',
-    endpoints: ['https://servicodados.ibge.gov.br/api/v1/localidades/estados'],
-    inputs: []
-  },
-  {
-    id: 'municipios_ibge', title: 'Municípios (IBGE)', desc: 'Municípios por UF',
-    icon: 'location_city', category: 'Localização',
-    endpoints: ['https://servicodados.ibge.gov.br/api/v1/localidades/estados/{uf}/municipios'],
-    inputs: [{ key: 'uf', label: 'UF', placeholder: 'SP', maxlength: 2, validate: v => v.length === 2 || 'UF deve ter 2 letras' }]
-  },
-
-  // -------- FERIADOS --------
-  {
-    id: 'feriados', title: 'Feriados Nacionais', desc: 'Feriados por ano (BrasilAPI)',
-    icon: 'event', category: 'Feriados',
-    endpoints: ['https://brasilapi.com.br/api/feriados/v1/{ano}'],
-    inputs: [{ key: 'ano', label: 'Ano', placeholder: '2025', maxlength: 4, digits: true, validate: v => /^\d{4}$/.test(v) || 'Ano inválido' }]
-  },
-  {
-    id: 'feriados_api', title: 'Feriados API', desc: 'Nacionais, estaduais e municipais (chave)',
-    icon: 'event', category: 'Feriados',
-    endpoints: ['https://feriadosapi.com/api/v1/feriados/nacionais/{ano}'],
-    requiresKey: 'feriadosapi',
-    inputs: [{ key: 'ano', label: 'Ano', placeholder: '2025', maxlength: 4, digits: true, validate: v => /^\d{4}$/.test(v) || 'Ano inválido' }]
-  },
-
-  // -------- VEÍCULOS --------
-  {
-    id: 'fipe_marcas', title: 'FIPE — Marcas', desc: 'Marcas de veículos por tipo',
-    icon: 'directions_car', category: 'Veículos',
-    endpoints: ['https://brasilapi.com.br/api/fipe/marcas/v1/{tipo}'],
-    inputs: [{ key: 'tipo', label: 'Tipo', type: 'select', options: [
-      { value: 'carros', label: 'Carros' }, { value: 'motos', label: 'Motos' }, { value: 'caminhoes', label: 'Caminhões' }
-    ]}]
-  },
-  {
-    id: 'fipe_preco', title: 'FIPE — Preço', desc: 'Preço por marca/modelo/ano (parallelum)',
-    icon: 'attach_money', category: 'Veículos',
-    endpoints: ['https://parallelum.com.br/fipe/api/v1/{tipo}/marcas/{marca}/modelos/{modelo}/anos/{ano}'],
-    inputs: [
-      { key: 'tipo', label: 'Tipo', type: 'select', options: [{ value: 'carros', label: 'Carros' }, { value: 'motos', label: 'Motos' }] },
-      { key: 'marca', label: 'Código da Marca', placeholder: 'ex: 59', digits: true, validate: v => v.length > 0 || 'Informe o código' },
-      { key: 'modelo', label: 'Código do Modelo', placeholder: 'ex: 5940', digits: true, validate: v => v.length > 0 || 'Informe o código' },
-      { key: 'ano', label: 'Ano', placeholder: 'ex: 2014-1', validate: v => v.length > 0 || 'Informe o ano' }
-    ]
-  },
-
-  // -------- ECONOMIA --------
-  {
-    id: 'cotacao', title: 'Cotação de Moedas', desc: 'Dólar, Euro, Bitcoin (AwesomeAPI)',
-    icon: 'currency_exchange', category: 'Economia',
-    endpoints: ['https://economia.awesomeapi.com.br/json/last/{par}'],
-    inputs: [{ key: 'par', label: 'Par de moedas', placeholder: 'USD-BRL', validate: v => v.includes('-') || 'Formato: USD-BRL' }]
-  },
-  {
-    id: 'cambio', title: 'Câmbio (Frankfurter)', desc: 'Conversão entre moedas',
-    icon: 'swap_horiz', category: 'Economia',
-    endpoints: ['https://api.frankfurter.app/latest?from={from}&to={to}'],
-    inputs: [
-      { key: 'from', label: 'De (ex: USD)', placeholder: 'USD', maxlength: 3, validate: v => v.length === 3 || 'Código de 3 letras' },
-      { key: 'to', label: 'Para (ex: BRL)', placeholder: 'BRL', maxlength: 3, validate: v => v.length === 3 || 'Código de 3 letras' }
-    ]
-  },
-  {
-    id: 'crypto', title: 'Criptomoedas', desc: 'Preço em BRL/USD (CoinGecko)',
-    icon: 'currency_bitcoin', category: 'Economia',
-    endpoints: ['https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=brl,usd&include_last_updated_at=true'],
-    inputs: [{ key: 'ids', label: 'IDs (separar por vírgula)', placeholder: 'bitcoin,ethereum', validate: v => v.length > 0 || 'Informe pelo menos um ID' }]
-  },
-  {
-    id: 'selic', title: 'Taxa Selic', desc: 'Série histórica (BrasilAPI)',
-    icon: 'trending_up', category: 'Economia',
-    endpoints: ['https://brasilapi.com.br/api/taxas/v1'],
-    inputs: []
-  },
-  {
-    id: 'ipca', title: 'IPCA', desc: 'Inflação por ano (BrasilAPI)',
-    icon: 'trending_up', category: 'Economia',
-    endpoints: ['https://brasilapi.com.br/api/ipca/v1/{ano}'],
-    inputs: [{ key: 'ano', label: 'Ano', placeholder: '2024', maxlength: 4, digits: true, validate: v => /^\d{4}$/.test(v)
+  { id: 'cnpj_brasilapi', title: 'CNPJ (BrasilAPI)', desc: 'Empresa por CNPJ via BrasilAPI', icon: 'domain', category: 'Empresas', endpoints: ['https://brasilapi.com.br/api/cnpj/v1/{cnpj}'], inputs: [{ key: 'cnpj', label: 'CNPJ', placeholder: '00000000000000', maxlength: 14, digits: true, validate: v => v.length === 14 || 'CNPJ deve ter 14 dígitos' }] },
+  { id: 'cnpj_receitaws', title: 'CNPJ (Receita WS)', desc: 'Fallback via Receita WS', icon: 'domain', category: 'Empresas', endpoints: ['https://receitaws.com.br/v1/cnpj/{cnpj}'], inputs: [{ key: 'cnpj', label: 'CNPJ', placeholder: '00000000000000', maxlength: 14, digits: true, validate: v => v.length === 14 || 'CNPJ deve ter 14 dígitos' }] },
+  { id: 'cnpj_ws', title: 'CNPJ (CNPJ.ws)', desc: 'Fallback via CNPJ.ws (3 req/min)', icon: 'domain', category: 'Empresas', endpoints: ['https://publica.cnpj.ws/cnpj/{cnpj}'], inputs: [{ key: 'cnpj', label: 'CNPJ', placeholder: '00000000000000', maxlength: 14, digits: true, validate: v => v.length === 14 || 'CNPJ deve ter 14 dígitos' }] },
+  { id: 'cep', title: 'Consulta CEP', desc: 'BrasilAPI → ViaCEP (fallback)', icon: 'location_on', category: 'Localização', endpoints: ['https://brasilapi.com.br/api/cep/v2/{cep}', 'https://viacep.com.br/ws/{cep}/json/'], inputs: [{ key: 'cep', label: 'CEP', placeholder: '01310100', maxlength: 8, digits: true, validate: v => v.length === 8 || 'CEP deve ter 8 dígitos' }] },
+  { id: 'ddd', title: 'Consulta DDD', desc: 'Estado e cidades por DDD', icon: 'phone_in_talk', category: 'Localização', endpoints: ['https://brasilapi.com.br/api/ddd/v1/{ddd}'], inputs: [{ key: 'ddd', label: 'DDD', placeholder: '11', maxlength: 2, digits: true, validate: v => v.length === 2 || 'DDD deve ter 2 dígitos' }] },
+  { id: 'estados_ibge', title: 'Estados (IBGE)', desc: 'Lista de estados brasileiros', icon: 'map', category: 'Localização', endpoints: ['https://servicodados.ibge.gov.br/api/v1/localidades/estados'], inputs: [] },
+  { id: 'municipios_ibge', title: 'Municípios (IBGE)', desc: 'Municípios por UF', icon: 'location_city', category: 'Localização', endpoints: ['https://servicodados.ibge.gov.br/api/v1/localidades/estados/{uf}/municipios'], inputs: [{ key: 'uf', label: 'UF', placeholder: 'SP', maxlength: 2, validate: v => v.length === 2 || 'UF deve ter 2 letras' }] },
+  { id: 'feriados', title: 'Feriados Nacionais', desc: 'Feriados por ano (BrasilAPI)', icon: 'event', category: 'Feriados', endpoints: ['https://brasilapi.com.br/api/feriados/v1/{ano}'], inputs: [{ key: 'ano', label: 'Ano', placeholder: '2025', maxlength: 4, digits: true, validate: v => /^\d{4}$/.test(v) || 'Ano inválido' }] },
+  { id: 'feriados_api', title: 'Feriados API', desc: 'Nacionais, estaduais e municipais (chave)', icon: 'event', category: 'Feriados', endpoints: ['https://feriadosapi.com/api/v1/feriados/nacionais/{ano}'], requiresKey: 'feriadosapi', inputs: [{ key: 'ano', label: 'Ano', placeholder: '2025', maxlength: 4, digits: true, validate: v => /^\d{4}$/.test(v) || 'Ano inválido' }] },
+  { id: 'fipe_marcas', title: 'FIPE — Marcas', desc: 'Marcas de veículos por tipo', icon: 'directions_car', category: 'Veículos', endpoints: ['https://brasilapi.com.br/api/fipe/marcas/v1/{tipo}'], inputs: [{ key: 'tipo', label: 'Tipo', type: 'select', options: [{ value: 'carros', label: 'Carros' }, { value: 'motos', label: 'Motos' }, { value: 'caminhoes', label: 'Caminhões' }] }] },
+  { id: 'fipe_preco', title: 'FIPE — Preço', desc: 'Preço por marca/modelo/ano (parallelum)', icon: 'attach_money', category: 'Veículos', endpoints: ['https://parallelum.com.br/fipe/api/v1/{tipo}/marcas/{marca}/modelos/{modelo}/anos/{ano}'], inputs: [{ key: 'tipo', label: 'Tipo', type: 'select', options: [{ value: 'carros', label: 'Carros' }, { value: 'motos', label: 'Motos' }] }, { key: 'marca', label: 'Código da Marca', placeholder: 'ex: 59', digits: true, validate: v => v.length > 0 || 'Informe o código' }, { key: 'modelo', label: 'Código do Modelo', placeholder: 'ex: 5940', digits: true, validate: v => v.length > 0 || 'Informe o código' }, { key: 'ano', label: 'Ano', placeholder: 'ex: 2014-1', validate: v => v.length > 0 || 'Informe o ano' }] },
+  { id: 'cotacao', title: 'Cotação de Moedas', desc: 'Dólar, Euro, Bitcoin (AwesomeAPI)', icon: 'currency_exchange', category: 'Economia', endpoints: ['https://economia.awesomeapi.com.br/json/last/{par}'], inputs: [{ key: 'par', label: 'Par de moedas', placeholder: 'USD-BRL', validate: v => v.includes('-') || 'Formato: USD-BRL' }] },
+  { id: 'cambio', title: 'Câmbio (Frankfurter)', desc: 'Conversão entre moedas', icon: 'swap_horiz', category: 'Economia', endpoints: ['https://api.frankfurter.app/latest?from={from}&to={to}'], inputs: [{ key: 'from', label: 'De (ex: USD)', placeholder: 'USD', maxlength: 3, validate: v => v.length === 3 || 'Código de 3 letras' }, { key: 'to', label: 'Para (ex: BRL)', placeholder: 'BRL', maxlength: 3, validate: v => v.length === 3 || 'Código de 3 letras' }] },
+  { id: 'crypto', title: 'Criptomoedas', desc: 'Preço em BRL/USD (CoinGecko)', icon: 'currency_bitcoin', category: 'Economia', endpoints: ['https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=brl,usd&include_last_updated_at=true'], inputs: [{ key: 'ids', label: 'IDs (separar por vírgula)', placeholder: 'bitcoin,ethereum', validate: v => v.length > 0 || 'Informe pelo menos um ID' }] },
+  { id: 'selic', title: 'Taxa Selic', desc: 'Série histórica (BrasilAPI)', icon: 'trending_up', category: 'Economia', endpoints: ['https://brasilapi.com.br/api/taxas/v1'], inputs: [] },
+  { id: 'ipca', title: 'IPCA', desc: 'Inflação por ano (BrasilAPI)', icon: 'trending_up', category: 'Economia', endpoints: ['https://brasilapi.com.br/api/ipca/v1/{ano}'], inputs: [{ key: 'ano', label: 'Ano', placeholder: '2024', maxlength: 4, digits: true, validate: v => /^\d{4}$/.test(v) || 'Ano inválido' }] },
+  { id: 'isbn', title: 'ISBN', desc: 'Dados de livros (BrasilAPI)', icon: 'menu_book', category: 'Utilidades', endpoints: ['https://brasilapi.com.br/api/isbn/v1/{isbn}'], inputs: [{ key: 'isbn', label: 'ISBN', placeholder: '9788501014344', maxlength: 13, digits: true, validate: v => (v.length >= 10 && v.length <= 13) || 'ISBN inválido' }] },
+  { id: 'ncm', title: 'NCM', desc: 'Nomenclatura comum do Mercosul', icon: 'category', category: 'Utilidades', endpoints: ['https://brasilapi.com.br/api/ncm/v1/{codigo}'], inputs: [{ key: 'codigo', label: 'Código NCM', placeholder: '01012100', maxlength: 8, digits: true, validate: v => v.length === 8 || 'NCM deve ter 8 dígitos' }] },
+  { id: 'bancos', title: 'Bancos', desc: 'Lista de bancos brasileiros', icon: 'account_balance', category: 'Utilidades', endpoints: ['https://brasilapi.com.br/api/banks/v1'], inputs: [] },
+ 
