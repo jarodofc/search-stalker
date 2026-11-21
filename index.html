@@ -3,193 +3,315 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel de Consultas</title>
+<title>Painel de Consultas Premium</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0">
 <style>
-  :root{--bg:#0a0f1e;--card:rgba(30,41,59,.7);--b:rgba(255,255,255,.1);--t1:#f1f5f9;--t2:#94a3b8;--in:rgba(0,0,0,.3)}
-  body.light{--bg:#f4f6fb;--card:#fff;--b:#e2e8f0;--t1:#0f172a;--t2:#64748b;--in:#f8fafc}
-  *{box-sizing:border-box}body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);margin:0;transition:.3s;min-height:100vh}
-  .card{background:var(--card);border:1px solid var(--b);border-radius:12px;backdrop-filter:blur(10px)}
-  .inp{width:100%;padding:10px 12px;background:var(--in);border:1px solid var(--b);border-radius:8px;color:var(--t1);outline:none;transition:.2s}
-  .inp:focus{border-color:#22c55e}
-  .btn{background:#22c55e;color:#000;font-weight:600;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;gap:8px}
-  .btn:hover{background:#16a34a}.btn:disabled{opacity:.6;cursor:not-allowed}
-  .nav{padding:10px 16px;border-radius:8px;color:var(--t2);cursor:pointer;display:flex;align-items:center;gap:10px;transition:.2s;text-decoration:none}
-  .nav:hover{background:rgba(255,255,255,.05);color:var(--t1)}
-  .nav.active{background:rgba(34,197,94,.15);color:#22c55e;font-weight:500}
-  .modal{position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:.3s;z-index:99}
-  .modal.show{opacity:1;pointer-events:all}
-  .modal-content{background:var(--bg);border:1px solid var(--b);border-radius:16px;width:90%;max-width:800px;max-height:90vh;display:flex;flex-direction:column;transform:scale(.95);transition:.3s}
-  .modal.show .modal-content{transform:scale(1)}
-  .spinner{animation:spin 1s linear infinite}@keyframes spin{100%{transform:rotate(360deg)}}
-  .kv-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b);font-size:14px;gap:16px}
-  .kv-key{color:var(--t2);text-transform:capitalize}.kv-val{color:var(--t1);font-weight:500;text-align:right;word-break:break-word}
+  :root{
+    --bg-base:#09090b;
+    --glass-bg:rgba(255,255,255,0.03);
+    --glass-border:rgba(255,255,255,0.08);
+    --text-main:#f8fafc;
+    --text-muted:#94a3b8;
+    --accent-green:#10b981;
+    --accent-blue:#3b82f6;
+    --accent-purple:#8b5cf6;
+  }
+  body.light{
+    --bg-base:#f1f5f9;
+    --glass-bg:rgba(255,255,255,0.7);
+    --glass-border:rgba(0,0,0,0.06);
+    --text-main:#0f172a;
+    --text-muted:#64748b;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family:'Plus Jakarta Sans',sans-serif;
+    background-color:var(--bg-base);
+    color:var(--text-main);
+    margin:0;min-height:100vh;
+    transition:background-color .4s, color .4s;
+    overflow-x:hidden;
+  }
+  
+  /* Fundo Animado */
+  .bg-orbs { position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
+  .orb { position:absolute; border-radius:50%; filter:blur(100px); opacity:.35; animation:float 20s infinite ease-in-out alternate; }
+  .orb-1 { width:600px; height:600px; background:var(--accent-green); top:-200px; left:-100px; }
+  .orb-2 { width:500px; height:500px; background:var(--accent-blue); bottom:-100px; right:-100px; animation-delay:-5s; }
+  .orb-3 { width:400px; height:400px; background:var(--accent-purple); top:40%; left:40%; animation-delay:-10s; opacity:.2; }
+  body.light .orb { opacity:.15; }
+  @keyframes float { 0%{transform:translate(0,0) scale(1);} 100%{transform:translate(50px,50px) scale(1.1);} }
+
+  /* Glassmorphism Classes */
+  .glass{
+    background:var(--glass-bg);
+    border:1px solid var(--glass-border);
+    backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px);
+    border-radius:20px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.1);
+  }
+  
+  /* Inputs e Botões */
+  .input-glass{
+    width:100%; padding:14px 16px; background:rgba(0,0,0,0.2);
+    border:1px solid var(--glass-border); border-radius:12px;
+    color:var(--text-main); outline:none; font-size:15px; transition:.3s;
+  }
+  body.light .input-glass { background:rgba(255,255,255,0.5); }
+  .input-glass:focus{ border-color:var(--accent-green); box-shadow:0 0 0 3px rgba(16,185,129,0.15); }
+  
+  .btn-primary{
+    background:linear-gradient(135deg, var(--accent-green), #059669);
+    color:#fff; font-weight:600; padding:14px 24px; border-radius:12px;
+    border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+    transition:transform .2s, box-shadow .2s; width:100%;
+  }
+  .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 8px 20px rgba(16,185,129,0.3); }
+  .btn-primary:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
+
+  /* Cards Dashboard */
+  .card-module{
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    padding:32px 24px; cursor:pointer; transition:.3s; position:relative; overflow:hidden;
+  }
+  .card-module::before{ content:''; position:absolute; top:0; left:0; width:100%; height:4px; background:transparent; transition:.3s; }
+  .card-module:hover{ transform:translateY(-5px); border-color:var(--glass-border); box-shadow:0 15px 30px rgba(0,0,0,0.15); }
+  
+  .card-cnpj:hover::before{ background:var(--accent-blue); }
+  .card-cpf:hover::before{ background:var(--accent-green); }
+  .card-placa:hover::before{ background:var(--accent-purple); }
+
+  .icon-box{ width:70px; height:70px; border-radius:20px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; }
+  .icon-cnpj{ background:rgba(59,130,246,0.1); color:var(--accent-blue); }
+  .icon-cpf{ background:rgba(16,185,129,0.1); color:var(--accent-green); }
+  .icon-placa{ background:rgba(139,92,246,0.1); color:var(--accent-purple); }
+
+  /* Data Rows */
+  .data-row{ display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--glass-border); gap:20px; font-size:14px; }
+  .data-row:last-child{ border-bottom:none; }
+  .data-label{ color:var(--text-muted); font-weight:500; text-transform:capitalize; }
+  .data-value{ color:var(--text-main); font-weight:600; text-align:right; word-break:break-word; }
+
+  /* Loader & Modal */
+  .spinner{ animation:spin 1s linear infinite; }
+  @keyframes spin{ 100%{ transform:rotate(360deg); } }
+  
+  .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(5px); display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:.3s; z-index:100; padding:20px; }
+  .modal-overlay.show{ opacity:1; pointer-events:all; }
+  .modal-box{ width:100%; max-width:800px; max-height:85vh; display:flex; flex-direction:column; transform:scale(.95); transition:.3s; }
+  .modal-overlay.show .modal-box{ transform:scale(1); }
+  .custom-scroll::-webkit-scrollbar{ width:6px; }
+  .custom-scroll::-webkit-scrollbar-thumb{ background:var(--glass-border); border-radius:10px; }
 </style>
 </head>
 <body>
-<div class="flex h-screen overflow-hidden">
-  <!-- Sidebar -->
-  <aside class="w-64 border-r hidden md:flex flex-col" style="border-color:var(--b);background:var(--card)">
-    <div class="p-5 border-b flex items-center gap-3" style="border-color:var(--b)">
-      <span class="material-symbols-outlined text-green-500 text-3xl">api</span>
-      <span class="font-bold text-lg">API REST</span>
-    </div>
-    <nav id="nav" class="p-4 flex-1 space-y-2 overflow-y-auto"></nav>
-    <div class="p-4 border-t text-center text-xs" style="border-color:var(--b);color:var(--t2)">
-      <button onclick="toggleTheme()" class="nav w-full justify-center">Alternar Tema</button>
-    </div>
-  </aside>
 
-  <!-- Main Content -->
-  <main class="flex-1 flex flex-col h-full overflow-hidden relative">
-    <header class="p-4 border-b flex justify-between items-center" style="border-color:var(--b)">
-      <h1 class="font-semibold text-xl" id="pageTitle">Dashboard</h1>
-    </header>
-    <div class="p-6 flex-1 overflow-y-auto" id="view"></div>
-  </main>
+<!-- Fundo Animado -->
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
 </div>
 
-<!-- Modal para JSON -->
-<div class="modal" id="modal">
-  <div class="modal-content">
-    <div class="p-4 border-b flex justify-between items-center" style="border-color:var(--b)">
-      <h2 class="font-semibold">Resultado Completo</h2>
-      <button onclick="document.getElementById('modal').classList.remove('show')" class="nav"><span class="material-symbols-outlined">close</span></button>
+<!-- Top Navigation -->
+<header class="w-full border-b border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-md sticky top-0 z-50">
+  <div class="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+    <div class="flex items-center gap-3 cursor-pointer" onclick="navigate('')">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center text-white shadow-lg">
+        <span class="material-symbols-rounded">radar</span>
+      </div>
+      <span class="font-bold text-xl tracking-tight">Data<span class="text-[var(--accent-green)]">Search</span></span>
     </div>
-    <div class="p-4 overflow-auto" style="max-height:70vh">
-      <pre id="modalBody" class="text-sm" style="color:var(--t2)"></pre>
+    <button onclick="toggleTheme()" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/10 transition">
+      <span class="material-symbols-rounded" id="themeIcon">dark_mode</span>
+    </button>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="max-w-6xl mx-auto px-6 py-12 min-h-[calc(100vh-80px)]">
+  <div id="view" class="w-full flex flex-col items-center justify-center"></div>
+</main>
+
+<!-- Modal JSON -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box glass">
+    <div class="p-6 border-b border-[var(--glass-border)] flex justify-between items-center">
+      <h2 class="font-bold text-lg flex items-center gap-2">
+        <span class="material-symbols-rounded text-blue-400">data_object</span> Dados Brutos (JSON)
+      </h2>
+      <button onclick="document.getElementById('modal').classList.remove('show')" class="w-8 h-8 rounded-full hover:bg-black/10 flex items-center justify-center transition">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+    <div class="p-6 overflow-auto custom-scroll">
+      <pre id="modalBody" class="text-sm leading-relaxed" style="color:var(--text-muted); font-family:monospace;"></pre>
     </div>
   </div>
 </div>
 
 <script>
 // ==========================================
-// 1. CONFIGURAÇÃO DAS CHAVES (COLOQUE AQUI)
+// CONFIGURAÇÃO
 // ==========================================
 const CONFIG = {
+  // Chave da CPFHub embutida
   cpfKey: '778433e124468b1aa60f2681919cd918f852afe1761056985813881cb72a550f',
-  placaKey: 'SUA_CHAVE_DE_PLACA_AQUI', // Substitua pela chave da sua API de Placa
-  placaBaseUrl: 'https://api.exemplo.com/v1/placa/' // Substitua pela URL da sua API de Placa
+  // Configurações da API de Placa (Substitua os valores abaixo)
+  placaBaseUrl: 'https://sua-api-de-placa.com/v1/',
+  placaKey: 'SUA_CHAVE_DE_PLACA_AQUI'
 };
 
-// ==========================================
-// 2. DEFINIÇÃO DOS MÓDULOS
-// ==========================================
 const MODULES = [
   { 
     id: 'cnpj', 
-    name: 'Consulta CNPJ', 
+    name: 'CNPJ', 
+    desc: 'Consulta de Empresas',
     icon: 'domain', 
-    desc: 'Dados de Empresas (BrasilAPI)',
-    placeholder: '00.000.000/0000-00', 
+    colorClass: 'icon-cnpj',
+    cardClass: 'card-cnpj',
+    placeholder: 'Apenas números (14 dígitos)', 
     max: 14, 
     digits: true,
-    url: (v) => `https://brasilapi.com.br/api/cnpj/v1/${v.replace(/\D/g,'')}`
+    fetchApi: async (v) => {
+      // Usando MinhaReceita como fonte mais estável
+      const res = await fetch(`https://minhareceita.org/${v.replace(/\D/g,'')}`);
+      if(!res.ok) throw new Error('CNPJ não encontrado ou inválido');
+      return await res.json();
+    }
   },
   { 
     id: 'cpf', 
-    name: 'Consulta CPF', 
-    icon: 'person', 
-    desc: 'Dados de Pessoas (CPFHub)',
-    placeholder: '000.000.000-00', 
+    name: 'CPF', 
+    desc: 'Consulta de Pessoas',
+    icon: 'fingerprint', 
+    colorClass: 'icon-cpf',
+    cardClass: 'card-cpf',
+    placeholder: 'Apenas números (11 dígitos)', 
     max: 11, 
     digits: true,
-    url: (v) => `https://api.cpfhub.io/cpf/${v.replace(/\D/g,'')}`,
-    headers: { 'x-api-key': CONFIG.cpfKey }
+    fetchApi: async (v) => {
+      const res = await fetch(`https://api.cpfhub.io/cpf/${v.replace(/\D/g,'')}`, {
+        headers: { 'x-api-key': CONFIG.cpfKey, 'Accept': 'application/json' }
+      });
+      const data = await res.json();
+      if(!res.ok) throw new Error(data.message || data.error || 'Erro ao consultar CPF');
+      return data;
+    }
   },
   { 
     id: 'placa', 
-    name: 'Consulta Placa', 
+    name: 'Placa', 
+    desc: 'Consulta de Veículos',
     icon: 'directions_car', 
-    desc: 'Dados de Veículos',
-    placeholder: 'ABC-1234', 
+    colorClass: 'icon-placa',
+    cardClass: 'card-placa',
+    placeholder: 'ABC1D23', 
     max: 7, 
     digits: false,
-    url: (v) => `${CONFIG.placaBaseUrl}${v.replace(/[^A-Za-z0-9]/g,'').toUpperCase()}`,
-    headers: { 'Authorization': `Bearer ${CONFIG.placaKey}` } // Altere se sua API usar outro header
+    fetchApi: async (v) => {
+      // Configuração para sua API de placa
+      const res = await fetch(`${CONFIG.placaBaseUrl}${v.replace(/[^A-Za-z0-9]/g,'').toUpperCase()}`, {
+        headers: { 'Authorization': `Bearer ${CONFIG.placaKey}` }
+      });
+      if(!res.ok) throw new Error('Erro ao consultar placa. Verifique a chave.');
+      return await res.json();
+    }
   }
 ];
 
 // ==========================================
-// 3. LÓGICA E RENDERIZAÇÃO
+// LÓGICA E RENDERIZAÇÃO
 // ==========================================
 function toggleTheme() {
   document.body.classList.toggle('light');
-}
-
-function renderNav() {
-  const nav = document.getElementById('nav');
-  let html = `<a href="#" onclick="navigate('')" class="nav ${!window.location.hash ? 'active' : ''}">
-    <span class="material-symbols-outlined">dashboard</span> Dashboard
-  </a>`;
-  
-  MODULES.forEach(m => {
-    html += `<a href="#" onclick="navigate('${m.id}')" class="nav ${window.location.hash === '#'+m.id ? 'active' : ''}">
-      <span class="material-symbols-outlined">${m.icon}</span> ${m.name}
-    </a>`;
-  });
-  nav.innerHTML = html;
+  const isLight = document.body.classList.contains('light');
+  document.getElementById('themeIcon').textContent = isLight ? 'light_mode' : 'dark_mode';
+  localStorage.setItem('theme', isLight ? 'light' : 'dark');
 }
 
 function navigate(id) {
-  window.location.hash = id ? '#'+id : '';
-  render();
+  window.location.hash = id ? '#' + id : '';
 }
 
 function render() {
-  renderNav();
-  const hash = window.location.hash.replace('#', '');
   const view = document.getElementById('view');
-  const title = document.getElementById('pageTitle');
+  const hash = window.location.hash.replace('#', '');
 
-  if (!hash) {
-    title.innerText = 'Dashboard';
-    let cards = MODULES.map(m => `
-      <div class="card p-6 cursor-pointer hover:border-green-500 transition" onclick="navigate('${m.id}')">
-        <span class="material-symbols-outlined text-4xl text-green-500 mb-4">${m.icon}</span>
-        <h3 class="text-xl font-semibold mb-1">${m.name}</h3>
-        <p class="text-sm" style="color:var(--t2)">${m.desc}</p>
-      </div>
-    `).join('');
-    view.innerHTML = `<div class="grid grid-cols-1 md:grid-cols-3 gap-6">${cards}</div>`;
-  } else {
-    const m = MODULES.find(x => x.id === hash);
-    if (!m) return navigate('');
-    
-    title.innerText = m.name;
-    view.innerHTML = `
-      <div class="max-w-xl">
-        <div class="card p-6">
-          <div class="flex items-center gap-3 mb-6">
-            <div class="p-3 rounded-lg bg-green-500/10 text-green-500">
-              <span class="material-symbols-outlined text-3xl">${m.icon}</span>
+  // Animação de entrada
+  view.style.opacity = 0;
+  view.style.transform = 'translateY(10px)';
+  
+  setTimeout(() => {
+    if (!hash) {
+      // DASHBOARD CENTRALIZADO
+      let cards = MODULES.map(m => `
+        <div class="glass card-module ${m.cardClass}" onclick="navigate('${m.id}')">
+          <div class="icon-box ${m.colorClass}">
+            <span class="material-symbols-rounded text-4xl">${m.icon}</span>
+          </div>
+          <h3 class="text-xl font-bold mb-2">${m.name}</h3>
+          <p class="text-sm" style="color:var(--text-muted)">${m.desc}</p>
+        </div>
+      `).join('');
+
+      view.innerHTML = `
+        <div class="w-full max-w-4xl text-center mb-12">
+          <h1 class="text-4xl font-bold mb-4 tracking-tight">O que você deseja <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-blue-500">consultar?</span></h1>
+          <p class="text-lg" style="color:var(--text-muted)">Selecione um dos módulos abaixo para iniciar.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">${cards}</div>
+      `;
+    } else {
+      // FORMULÁRIO CENTRALIZADO
+      const m = MODULES.find(x => x.id === hash);
+      if (!m) return navigate('');
+      
+      view.innerHTML = `
+        <div class="w-full max-w-lg">
+          <button onclick="navigate('')" class="flex items-center gap-1 text-sm mb-6 hover:opacity-70 transition" style="color:var(--text-muted)">
+            <span class="material-symbols-rounded text-sm">arrow_back</span> Voltar ao painel
+          </button>
+          
+          <div class="glass p-8">
+            <div class="flex flex-col items-center text-center mb-8">
+              <div class="icon-box ${m.colorClass} mb-4">
+                <span class="material-symbols-rounded text-4xl">${m.icon}</span>
+              </div>
+              <h2 class="text-2xl font-bold mb-1">Consulta de ${m.name}</h2>
+              <p class="text-sm" style="color:var(--text-muted)">${m.desc}</p>
             </div>
-            <div>
-              <h2 class="text-xl font-semibold">${m.name}</h2>
-              <p class="text-sm" style="color:var(--t2)">${m.desc}</p>
-            </div>
+            
+            <form id="searchForm" onsubmit="handleSearch(event, '${m.id}')">
+              <div class="mb-6">
+                <label class="block text-sm font-medium mb-2 ml-1">Documento</label>
+                <input type="text" id="searchInput" class="input-glass" placeholder="${m.placeholder}" maxlength="${m.max}" required autocomplete="off">
+              </div>
+              <button type="submit" class="btn-primary">
+                <span class="material-symbols-rounded">search</span> Realizar Consulta
+              </button>
+            </form>
           </div>
           
-          <form id="searchForm" onsubmit="handleSearch(event, '${m.id}')">
-            <label class="block text-sm mb-2" style="color:var(--t2)">Digite o valor para consulta</label>
-            <input type="text" id="searchInput" class="inp mb-4" placeholder="${m.placeholder}" maxlength="${m.max}" required>
-            <button type="submit" class="btn w-full">
-              <span class="material-symbols-outlined">search</span> Consultar
-            </button>
-          </form>
+          <div id="result" class="mt-6 hidden"></div>
         </div>
-        <div id="result" class="mt-6 hidden"></div>
-      </div>
-    `;
+      `;
 
-    if (m.digits) {
-      document.getElementById('searchInput').addEventListener('input', function(e) {
-        this.value = this.value.replace(/\D/g, '');
-      });
+      if (m.digits) {
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+          this.value = this.value.replace(/\D/g, '');
+        });
+      }
     }
-  }
+    
+    // Reset animation
+    view.style.transition = 'all .4s ease';
+    view.style.opacity = 1;
+    view.style.transform = 'translateY(0)';
+  }, 50);
 }
 
 async function handleSearch(e, id) {
@@ -200,67 +322,63 @@ async function handleSearch(e, id) {
   const resDiv = document.getElementById('result');
 
   btn.disabled = true;
-  btn.innerHTML = '<span class="material-symbols-outlined spinner">refresh</span> Buscando...';
+  btn.innerHTML = '<span class="material-symbols-rounded spinner">refresh</span> Buscando...';
   resDiv.classList.add('hidden');
 
   try {
-    const url = m.url(val);
-    const options = { method: 'GET', headers: m.headers || {} };
-    
-    // Adiciona um timeout para não travar caso a API demore
     const controller = new AbortController();
-    options.signal = controller.signal;
-    setTimeout(() => controller.abort(), 15000);
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    
+    // Executa a função da API correspondente
+    const data = await m.fetchApi(val);
+    clearTimeout(timeoutId);
 
-    const response = await fetch(url, options);
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || data.error || `Erro HTTP ${response.status}`);
+    // Formata os dados bonitinho
+    let formattedRows = '';
+    if (data && typeof data === 'object') {
+      const ignoreKeys = ['raw', 'json', 'html', 'response']; // Ignora campos muito complexos
+      
+      formattedRows = Object.keys(data)
+        .filter(k => !ignoreKeys.includes(k) && (typeof data[k] !== 'object' || data[k] === null))
+        .slice(0, 20) // Limita a 20 campos
+        .map(k => {
+          let v = data[k];
+          if (v === true) v = 'Sim'; if (v === false) v = 'Não';
+          if (v === null || v === '') v = 'Não informado';
+          return `<div class="data-row"><span class="data-label">${k.replace(/_/g,' ')}</span><span class="data-value">${v}</span></div>`;
+        }).join('');
     }
 
     resDiv.innerHTML = `
-      <div class="card p-6 border-green-500/30">
-        <div class="flex justify-between items-center mb-4">
-          <h3 class="font-semibold text-green-500 flex items-center gap-2">
-            <span class="material-symbols-outlined">check_circle</span> Sucesso
+      <div class="glass p-6 border-t-4" style="border-top-color:var(--accent-green)">
+        <div class="flex justify-between items-center mb-4 border-b border-[var(--glass-border)] pb-4">
+          <h3 class="font-bold text-lg flex items-center gap-2">
+            <span class="material-symbols-rounded text-green-500">verified</span> Sucesso
           </h3>
-          <button onclick="showJson()" class="text-xs text-blue-400 hover:underline">Ver JSON</button>
+          <button onclick="showJson()" class="text-xs bg-blue-500/10 text-blue-400 px-3 py-1 rounded-md hover:bg-blue-500/20 transition">Ver JSON</button>
         </div>
-        <div id="formattedResult"></div>
+        <div class="space-y-1">${formattedRows || '<p class="text-center text-sm py-4" style="color:var(--text-muted)">Nenhum dado simples para exibir. Verifique o JSON.</p>'}</div>
       </div>
     `;
     
-    // Formata os dados visualmente (apenas campos de texto simples)
-    const formatted = Object.keys(data)
-      .filter(k => typeof data[k] !== 'object' || data[k] === null)
-      .map(k => `<div class="kv-row"><span class="kv-key">${k.replace(/_/g,' ')}</span><span class="kv-val">${data[k]}</span></div>`)
-      .join('');
-      
-    document.getElementById('formattedResult').innerHTML = formatted || '<p class="text-sm" style="color:var(--t2)">Nenhum dado simples para exibir. Clique em Ver JSON.</p>';
-    resDiv.classList.remove('hidden');
-    
-    // Guarda os dados para o modal
     window._currentJson = data;
+    resDiv.classList.remove('hidden');
 
   } catch (err) {
-    let msg = err.name === 'AbortError' ? 'Tempo limite excedido. A API demorou muito para responder.' : err.message;
-    if (msg.includes('Failed to fetch')) {
-      msg = 'Falha de conexão. Isso geralmente ocorre por bloqueio de CORS. Se o projeto for particular, use um proxy (como o Vercel) para contornar.';
-    }
+    let msg = err.name === 'AbortError' ? 'A API demorou muito para responder.' : err.message;
     
     resDiv.innerHTML = `
-      <div class="card p-6 border-red-500/30">
-        <h3 class="font-semibold text-red-500 flex items-center gap-2 mb-2">
-          <span class="material-symbols-outlined">error</span> Erro na consulta
+      <div class="glass p-6 border-t-4" style="border-top-color:#ef4444">
+        <h3 class="font-bold text-lg flex items-center gap-2 mb-2 text-red-500">
+          <span class="material-symbols-rounded">error</span> Falha na Consulta
         </h3>
-        <p class="text-sm text-red-400">${msg}</p>
+        <p class="text-sm" style="color:var(--text-muted)">${msg}</p>
       </div>
     `;
     resDiv.classList.remove('hidden');
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<span class="material-symbols-outlined">search</span> Consultar';
+    btn.innerHTML = '<span class="material-symbols-rounded">search</span> Realizar Consulta';
   }
 }
 
@@ -271,7 +389,13 @@ function showJson() {
 
 // Inicialização
 window.addEventListener('hashchange', render);
-document.addEventListener('DOMContentLoaded', render);
+document.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('theme') === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('themeIcon').textContent = 'light_mode';
+  }
+  render();
+});
 </script>
 </body>
 </html>
