@@ -3,88 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API REST Brasil - Dashboard</title>
+    <title>API REST Brasil - Consultas</title>
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
-    <link rel="stylesheet" href="style.css">
+    <style>
+        :root{--b:rgba(148,163,184,.12);--bh:rgba(148,163,184,.22);--s:rgba(30,41,59,.55);--sm:#1e293b;--t1:#f1f5f9;--t2:#cbd5e1;--t3:#94a3b8;--in:rgba(255,255,255,.04);--h:rgba(255,255,255,.06)}
+        body.theme-light{--b:rgba(15,23,42,.08);--bh:rgba(15,23,42,.16);--s:rgba(255,255,255,.85);--sm:#fff;--t1:#0f172a;--t2:#334155;--t3:#64748b;--in:#fff;--h:rgba(15,23,42,.04)}
+        *{box-sizing:border-box}body{font-family:'Inter',sans-serif;background:#0a0f1e;color:var(--t1);margin:0;min-height:100vh;transition:.25s}
+        body.theme-light{background:#f4f6fb}
+        .material-symbols-outlined{font-size:1.25rem;vertical-align:middle;user-select:none}.icon-sm{font-size:1rem}.icon-lg{font-size:1.5rem}.icon-xl{font-size:2rem}
+        .t1{color:var(--t1)}.t2{color:var(--t2)}.t3{color:var(--t3)}:focus-visible{outline:2px solid #22c55e;outline-offset:2px}
+        .card{background:var(--s);border:1px solid var(--b);border-radius:16px;backdrop-filter:blur(12px);transition:.15s}
+        .card.hover:hover{transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,.15)}
+        .btn-p{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.75rem 1.5rem;background:#22c55e;color:#0a0f1e;font-weight:600;border:none;border-radius:99px;cursor:pointer;transition:.15s}.btn-p:hover{background:#16a34a}
+        .btn-g{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.5rem 1rem;background:transparent;color:var(--t2);border:1px solid var(--b);border-radius:99px;cursor:pointer;transition:.15s}.btn-g:hover{background:var(--h);color:var(--t1)}
+        .icon-btn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;background:transparent;border:none;border-radius:50%;color:var(--t2);cursor:pointer;transition:.15s}.icon-btn:hover{background:var(--h);color:var(--t1)}
+        .md-field{position:relative;margin-bottom:1rem}.md-field input{width:100%;padding:1rem .875rem .5rem;background:var(--in);border:1px solid var(--bh);border-radius:8px;color:var(--t1);font-size:.9rem;transition:.15s}.md-field input::placeholder{color:transparent}.md-field input:focus{outline:none;border-color:#22c55e;border-width:2px;padding:calc(1rem - 1px) calc(.875rem - 1px) calc(.5rem - 1px)}.md-field label{position:absolute;left:.875rem;top:50%;transform:translateY(-50%);font-size:.9rem;color:var(--t3);pointer-events:none;padding:0 .25rem;transition:.15s}.md-field input:focus+label,.md-field input:not(:placeholder-shown)+label{top:0;font-size:.75rem;background:var(--sm);color:#22c55e}
+        .nav-item{display:flex;align-items:center;gap:.5rem;padding:.5rem .6rem;border-radius:8px;color:var(--t3);text-decoration:none;font-size:.8rem;transition:.15s;position:relative}.nav-item:hover{background:var(--h);color:var(--t1)}.nav-item.active{background:rgba(34,197,94,.14);color:#22c55e;font-weight:500}.nav-bullet{width:4px;height:4px;border-radius:50%;background:var(--t3);flex-shrink:0}.nav-item.active .nav-bullet{background:#22c55e}
+        #sidebar{transition:transform .35s}#sidebar-overlay{opacity:0;visibility:hidden;transition:.25s;backdrop-filter:blur(2px)}#sidebar-overlay.visible{opacity:1;visibility:visible}
+        #analiticModal{display:flex;opacity:0;visibility:hidden;transition:.25s;align-items:center;justify-content:center;padding:1rem;background:rgba(2,6,23,.7);backdrop-filter:blur(6px);position:fixed;inset:0;z-index:100}#analiticModal.open{opacity:1;visibility:visible}#analiticModal .mc{transform:scale(.96);opacity:0;transition:.35s;background:var(--sm);border:1px solid var(--b);max-height:92vh;display:flex;flex-direction:column;border-radius:16px;overflow:hidden;width:100%;max-width:800px}#analiticModal.open .mc{transform:scale(1);opacity:1}
+        #progressBar{position:fixed;top:0;left:0;height:3px;background:#22c55e;width:0;z-index:9999;transition:width .25s,opacity .25s;opacity:0;box-shadow:0 0 8px #22c55e}#progressBar.active{opacity:1}
+        .sk{background:linear-gradient(90deg,var(--h) 25%,var(--bh) 50%,var(--h) 75%);background-size:200% 100%;animation:sk 1.4s infinite;border-radius:8px}@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+        .view-enter{animation:ve .35s both}@keyframes ve{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        .kv-row{display:flex;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid var(--b);font-size:.85rem;gap:1rem}.kv-key{color:var(--t3);text-transform:capitalize}.kv-val{color:var(--t1);font-weight:500;text-align:right;word-break:break-word}
+    </style>
 </head>
 <body class="theme-dark min-h-screen">
-    <script>
-        // Aplica o tema antes da renderização para evitar flash
-        if (localStorage.getItem('theme') === 'light') {
-            document.body.className = 'theme-light min-h-screen';
-        }
-    </script>
+<script>if(localStorage.getItem('theme')==='light')document.body.className='theme-light min-h-screen';</script>
+<div id="progressBar"></div>
 
-    <div id="progressBar"></div>
-
-    <div class="flex">
-        <!-- Sidebar -->
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-[60] w-64 border-r -translate-x-full lg:translate-x-0" style="background:var(--surface);border-color:var(--border)">
-            <div class="flex flex-col h-full">
-                <div class="flex items-center justify-between p-3 border-b lg:hidden" style="border-color:var(--border)">
-                    <span class="text-1 font-bold text-sm">API REST BRASIL</span>
-                    <button id="sidebar-close" class="icon-btn" aria-label="Fechar menu">
-                        <span class="material-symbols-outlined">close</span>
-                    </button>
-                </div>
-                <div class="flex-1 p-3 overflow-y-auto">
-                    <nav id="sidebar-nav" class="space-y-1"></nav>
-                </div>
-                <div class="p-3 border-t" style="border-color:var(--border)">
-                    <div class="rounded-2xl p-3" style="background:linear-gradient(135deg,rgba(34,197,94,.1),rgba(59,130,246,.08))">
-                        <div class="flex items-center justify-center gap-1.5 mb-2">
-                            <span id="netStatus" class="s-dot check"></span>
-                            <span id="netText" class="text-xs text-3">Verificando...</span>
-                        </div>
-                        <div class="text-center">
-                            <div class="font-bold text-sm text-1" id="apiCount">0</div>
-                            <div class="text-xs text-3">APIs disponíveis</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Overlay Mobile -->
-        <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-[55] lg:hidden"></div>
-
-        <!-- Conteúdo Principal -->
-        <div class="flex-1 lg:ml-64 min-w-0">
-            <header id="header" class="border-b sticky top-0 z-50" style="background:var(--surface);border-color:var(--border)">
-                <div class="px-4 py-3 flex justify-between items-center">
-                    <div class="flex items-center gap-2">
-                        <button id="sidebar-toggle" class="icon-btn lg:hidden" aria-label="Abrir menu">
-                            <span class="material-symbols-outlined">menu</span>
-                        </button>
-                        <span class="font-bold text-base text-1">API REST <span style="color:#22c55e">BRASIL</span></span>
-                    </div>
-                    <div class="flex gap-1">
-                        <button id="theme-toggle" class="icon-btn" aria-label="Alternar tema">
-                            <span class="material-symbols-outlined" id="themeIcon">light_mode</span>
-                        </button>
-                    </div>
-                </div>
-            </header>
-            
-            <main id="view" class="p-4 lg:p-6"></main>
+<div class="flex">
+  <aside id="sidebar" class="fixed inset-y-0 left-0 z-[60] w-64 border-r -translate-x-full lg:translate-x-0" style="background:var(--s);border-color:var(--b)">
+    <div class="flex flex-col h-full">
+      <div class="flex items-center justify-between p-3 border-b lg:hidden" style="border-color:var(--b)">
+        <span class="t1 font-bold text-sm">API REST BRASIL</span>
+        <button id="sidebar-close" class="icon-btn"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="flex-1 p-3 overflow-y-auto">
+        <nav id="sidebar-nav" class="space-y-1"></nav>
+      </div>
+      <div class="p-3 border-t" style="border-color:var(--b)">
+        <div class="text-center">
+          <div class="font-bold text-sm t1">3 APIs</div>
+          <div class="text-xs t3">Disponíveis</div>
         </div>
+      </div>
     </div>
-
-    <!-- Modal de Resultados -->
-    <div id="analiticModal" role="dialog" aria-modal="true">
-        <div class="mc">
-            <div class="flex items-center justify-between p-4 border-b" style="border-color:var(--border)">
-                <h2 class="font-semibold text-1">Resultado Completo</h2>
-                <button id="btnCloseModal" class="icon-btn">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
-            </div>
-            <div id="modalBody" class="p-4 overflow-auto" style="max-height:calc(92vh - 4rem)"></div>
+  </aside>
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-[55] lg:hidden"></div>
+  
+  <div class="flex-1 lg:ml-64 min-w-0">
+    <header id="header" class="border-b sticky top-0 z-50" style="background:var(--s);border-color:var(--b)">
+      <div class="px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <button id="sidebar-toggle" class="icon-btn lg:hidden"><span class="material-symbols-outlined">menu</span></button>
+          <span class="font-bold text-base t1">API REST <span style="color:#22c55e">BRASIL</span></span>
         </div>
-    </div>
+        <button id="theme-toggle" class="icon-btn"><span class="material-symbols-outlined" id="themeIcon">light_mode</span></button>
+      </div>
+    </header>
+    <main id="view" class="p-4 lg:p-6"></main>
+  </div>
+</div>
 
-    <script src="app.js"></script>
+<div id="analiticModal">
+  <div class="mc">
+    <div class="flex items-center justify-between p-4 border-b" style="border-color:var(--b)">
+      <h2 class="font-semibold t1">Resultado Completo</h2>
+      <button id="btnCloseModal" class="icon-btn"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <div id="modalBody" class="p-4 overflow-auto" style="max-height:calc(92vh - 4rem)"></div>
+  </div>
+</div>
+
+<script>
+const MODULES = [
+  { id: 'cnpj', t: 'Consulta CNPJ', d: 'Dados de Empresas', i: 'domain', e: ['https://brasilapi.com.br/api/cnpj/v1/{cnpj}'], in: [{ k: 'cnpj', l: 'CNPJ', p: '00000000000000', m: 14, n: 1, v: v => v.length === 14 || 'CNPJ deve ter 14 dígitos' }] },
+  { id: 'cpf', t: 'Consulta CPF', d: 'Dados de Pessoas', i: 'person', e: ['/api/cpf?cpf={cpf}'], in: [{ k: 'cpf', l: 'CPF', p: '00000000000', m: 11, n: 1, v: v => v.length === 11 || 'CPF deve ter 11 dígitos' }] },
+  { id: 'placa', t: 'Consulta Placa', d: 'Dados de Veículos', i: 'directions_car', e: ['/api/placa?placa={placa}'], in: [{ k: 'placa', l: 'Placa do Veículo', p: 'ABC1D23', m: 7, n: 0, v: v => /^[A-Za-z0-9]{7}$/.test(v) || 'Placa inválida' }] }
+];
+
+function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function prog(a) { const b = document.getElementById('progressBar'); if(a){b.classList.add('active');b.style.width='70%'}else{b.style.width='100%';setTimeout(()=>{b.classList.remove('active');b.style.width='0'},350)} }
+function getRoute() { let h = location.hash.replace(/^#/,''); return !h || h==='/' ? '/' : (h.startsWith('/')?h:'/'+h); }
+
+function renderSidebar() {
+  const nav = document.getElementById('sidebar-nav'), cur = getRoute();
+  let html = `<a href="#/" class="nav-item ${cur==='/'?'active':''}"><span class="material-symbols-outlined icon-sm">dashboard</span>Dashboard</a>`;
+  MODULES.forEach(m => {
+    html += `<a href="#/${m.id}" class="nav-item ${cur==='/'+m.id?'active':''}"><span class="nav-bullet"></span><span class="truncate flex-1">${m.t}</span></a>`;
+  });
+  nav.innerHTML = html;
+}
+
+function renderDash() {
+  const v = document.getElementById('view');
+  const cards = MODULES.map(m => `
+    <a href="#/${m.id}" class="card hover p-5 group block">
+      <div class="flex items-start justify-between mb-3"><div class="p-2.5 rounded-xl" style="background:rgba(34,197,94,.14);color:#22c55e"><span class="material-symbols-outlined icon-lg">${m.i}</span></div></div>
+      <h3 class="t1 font-semibold mb-1">${m.t}</h3><p class="t2 text-sm mb-4">${m.d}</p>
+      <div class="flex items-center justify-between pt-3 border-t" style="border-color:var(--b)"><span class="t3 text-xs">Rápida</span><span class="material-symbols-outlined icon-sm" style="color:#22c55e">arrow_forward</span></div>
+    </a>`).join('');
+
+  v.innerHTML = `<div class="view-enter">
+    <div class="mb-6"><h1 class="text-2xl font-bold t1">Painel de Consultas</h1><p class="t2 text-sm">Selecione um módulo para iniciar</p></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">${cards}</div>
+  </div>`;
+}
+
+function renderMod(m) {
+  const v = document.getElementById('view');
+  const inputsHtml = m.in.map(i => `<div class="md-field"><input type="text" id="i_${i.k}" placeholder=" " ${i.m?`maxlength="${i.m}"`:''}><label>${i.l}</label></div>`).join('');
+
+  v.innerHTML = `<div class="view-enter">
+    <nav class="text-sm mb-4 t3"><a href="#/">Dashboard</a> > <span class="t1">${m.t}</span></nav>
+    <div class="card p-5 mb-4"><div class="flex items-center gap-3"><div class="p-3 rounded-xl" style="background:rgba(34,197,94,.14);color:#22c55e"><span class="material-symbols-outlined icon-xl">${m.i}</span></div><div><h1 class="text-2xl font-bold t1">${m.t}</h1><p class="t2 text-sm">${m.d}</p></div></div></div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div><div class="card p-5 sticky top-24"><form id="form">${inputsHtml}<button type="submit" class="btn-p w-full mt-4">Consultar</button></form></div></div>
+      <div class="lg:col-span-2"><div id="res"><div class="card text-center p-8"><span class="material-symbols-outlined icon-xl t3">search</span><p class="t3 text-sm mt-2">Aguardando consulta</p></div></div></div>
+    </div>
+  </div>`;
+
+  document.getElementById('form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const r = document.getElementById('res'), q = {};
+    let valid = true;
+
+    m.in.forEach(i => {
+      const el = document.getElementById('i_'+i.k);
+      if(el) {
+        if(!el.value.trim()){ alert('Preencha '+i.l); valid=false; el.focus(); return; }
+        if(i.v) { const err = i.v(el.value.trim()); if(err !== true){ alert(err); valid=false; el.focus(); return; } }
+        q[i.k] = el.value.trim();
+      }
+    });
+    if(!valid) return;
+
+    prog(true);
+    r.innerHTML = '<div class="card p-5"><div class="sk mb-2" style="height:40px;width:50%"></div><div class="sk mb-2" style="height:14px;width:80%"></div><div class="sk" style="height:14px;width:60%"></div></div>';
+
+    try {
+      const url = m.e[0].replace(/\{(\w+)\}/g, (_, k) => encodeURIComponent(q[k] || ''));
+      const res = await fetch(url);
+      const text = await res.text();
+      let data;
+      
+      try { data = JSON.parse(text); } catch(err) { data = text; }
+      
+      if (!res.ok) {
+        let msg = data.error || data.message || (typeof data === 'string' ? data.substring(0,100) : 'Erro desconhecido');
+        throw new Error(`Erro ${res.status}: ${msg}`);
+      }
+
+      if (data && data.success === true && data.data) data = data.data;
+      if (data && data.success === false && data.error) throw new Error(data.error);
+
+      const preview = typeof data === 'object' && data !== null
+        ? Object.keys(data).filter(k => typeof data[k] !== 'object' || data[k] === null).slice(0, 15).map(k => `<div class="kv-row"><span class="kv-key">${k.replace(/_/g,' ')}</span><span class="kv-val">${esc(data[k])}</span></div>`).join('')
+        : `<pre class="text-xs t2">${esc(JSON.stringify(data, null, 2))}</pre>`;
+
+      r.innerHTML = `<div class="card p-5"><h3 class="font-semibold t1 mb-3">Resultado</h3><div class="space-y-1">${preview}</div><button id="op" class="btn-g mt-4">Ver JSON completo</button></div>`;
+      
+      document.getElementById('op').onclick = () => {
+        document.getElementById('modalBody').innerHTML = `<pre class="text-xs t2">${esc(JSON.stringify(data, null, 2))}</pre>`;
+        document.getElementById('analiticModal').classList.add('open');
+      };
+
+    } catch (err) {
+      r.innerHTML = `<div class="card p-5" style="border-color:#ef4444"><p class="text-red-400 font-medium mb-2">Falha na consulta</p><p class="text-sm text-red-300">${esc(err.message)}</p></div>`;
+    } finally {
+      prog(false);
+    }
+  });
+}
+
+function render() {
+  const r = getRoute();
+  prog(true);
+  if(r === '/') renderDash();
+  else {
+    const m = MODULES.find(x => x.id === r.slice(1));
+    if(!m) { location.hash = '#/'; return; }
+    renderMod(m);
+  }
+  renderSidebar();
+  window.scrollTo(0,0);
+  setTimeout(() => prog(false), 200);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('sidebar-toggle').onclick = () => { const s = document.getElementById('sidebar'), o = document.getElementById('sidebar-overlay'); s.classList.toggle('-translate-x-full'); o.classList.toggle('visible'); };
+  document.getElementById('sidebar-close').onclick = () => { document.getElementById('sidebar').classList.add('-translate-x-full'); document.getElementById('sidebar-overlay').classList.remove('visible'); };
+  document.getElementById('sidebar-overlay').onclick = () => { document.getElementById('sidebar').classList.add('-translate-x-full'); document.getElementById('sidebar-overlay').classList.remove('visible'); };
+  
+  document.getElementById('theme-toggle').onclick = () => {
+    const isDark = document.body.classList.contains('theme-dark');
+    document.body.className = isDark ? 'theme-light min-h-screen' : 'theme-dark min-h-screen';
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+    document.getElementById('themeIcon').textContent = isDark ? 'dark_mode' : 'light_mode';
+  };
+  
+  document.getElementById('btnCloseModal').onclick = () => document.getElementById('analiticModal').classList.remove('open');
+  
+  if(localStorage.getItem('theme') === 'light') document.getElementById('themeIcon').textContent = 'dark_mode';
+
+  render();
+  window.addEventListener('hashchange', render);
+});
+</script>
 </body>
 </html>
