@@ -371,10 +371,4 @@ const MODULES = [
     id: 'ipca', title: 'IPCA', desc: 'Inflação por ano (BrasilAPI)',
     icon: 'trending_up', category: 'Economia',
     endpoints: ['https://brasilapi.com.br/api/ipca/v1/{ano}'],
-    inputs: [{ key: 'ano', label: 'Ano', placeholder: '2024', maxlength: 4, digits: true, validate: v => /^\d{4}$/.test(v) || 'Ano inválido' }]
-  },
-
-  // -------- UTILIDADES --------
-  {
-    id: 'isbn', title: 'ISBN', desc: 'Dados de livros (BrasilAPI)',
-    icon: 'menu_book', category: 'Util
+    inputs: [{ key: 'ano', label: 'Ano', placeholder: '2024', maxlength: 4, digits: true, validate: v => /^\d{4}$/.test(v)
