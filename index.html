@@ -244,18 +244,17 @@ body.theme-light { background: radial-gradient(1200px 600px at 10% 0%, rgba(34,1
 
 <script>
 /* ============================================================
-   CONFIG — chaves opcionais
+   CONFIG
    ============================================================ */
 const CONFIG = {
   provider: 'public',
   keys: {
-    cpfhub: '',        // https://cpfhub.io
-    feriadosapi: ''    // https://feriadosapi.com
+    feriadosapi: '' // Adicione a chave da Feriados API se tiver
   }
 };
 
 /* ============================================================
-   MÓDULOS — APIs do repositório public-apis
+   MÓDULOS
    ============================================================ */
 const MODULES = [
   // -------- EMPRESAS (CNPJ) --------
@@ -409,10 +408,9 @@ const MODULES = [
 
   // -------- PESSOAS (CPF) --------
   {
-    id: 'cpfhub', title: 'Consulta CPF', desc: 'CPFHub (requer chave)',
+    id: 'cpfhub', title: 'Consulta CPF', desc: 'CPFHub (via Vercel Serverless)',
     icon: 'person', category: 'Pessoas',
-    endpoints: ['https://api.cpfhub.io/cpf/{cpf}'],
-    requiresKey: 'cpfhub',
+    endpoints: ['/api/cpf?cpf={cpf}'],
     inputs: [{ key: 'cpf', label: 'CPF', placeholder: '00000000000', maxlength: 11, digits: true, validate: v => v.length === 11 || 'CPF deve ter 11 dígitos' }]
   }
 ];
@@ -570,7 +568,7 @@ function renderDashboard() {
   view.innerHTML = `<div class="view-enter">
     <div class="mb-6">
       <h1 class="text-2xl sm:text-3xl font-bold text-1 mb-1">APIs Públicas</h1>
-      <p class="text-2">${MODULES.length} módulos do repositório public-apis. ${MODULES.filter(m => !m.requiresKey).length} sem chave.</p>
+      <p class="text-2">${MODULES.length} módulos do repositório public-apis.</p>
     </div>
 
     <div id="connBanner" class="mb-4"></div>
@@ -617,11 +615,14 @@ function renderDashboard() {
    ============================================================ */
 function renderModule(mod) {
   const view = document.getElementById('view');
-  const banner = mod.requiresKey && !CONFIG.keys[mod.requiresKey] ? `
-    <div class="banner-warn mb-4">
+  let banner = '';
+  
+  if (mod.requiresKey && !CONFIG.keys[mod.requiresKey]) {
+    banner = `<div class="banner-warn mb-4">
       <span class="material-symbols-outlined icon-sm" style="margin-top:2px;">info</span>
       <div class="text-sm"><strong>Requer chave.</strong> Configure <code>CONFIG.keys.${mod.requiresKey}</code> no topo do script.</div>
-    </div>` : '';
+    </div>`;
+  }
 
   view.innerHTML = `<div class="view-enter">
     <nav class="flex items-center gap-1 text-sm mb-4 flex-wrap text-3">
