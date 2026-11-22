@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#040408">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="no-referrer">
 <title>GlassOSINT • Proxy Remoto</title>
@@ -14,16 +14,19 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0">
 <style>
   :root {
-    --ios-bg: #05050A;
-    --glass-border: rgba(255, 255, 255, 0.14);
-    --glass-highlight: rgba(255, 255, 255, 0.28);
+    --bg-base: #040408;
+    --glass-surface: rgba(255, 255, 255, 0.055);
+    --glass-elevated: rgba(28, 28, 36, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.13);
+    --glass-specular: rgba(255, 255, 255, 0.28);
     --text-primary: #FFFFFF;
     --text-secondary: rgba(235, 235, 245, 0.68);
-    --text-tertiary: rgba(235, 235, 245, 0.40);
+    --text-tertiary: rgba(235, 235, 245, 0.38);
     --ios-blue: #0A84FF;
     --ios-green: #30D158;
     --ios-red: #FF453A;
     --ios-orange: #FF9F0A;
+    --ios-purple: #BF5AF2;
     --spring: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
@@ -39,77 +42,289 @@
     margin: 0;
     padding: 0;
     min-height: 100vh;
-    background-color: var(--ios-bg);
+    background-color: var(--bg-base);
     color: var(--text-primary);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
   }
 
-  .ios-wallpaper {
+  /* Ambient Aurora Wallpaper */
+  .aurora-bg {
     position: fixed;
     inset: 0;
     z-index: -1;
-    background:
-      radial-gradient(circle at 12% 10%, rgba(10, 132, 255, 0.28), transparent 40%),
-      radial-gradient(circle at 88% 15%, rgba(191, 90, 242, 0.22), transparent 42%),
-      radial-gradient(circle at 80% 85%, rgba(48, 209, 88, 0.16), transparent 45%),
-      radial-gradient(circle at 15% 85%, rgba(94, 92, 230, 0.22), transparent 44%),
-      #05050A;
+    overflow: hidden;
+    background: #040408;
+  }
+  .aurora-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(95px);
+    opacity: 0.42;
+    will-change: transform;
+    animation: floatOrb 18s ease-in-out infinite alternate;
+  }
+  .orb-1 { width: 52vw; height: 52vw; max-width: 620px; max-height: 620px; top: -14%; left: -12%; background: radial-gradient(circle, #0A84FF, transparent 70%); }
+  .orb-2 { width: 48vw; height: 48vw; max-width: 560px; max-height: 560px; top: 8%; right: -14%; background: radial-gradient(circle, #BF5AF2, transparent 70%); animation-delay: -6s; }
+  .orb-3 { width: 46vw; height: 46vw; max-width: 540px; max-height: 540px; bottom: -16%; left: 24%; background: radial-gradient(circle, #30D158, transparent 70%); opacity: 0.24; animation-delay: -11s; }
+
+  @keyframes floatOrb {
+    0% { transform: translate3d(0, 0, 0) scale(1); }
+    100% { transform: translate3d(28px, 22px, 0) scale(1.08); }
   }
 
+  /* =============================================
+     TELA DE INICIALIZAÇÃO ANIMADA DO PROXY REMOTO
+     ============================================= */
+  #proxyBoot {
+    position: fixed;
+    inset: 0;
+    z-index: 99990;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(4, 4, 8, 0.88);
+    backdrop-filter: blur(42px) saturate(180%);
+    -webkit-backdrop-filter: blur(42px) saturate(180%);
+    transition: opacity 0.55s var(--spring), transform 0.55s var(--spring), visibility 0.55s;
+  }
+  #proxyBoot.boot-done {
+    opacity: 0;
+    transform: scale(1.04);
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .boot-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 32px 26px 26px;
+    border-radius: 34px;
+    background: linear-gradient(155deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.03) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.34);
+    text-align: center;
+  }
+
+  .radar-wrap {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .radar-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1.5px solid rgba(10, 132, 255, 0.55);
+    animation: radarPulse 2.1s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
+  .radar-ring.r2 { animation-delay: 0.7s; }
+  .radar-ring.r3 { animation-delay: 1.4s; }
+  @keyframes radarPulse {
+    0% { transform: scale(0.62); opacity: 0.9; }
+    100% { transform: scale(1.55); opacity: 0; }
+  }
+
+  .radar-core {
+    position: relative;
+    z-index: 2;
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #0A84FF 0%, #5E5CE6 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 12px 30px rgba(10, 132, 255, 0.5), inset 0 1.5px 1px rgba(255, 255, 255, 0.55);
+    transition: background 0.4s ease, box-shadow 0.4s ease;
+  }
+  .radar-core.connected {
+    background: linear-gradient(135deg, #30D158 0%, #0D9488 100%);
+    box-shadow: 0 12px 30px rgba(48, 209, 88, 0.5), inset 0 1.5px 1px rgba(255, 255, 255, 0.55);
+  }
+
+  .boot-bar-track {
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.10);
+    overflow: hidden;
+    margin: 18px 0 16px;
+  }
+  .boot-bar-fill {
+    height: 100%;
+    width: 10%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #0A84FF, #64D2FF, #30D158);
+    transition: width 0.45s var(--spring);
+    box-shadow: 0 0 14px rgba(10, 132, 255, 0.7);
+  }
+
+  .boot-step {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    font-size: 12px;
+    color: var(--text-secondary);
+    transition: all 0.25s ease;
+  }
+  .boot-step.active {
+    background: rgba(10, 132, 255, 0.12);
+    border-color: rgba(10, 132, 255, 0.35);
+    color: #FFFFFF;
+  }
+  .boot-step.done {
+    background: rgba(48, 209, 88, 0.10);
+    border-color: rgba(48, 209, 88, 0.28);
+    color: #FFFFFF;
+  }
+
+  /* =============================================
+     COMPONENTES LIQUID GLASS + MATERIAL 3
+     ============================================= */
   .liquid-card {
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%);
-    backdrop-filter: blur(32px) saturate(200%);
-    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    background: linear-gradient(150deg, rgba(255, 255, 255, 0.095) 0%, rgba(255, 255, 255, 0.028) 100%);
+    backdrop-filter: blur(34px) saturate(210%);
+    -webkit-backdrop-filter: blur(34px) saturate(210%);
     border: 1px solid var(--glass-border);
-    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 var(--glass-highlight);
-    border-radius: 26px;
-    transition: transform 0.26s var(--spring), background 0.2s ease, border-color 0.2s ease;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.48), inset 0 1px 0 0 var(--glass-specular);
+    border-radius: 28px;
+    transition: transform 0.28s var(--spring), background 0.25s ease, border-color 0.25s ease, box-shadow 0.28s ease;
   }
 
-  .app-widget { cursor: pointer; position: relative; overflow: hidden; }
+  .app-widget {
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+  .app-widget::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.10), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+  }
   .app-widget:hover {
-    transform: translateY(-4px);
-    background: linear-gradient(145deg, rgba(255, 255, 255, 0.13) 0%, rgba(255, 255, 255, 0.05) 100%);
-    border-color: rgba(255, 255, 255, 0.24);
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.26);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.56), inset 0 1px 0 rgba(255, 255, 255, 0.38);
   }
-  .app-widget:active { transform: scale(0.97); }
+  .app-widget:hover::after { opacity: 1; }
+  .app-widget:active { transform: scale(0.965); }
 
+  /* Dynamic Island Header */
   .dynamic-island {
-    background: rgba(14, 14, 18, 0.85);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    background: rgba(14, 14, 20, 0.82);
+    backdrop-filter: blur(28px) saturate(190%);
+    -webkit-backdrop-filter: blur(28px) saturate(190%);
     border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.58), inset 0 1px 0 rgba(255, 255, 255, 0.18);
     border-radius: 999px;
     padding: 8px 16px;
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    transition: transform 0.2s var(--spring);
+    gap: 9px;
+    transition: transform 0.22s var(--spring), border-color 0.2s ease;
   }
   .dynamic-island:active { transform: scale(0.96); }
 
+  /* iOS Spotlight Search Bar */
+  .spotlight-bar {
+    position: relative;
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(26px) saturate(190%);
+    -webkit-backdrop-filter: blur(26px) saturate(190%);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+  .spotlight-bar:focus-within {
+    background: rgba(255, 255, 255, 0.10);
+    border-color: var(--ios-blue);
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.24), 0 12px 32px rgba(0, 0, 0, 0.4);
+  }
+  .spotlight-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #FFFFFF;
+    font-size: 15px;
+    padding: 14px 10px;
+  }
+  .spotlight-input::placeholder { color: var(--text-tertiary); }
+
+  /* Sector Segmented Pills */
+  .sector-tabs {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 2px 2px 6px;
+    scrollbar-width: none;
+  }
+  .sector-tabs::-webkit-scrollbar { display: none; }
+  .sector-tab {
+    flex-shrink: 0;
+    padding: 9px 16px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.22s var(--spring);
+  }
+  .sector-tab:hover { background: rgba(255, 255, 255, 0.12); color: #FFFFFF; }
+  .sector-tab.active {
+    background: var(--ios-blue);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #FFFFFF;
+    box-shadow: 0 6px 18px rgba(10, 132, 255, 0.4);
+  }
+
+  /* Squircle iOS Icon */
   .squircle {
-    width: 50px;
-    height: 50px;
-    border-radius: 15px;
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), inset 0 1.5px 1px rgba(255, 255, 255, 0.45), inset 0 -2px 4px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.42), inset 0 1.5px 1px rgba(255, 255, 255, 0.48), inset 0 -2px 5px rgba(0, 0, 0, 0.28);
   }
   .squircle .material-symbols-rounded { font-size: 26px; color: #FFFFFF; }
 
+  /* Material 3 Filled Glass Inputs */
   .md-field { position: relative; margin-bottom: 14px; }
   .md-input {
     width: 100%;
-    padding: 22px 16px 8px;
+    padding: 23px 16px 8px;
     background: rgba(118, 118, 128, 0.20);
     border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 16px;
+    border-radius: 17px;
     color: #FFFFFF;
     font-size: 15px;
     outline: none;
@@ -118,7 +333,7 @@
   .md-input:focus {
     background: rgba(118, 118, 128, 0.30);
     border-color: var(--ios-blue);
-    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25);
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.26);
   }
   .md-label {
     position: absolute;
@@ -138,21 +353,22 @@
     color: var(--ios-blue);
   }
 
+  /* Buttons */
   .ios-btn {
     width: 100%;
-    background: var(--ios-blue);
+    background: linear-gradient(180deg, #1E90FF 0%, #0A84FF 100%);
     color: #FFFFFF;
     font-weight: 600;
     font-size: 15px;
     padding: 14px 20px;
-    border-radius: 16px;
+    border-radius: 17px;
     border: none;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    box-shadow: 0 8px 22px rgba(10, 132, 255, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 24px rgba(10, 132, 255, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.36);
     transition: transform 0.2s var(--spring), opacity 0.2s ease;
   }
   .ios-btn:active { transform: scale(0.97); }
@@ -176,10 +392,11 @@
   .ios-chip:hover { background: rgba(255, 255, 255, 0.16); }
   .ios-chip:active { transform: scale(0.95); }
 
+  /* Inset Grouped List (iOS Style) */
   .ios-group {
-    background: rgba(20, 20, 26, 0.55);
+    background: rgba(18, 18, 26, 0.56);
     border: 1px solid rgba(255, 255, 255, 0.10);
-    border-radius: 20px;
+    border-radius: 22px;
     overflow: hidden;
   }
   .ios-row {
@@ -188,7 +405,7 @@
     justify-content: space-between;
     gap: 12px;
     padding: 13px 16px;
-    border-bottom: 0.5px solid rgba(255, 255, 255, 0.10);
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.09);
     text-decoration: none;
     color: inherit;
     transition: background 0.15s ease;
@@ -200,7 +417,7 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 3px 9px;
+    padding: 3px 10px;
     border-radius: 999px;
     font-size: 11px;
     font-weight: 600;
@@ -211,12 +428,65 @@
   .tag-warn { background: rgba(255, 159, 10, 0.18); color: var(--ios-orange); }
   .tag-info { background: rgba(10, 132, 255, 0.18); color: var(--ios-blue); }
 
+  /* Floating iOS Dock */
+  .ios-dock-wrap {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: max(14px, env(safe-area-inset-bottom));
+    z-index: 60;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+    padding: 0 14px;
+  }
+  .ios-dock {
+    pointer-events: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 26px;
+    background: rgba(18, 18, 26, 0.72);
+    backdrop-filter: blur(32px) saturate(210%);
+    -webkit-backdrop-filter: blur(32px) saturate(210%);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
+  .dock-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 7px 14px;
+    border-radius: 18px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.22s var(--spring);
+  }
+  .dock-item:hover { color: #FFFFFF; background: rgba(255, 255, 255, 0.08); }
+  .dock-item.active {
+    color: #FFFFFF;
+    background: rgba(10, 132, 255, 0.22);
+    box-shadow: inset 0 0 0 1px rgba(10, 132, 255, 0.45);
+  }
+  .dock-item .material-symbols-rounded { font-size: 21px; }
+  .dock-item span.dock-lbl { font-size: 10px; font-weight: 600; }
+
   .section-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
     margin-bottom: 14px;
-    padding-left: 4px;
+    padding: 0 4px;
+  }
+  .section-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
   .section-header h2 {
     font-size: 12px;
@@ -224,16 +494,18 @@
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--text-secondary);
+    margin: 0;
   }
 
-  .view-enter { animation: iosEnter 0.26s var(--spring) forwards; }
+  .view-enter { animation: iosEnter 0.3s var(--spring) forwards; }
   @keyframes iosEnter {
-    from { opacity: 0; transform: scale(0.97) translateY(8px); }
+    from { opacity: 0; transform: scale(0.97) translateY(10px); }
     to { opacity: 1; transform: scale(1) translateY(0); }
   }
   .spinner { animation: spin 0.9s linear infinite; }
   @keyframes spin { 100% { transform: rotate(360deg); } }
 
+  /* Proteção Anti-Inspeção */
   #securityLock {
     position: fixed;
     inset: 0;
@@ -251,10 +523,53 @@
   #securityLock.active { display: flex; }
 </style>
 </head>
-<body class="pb-12">
+<body class="pb-28">
 
-<div class="ios-wallpaper"></div>
+<div class="aurora-bg">
+  <div class="aurora-orb orb-1"></div>
+  <div class="aurora-orb orb-2"></div>
+  <div class="aurora-orb orb-3"></div>
+</div>
 
+<!-- TELA DE BOOT / INICIALIZAÇÃO DO PROXY REMOTO -->
+<div id="proxyBoot">
+  <div class="boot-card">
+    <div class="radar-wrap">
+      <div class="radar-ring"></div>
+      <div class="radar-ring r2"></div>
+      <div class="radar-ring r3"></div>
+      <div id="bootCore" class="radar-core">
+        <span id="bootCoreIcon" class="material-symbols-rounded text-white text-3xl">vpn_lock</span>
+      </div>
+    </div>
+
+    <h1 class="text-xl font-bold tracking-tight text-white">Conectando via Proxy Remoto</h1>
+    <p id="bootSubtitle" class="text-xs text-[var(--text-secondary)] mt-1">
+      Estabelecendo túnel seguro e criptografia de sessão...
+    </p>
+
+    <div class="boot-bar-track">
+      <div id="bootBar" class="boot-bar-fill"></div>
+    </div>
+
+    <div class="space-y-2 text-left">
+      <div id="stepP2P" class="boot-step active">
+        <span class="flex items-center gap-2"><span class="material-symbols-rounded text-base text-[#0A84FF]">encrypted</span> Sessão P2P (ECDH + AES-256)</span>
+        <span class="material-symbols-rounded text-sm spinner" data-step-icon>refresh</span>
+      </div>
+      <div id="stepProxy" class="boot-step">
+        <span class="flex items-center gap-2"><span class="material-symbols-rounded text-base text-[#64D2FF]">hub</span> Túnel Proxy Remoto</span>
+        <span class="text-[11px] font-semibold" data-step-icon>Aguardando</span>
+      </div>
+      <div id="stepSig" class="boot-step">
+        <span class="flex items-center gap-2"><span class="material-symbols-rounded text-base text-[#30D158]">verified_user</span> Assinatura KIIK HACKING</span>
+        <span class="text-[11px] font-semibold" data-step-icon>Aguardando</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BLOQUEIO ANTI-INSPEÇÃO -->
 <div id="securityLock">
   <div class="w-20 h-20 rounded-[24px] bg-[#FF453A]/20 border border-[#FF453A]/40 flex items-center justify-center mb-5">
     <span class="material-symbols-rounded text-5xl text-[#FF453A]">lock</span>
@@ -268,29 +583,55 @@
   </span>
 </div>
 
+<!-- CONTEÚDO PRINCIPAL -->
 <div class="max-w-5xl mx-auto px-4 pt-4 sm:pt-6">
-  <header class="flex flex-wrap items-center justify-between gap-2 mb-7">
+  <header class="flex flex-wrap items-center justify-between gap-2.5 mb-7">
     <button type="button" data-nav="" class="dynamic-island cursor-pointer">
       <span id="proxyDot" class="w-2.5 h-2.5 rounded-full bg-[#FF9F0A] shadow-[0_0_8px_#FF9F0A]"></span>
-      <span class="font-semibold text-sm tracking-tight text-white">GlassOSINT</span>
-      <span id="proxyLabel" class="text-[11px] text-[var(--text-secondary)] font-medium">• Conectando Proxy...</span>
+      <span class="font-bold text-sm tracking-tight text-white">GlassOSINT</span>
+      <span id="proxyLabel" class="text-[11px] text-[var(--text-secondary)] font-medium">• Inicializando...</span>
     </button>
 
     <div class="dynamic-island text-[11px] font-semibold text-[var(--text-secondary)]">
-      <span class="material-symbols-rounded text-sm text-[#0A84FF]">encrypted</span>
-      <span>P2P E2EE • KIIK HACKING</span>
+      <span class="material-symbols-rounded text-sm text-[#30D158]">verified_user</span>
+      <span>KIIK HACKING • P2P</span>
     </div>
   </header>
 
   <main id="view" class="w-full"></main>
 
-  <footer class="mt-12 flex justify-center">
-    <div class="liquid-card px-5 py-2.5 rounded-full inline-flex items-center gap-2 text-[11px] text-[var(--text-secondary)]">
-      <span class="material-symbols-rounded text-sm text-[#30D158]">verified_user</span>
-      <span>Assinado por <strong class="text-white">KIIK HACKING</strong> • Túnel Proxy Remoto + P2P E2EE</span>
+  <footer class="mt-10 flex justify-center">
+    <div class="px-4 py-2 rounded-full text-[11px] text-[var(--text-tertiary)] text-center">
+      Assinado criptograficamente por <strong class="text-[var(--text-secondary)]">KIIK HACKING</strong> • Proxy Remoto + ECDH P-256
     </div>
   </footer>
 </div>
+
+<!-- DOCK FLUTUANTE ESTILO IPHONE -->
+<nav class="ios-dock-wrap" aria-label="Navegação rápida">
+  <div class="ios-dock">
+    <button type="button" class="dock-item" data-nav="" data-dock="">
+      <span class="material-symbols-rounded">grid_view</span>
+      <span class="dock-lbl">Início</span>
+    </button>
+    <button type="button" class="dock-item" data-nav="atpv" data-dock="atpv">
+      <span class="material-symbols-rounded">directions_car</span>
+      <span class="dock-lbl">Veículos</span>
+    </button>
+    <button type="button" class="dock-item" data-nav="osint" data-dock="osint">
+      <span class="material-symbols-rounded">travel_explore</span>
+      <span class="dock-lbl">OSINT</span>
+    </button>
+    <button type="button" class="dock-item" data-nav="domain" data-dock="domain">
+      <span class="material-symbols-rounded">language</span>
+      <span class="dock-lbl">Sites</span>
+    </button>
+    <button type="button" class="dock-item" data-nav="dork" data-dock="dork">
+      <span class="material-symbols-rounded">manage_search</span>
+      <span class="dock-lbl">Dorks</span>
+    </button>
+  </div>
+</nav>
 
 <script>
 (() => {
@@ -344,7 +685,7 @@
         { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
       );
       const hmac = await crypto.subtle.importKey(
-        'raw', enc.encode(`${AUTHOR_SIGNATURE}::P2P::V6`),
+        'raw', enc.encode(`${AUTHOR_SIGNATURE}::P2P::V7`),
         { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
       );
       ctx = { aes, hmac };
@@ -381,14 +722,14 @@
       };
     }
 
-    return { seal, signJson };
+    return { init, seal, signJson };
   })();
 
   // ==========================================================
-  // 3. CAMADA NATIVA DE CONEXÃO VIA PROXY REMOTO (BOOT DO SITE)
+  // 3. CAMADA NATIVA DE PROXY REMOTO + ANIMAÇÃO DE BOOT
   // ==========================================================
   const RemoteProxy = (() => {
-    let mode = 'initializing'; // 'vercel' | 'public-remote'
+    let mode = 'initializing';
     let modeLabel = 'Conectando Proxy...';
     let initPromise = null;
 
@@ -413,38 +754,33 @@
       }
     }
 
-    // Inicializa o site conectado ao Proxy Remoto automaticamente
     async function init() {
       if (initPromise) return initPromise;
       initPromise = (async () => {
-        // 1. Tenta o Proxy Remoto dedicado da Vercel (/api/proxy)
         if (location.protocol === 'http:' || location.protocol === 'https:') {
           try {
-            const r = await rawTimeoutFetch('/api/proxy?ping=1', {}, 3000);
+            const r = await rawTimeoutFetch('/api/proxy?ping=1', {}, 2800);
             if (r.ok) {
               const info = await r.json();
               if (info?.ok) {
                 mode = 'vercel';
                 updateIndicator('#30D158', `Proxy Remoto (${info.region || 'Edge'})`);
-                return mode;
+                return { mode, label: modeLabel };
               }
             }
           } catch {}
         }
 
-        // 2. Fallback automático: Gateways de Proxy Remoto Públicos (AllOrigins / CorsProxy / CodeTabs)
         mode = 'public-remote';
         updateIndicator('#30D158', 'Proxy Remoto Ativo');
-        return mode;
+        return { mode, label: modeLabel };
       })();
       return initPromise;
     }
 
-    // Requisição via Proxy Remoto retornando { ok, status, text, json }
     async function request(targetUrl, options = {}, timeoutMs = 10500) {
       await init();
 
-      // Rota 1: Proxy Remoto próprio (/api/proxy) — suporta headers customizados e preserva HTTP status real
       if (mode === 'vercel') {
         const proxyHeaders = {};
         if (options.headers && Object.keys(options.headers).length) {
@@ -465,11 +801,9 @@
         };
       }
 
-      // Rota 2: Gateways de Proxy Remoto Públicos (sem /api/proxy)
       const hasAuthHeaders = Boolean(options.headers && Object.keys(options.headers).some(h => h.toLowerCase() === 'x-api-key'));
 
       if (!hasAuthHeaders) {
-        // Tenta AllOrigins (preserva status HTTP real do destino)
         try {
           const r = await rawTimeoutFetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
           if (r.ok) {
@@ -486,7 +820,6 @@
           }
         } catch {}
 
-        // Alternativa: CorsProxy.io
         try {
           const r = await rawTimeoutFetch(`https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
           const bodyText = await r.text();
@@ -499,7 +832,6 @@
           };
         } catch {}
 
-        // Alternativa: CodeTabs
         try {
           const r = await rawTimeoutFetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
           const bodyText = await r.text();
@@ -513,7 +845,6 @@
         } catch {}
       }
 
-      // Último recurso (para APIs que exigem x-api-key quando /api/proxy ainda não foi publicado)
       const direct = await rawTimeoutFetch(targetUrl, options, timeoutMs);
       const bodyText = await direct.text();
       return {
@@ -538,17 +869,72 @@
       return { html, code: r.status, via: r.via };
     }
 
-    return {
-      init,
-      request,
-      fetchJson,
-      fetchHtml,
-      getModeLabel: () => modeLabel
-    };
+    return { init, request, fetchJson, fetchHtml, getModeLabel: () => modeLabel };
   })();
 
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  async function runBootSequence() {
+    const bootEl = document.getElementById('proxyBoot');
+    const bar = document.getElementById('bootBar');
+    const sub = document.getElementById('bootSubtitle');
+    const core = document.getElementById('bootCore');
+    const coreIcon = document.getElementById('bootCoreIcon');
+
+    const step1 = document.getElementById('stepP2P');
+    const step2 = document.getElementById('stepProxy');
+    const step3 = document.getElementById('stepSig');
+
+    const markDone = (el, text) => {
+      el.classList.remove('active');
+      el.classList.add('done');
+      const icon = el.querySelector('[data-step-icon]');
+      if (icon) {
+        icon.className = 'text-[11px] font-bold text-[#30D158] flex items-center gap-1';
+        icon.innerHTML = `<span class="material-symbols-rounded text-sm">check_circle</span> ${text}`;
+      }
+    };
+    const markActive = (el) => {
+      el.classList.add('active');
+      const icon = el.querySelector('[data-step-icon]');
+      if (icon) {
+        icon.className = 'material-symbols-rounded text-sm spinner text-[#0A84FF]';
+        icon.textContent = 'refresh';
+      }
+    };
+
+    // Passo 1: P2P E2EE
+    bar.style.width = '28%';
+    await Promise.all([P2PLayer.init(), sleep(420)]);
+    markDone(step1, 'Ativo');
+
+    // Passo 2: Handshake Real com o Proxy Remoto
+    markActive(step2);
+    bar.style.width = '66%';
+    sub.textContent = 'Negociando rota de saída com o servidor proxy...';
+    const [proxyRes] = await Promise.all([RemoteProxy.init(), sleep(520)]);
+    markDone(step2, proxyRes.mode === 'vercel' ? 'Vercel Edge' : 'Gateway Ativo');
+
+    // Passo 3: Verificação de Assinatura
+    markActive(step3);
+    bar.style.width = '92%';
+    sub.textContent = 'Validando integridade da assinatura KIIK HACKING...';
+    await sleep(360);
+    markDone(step3, 'Verificada');
+
+    // Conclusão
+    bar.style.width = '100%';
+    core.classList.add('connected');
+    coreIcon.textContent = 'verified_user';
+    sub.textContent = `Conectado • ${proxyRes.label}`;
+    await sleep(420);
+
+    bootEl.classList.add('boot-done');
+    setTimeout(() => bootEl.remove(), 600);
+  }
+
   // ==========================================================
-  // 4. UTILITÁRIOS & CONFIGURAÇÃO ENCAPSULADA
+  // 4. UTILITÁRIOS & DADOS
   // ==========================================================
   const _vault = ['Nzc4NDMzZTEyNDQ2OGIxYWE2MGYyNjgxOTE5Y2Q5MThmODUyYWZlMTc2MTA1Njk4NTgxMzg4MWNiNzJhNTUwZg=='];
   const getCpfKey = () => atob(_vault[0]);
@@ -562,8 +948,10 @@
 
   let lastResultData = null;
   let lastModuleId = 'osint';
+  let activeSectorFilter = 'all';
+  let homeSearchQuery = '';
   let historyCache = [];
-  try { historyCache = JSON.parse(localStorage.getItem('kiik_v6_history') || '[]'); } catch { historyCache = []; }
+  try { historyCache = JSON.parse(localStorage.getItem('kiik_v7_history') || '[]'); } catch { historyCache = []; }
 
   function escapeHtml(str) {
     return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -614,8 +1002,8 @@
     historyCache.unshift({ moduleId, query, ts: Date.now() });
     historyCache = historyCache.slice(0, 15);
     try {
-      localStorage.setItem('kiik_v6_history', JSON.stringify(historyCache));
-      localStorage.setItem('kiik_v6_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
+      localStorage.setItem('kiik_v7_history', JSON.stringify(historyCache));
+      localStorage.setItem('kiik_v7_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
     } catch {}
   }
 
@@ -661,21 +1049,21 @@
   }
 
   // ==========================================================
-  // 5. SETORES & MÓDULOS (TODOS ROTEADOS PELO PROXY REMOTO)
+  // 5. SETORES & MÓDULOS
   // ==========================================================
   const SECTORS = [
-    { id: 'docs', title: 'Documentos & Veículos', icon: 'badge' },
-    { id: 'osint', title: 'Investigação, Dorks & Vazamentos', icon: 'travel_explore' },
-    { id: 'web', title: 'Sites, Proprietário & Infraestrutura', icon: 'language' }
+    { id: 'docs', title: 'Documentos & Veículos', short: 'Documentos', icon: 'badge' },
+    { id: 'osint', title: 'Investigação, Dorks & Vazamentos', short: 'OSINT & Dorks', icon: 'travel_explore' },
+    { id: 'web', title: 'Sites, Proprietário & Infraestrutura', short: 'Sites & Infra', icon: 'language' }
   ];
 
   const MODULES = [
-    // --- SETOR 1: DOCUMENTOS & VEÍCULOS ---
     {
       id: 'cpf',
       sector: 'docs',
       name: 'Consulta CPF',
-      desc: 'Dados cadastrais via CPFHub.io (roteado por proxy remoto) + fallback fiscal.',
+      desc: 'Dados cadastrais via CPFHub.io com validação fiscal de fallback.',
+      keywords: 'cpf pessoa documento receita',
       apisLabel: 'CPFHub + Local',
       icon: 'fingerprint',
       gradient: 'linear-gradient(135deg, #FF375F 0%, #C91D42 100%)',
@@ -733,7 +1121,8 @@
       id: 'cnpj',
       sector: 'docs',
       name: 'Consulta CNPJ',
-      desc: 'Razão social, situação, CNAE e sócios (QSA) com 3 APIs via proxy remoto.',
+      desc: 'Razão social, situação, CNAE e sócios (QSA) com 3 APIs em cascata.',
+      keywords: 'cnpj empresa socios qsa receita',
       apisLabel: '3 APIs BR',
       icon: 'domain',
       gradient: 'linear-gradient(135deg, #30D158 0%, #1E9E3E 100%)',
@@ -773,6 +1162,7 @@
       sector: 'docs',
       name: 'Central Veicular (MG)',
       desc: 'Placa, titular automático, FIPE e portais DETRAN-MG, SENATRAN e PBH.',
+      keywords: 'veiculo carro moto placa renavam atpv crlv detran multas fipe',
       apisLabel: '4 Portais + FIPE',
       icon: 'directions_car',
       gradient: 'linear-gradient(135deg, #0A84FF 0%, #0055D4 100%)',
@@ -783,6 +1173,7 @@
       sector: 'docs',
       name: 'Consulta CEP',
       desc: 'Endereço completo e coordenadas via BrasilAPI, ViaCEP e AwesomeAPI.',
+      keywords: 'cep endereco rua bairro cidade mapa',
       apisLabel: '3 APIs BR',
       icon: 'location_on',
       gradient: 'linear-gradient(135deg, #FF9F0A 0%, #D97706 100%)',
@@ -812,13 +1203,12 @@
         };
       }
     },
-
-    // --- SETOR 2: INVESTIGAÇÃO, DORKS & VAZAMENTOS ---
     {
       id: 'osint',
       sector: 'osint',
       name: 'OSINT Direto (APIs)',
-      desc: 'Verifica username em 11 plataformas compatíveis roteadas pelo proxy remoto.',
+      desc: 'Verifica username em 11 plataformas compatíveis roteadas pelo proxy.',
+      keywords: 'osint usuario username github reddit perfis',
       apisLabel: '11 APIs Diretas',
       icon: 'travel_explore',
       gradient: 'linear-gradient(135deg, #5E5CE6 0%, #3634A3 100%)',
@@ -832,6 +1222,7 @@
       sector: 'osint',
       name: 'Central de Dorks',
       desc: 'Buscas avançadas no Google para Redes Sociais, Adultos, Namoro e Apostas.',
+      keywords: 'dork google redes sociais instagram tiktok apostas namoro',
       apisLabel: 'Google Dorks',
       icon: 'manage_search',
       gradient: 'linear-gradient(135deg, #FF9F0A 0%, #EA580C 100%)',
@@ -845,6 +1236,7 @@
       sector: 'osint',
       name: 'Vazamentos (E-mail)',
       desc: 'Checa exposição em bases vazadas + validação alternativa de servidor MX.',
+      keywords: 'vazamento email breach senha seguranca',
       apisLabel: '2 APIs Sec',
       icon: 'security',
       gradient: 'linear-gradient(135deg, #FF453A 0%, #C62828 100%)',
@@ -887,13 +1279,12 @@
         return { ...data, provider };
       }
     },
-
-    // --- SETOR 3: SITES, PROPRIETÁRIO & INFRAESTRUTURA ---
     {
       id: 'domain',
       sector: 'web',
       name: 'Proprietário de Site',
-      desc: 'Retorna titular (dono), CNPJ/CPF (.br), registrador, datas e DNS do domínio.',
+      desc: 'Retorna titular (dono), CNPJ/CPF (.br), registrador, datas e DNS.',
+      keywords: 'site dominio dono proprietario whois rdap dns',
       apisLabel: 'RDAP + 2 DNS',
       icon: 'language',
       gradient: 'linear-gradient(135deg, #64D2FF 0%, #0A84FF 100%)',
@@ -960,7 +1351,8 @@
       id: 'scraping',
       sector: 'web',
       name: 'Web Scraper',
-      desc: 'Extrai metadados, e-mails, telefones e links públicos pelo proxy remoto.',
+      desc: 'Extrai metadados, e-mails, telefones e links públicos via proxy remoto.',
+      keywords: 'scraper html extrair links telefones emails site',
       apisLabel: 'Proxy Remoto',
       icon: 'code',
       gradient: 'linear-gradient(135deg, #32ADE6 0%, #007AFF 100%)',
@@ -1009,7 +1401,8 @@
       id: 'ip',
       sector: 'web',
       name: 'IP & Geolocalização',
-      desc: 'Operadora, ASN e coordenadas (vazio retorna o IP do Proxy Remoto ativo).',
+      desc: 'Operadora, ASN e coordenadas (vazio retorna o IP do Proxy Remoto).',
+      keywords: 'ip geo localizacao operadora asn servidor proxy',
       apisLabel: '3 APIs Geo',
       icon: 'router',
       gradient: 'linear-gradient(135deg, #BF5AF2 0%, #892CDC 100%)',
@@ -1043,7 +1436,7 @@
   ];
 
   // ==========================================================
-  // 6. OSINT DIRETO (11 APIS VIA PROXY REMOTO) & CENTRAL DORKS
+  // 6. OSINT DIRETO (11 APIS) & CENTRAL DE DORKS
   // ==========================================================
   function getCompatibleOsintApis(alvo) {
     const enc = encodeURIComponent(alvo);
@@ -1219,6 +1612,12 @@
   // ==========================================================
   function navigate(id) { window.location.hash = id ? '#' + id : ''; }
 
+  function updateDockState(hash) {
+    document.querySelectorAll('[data-dock]').forEach(el => {
+      el.classList.toggle('active', el.getAttribute('data-dock') === hash);
+    });
+  }
+
   function renderAtpvView(view) {
     const history = getHistory('atpv');
     const historyHtml = history.length ? `
@@ -1248,7 +1647,7 @@
     view.innerHTML = `
       <div class="view-enter">
         <button type="button" data-nav="" class="ios-chip mb-5">
-          <span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Início
+          <span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar ao Início
         </button>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -1407,42 +1806,120 @@
   }
 
   // ==========================================================
-  // 8. HOME SCREEN SETORIZADA
+  // 8. HOME SCREEN REFORMULADA (SPOTLIGHT + SETORES + WIDGETS)
   // ==========================================================
-  function render() {
-    const view = document.getElementById('view');
-    const hash = window.location.hash.replace('#', '');
+  function renderHomeSectors() {
+    const container = document.getElementById('sectorsContainer');
+    if (!container) return;
 
-    if (!hash) {
-      const sectorsHtml = SECTORS.map(sec => {
-        const items = MODULES.filter(m => m.sector === sec.id);
-        return `
-          <section class="mb-9">
-            <div class="section-header">
+    const q = homeSearchQuery.trim().toLowerCase();
+    const visibleSectors = activeSectorFilter === 'all'
+      ? SECTORS
+      : SECTORS.filter(s => s.id === activeSectorFilter);
+
+    let totalRendered = 0;
+
+    const html = visibleSectors.map(sec => {
+      const items = MODULES.filter(m => {
+        if (m.sector !== sec.id) return false;
+        if (!q) return true;
+        return `${m.name} ${m.desc} ${m.keywords}`.toLowerCase().includes(q);
+      });
+      if (!items.length) return '';
+      totalRendered += items.length;
+
+      return `
+        <section class="mb-8">
+          <div class="section-header">
+            <div class="section-header-left">
               <span class="material-symbols-rounded text-base text-[#0A84FF]">${escapeHtml(sec.icon)}</span>
               <h2>${escapeHtml(sec.title)}</h2>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              ${items.map(m => `
-                <div class="liquid-card app-widget p-5 flex flex-col justify-between gap-4" data-nav="${escapeHtml(m.id)}">
-                  <div class="flex items-start justify-between gap-3">
-                    <div class="squircle" style="background: ${m.gradient};">
-                      <span class="material-symbols-rounded">${escapeHtml(m.icon)}</span>
-                    </div>
-                    <span class="pill-tag tag-info">${escapeHtml(m.apisLabel)}</span>
+            <span class="text-[11px] text-[var(--text-tertiary)] font-semibold">${items.length} módulo(s)</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            ${items.map(m => `
+              <div class="liquid-card app-widget p-5 flex flex-col justify-between gap-4" data-nav="${escapeHtml(m.id)}">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="squircle" style="background: ${m.gradient};">
+                    <span class="material-symbols-rounded">${escapeHtml(m.icon)}</span>
                   </div>
-                  <div>
-                    <h3 class="text-base font-bold text-white leading-snug mb-1">${escapeHtml(m.name)}</h3>
-                    <p class="text-xs text-[var(--text-secondary)] leading-relaxed">${escapeHtml(m.desc)}</p>
-                  </div>
+                  <span class="pill-tag tag-info">${escapeHtml(m.apisLabel)}</span>
                 </div>
+                <div>
+                  <div class="flex items-center justify-between gap-2 mb-1">
+                    <h3 class="text-base font-bold text-white leading-snug">${escapeHtml(m.name)}</h3>
+                    <span class="material-symbols-rounded text-base text-[var(--text-tertiary)]">arrow_forward_ios</span>
+                  </div>
+                  <p class="text-xs text-[var(--text-secondary)] leading-relaxed">${escapeHtml(m.desc)}</p>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+      `;
+    }).join('');
+
+    container.innerHTML = totalRendered
+      ? html
+      : `<div class="liquid-card p-10 text-center">
+           <span class="material-symbols-rounded text-4xl text-white/20 mb-2">search_off</span>
+           <p class="text-sm text-[var(--text-secondary)]">Nenhuma ferramenta encontrada para "<strong>${escapeHtml(homeSearchQuery)}</strong>".</p>
+         </div>`;
+  }
+
+  function render() {
+    const view = document.getElementById('view');
+    const hash = window.location.hash.replace('#', '');
+    updateDockState(hash);
+
+    if (!hash) {
+      view.innerHTML = `
+        <div class="view-enter">
+          <!-- Hero + Spotlight + Tabs -->
+          <div class="mb-7">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5 px-1">
+              <div>
+                <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">Central de Inteligência</h1>
+                <p class="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
+                  Consultas setorizadas com roteamento via Proxy Remoto e fallback automático.
+                </p>
+              </div>
+            </div>
+
+            <div class="spotlight-bar mb-4">
+              <span class="material-symbols-rounded text-[var(--text-secondary)] text-xl">search</span>
+              <input type="text" id="spotlightInput" class="spotlight-input" placeholder="Buscar ferramenta (ex: CPF, placa, dono de site, dork...)" value="${escapeHtml(homeSearchQuery)}" autocomplete="off">
+              ${homeSearchQuery ? '<button type="button" id="clearSpotlight" class="text-[var(--text-secondary)] hover:text-white"><span class="material-symbols-rounded text-lg">close</span></button>' : ''}
+            </div>
+
+            <div class="sector-tabs">
+              <button type="button" class="sector-tab ${activeSectorFilter === 'all' ? 'active' : ''}" data-sector="all">
+                <span class="material-symbols-rounded text-sm">apps</span> Todos (${MODULES.length})
+              </button>
+              ${SECTORS.map(s => `
+                <button type="button" class="sector-tab ${activeSectorFilter === s.id ? 'active' : ''}" data-sector="${escapeHtml(s.id)}">
+                  <span class="material-symbols-rounded text-sm">${escapeHtml(s.icon)}</span> ${escapeHtml(s.short)}
+                </button>
               `).join('')}
             </div>
-          </section>
-        `;
-      }).join('');
+          </div>
 
-      view.innerHTML = `<div class="view-enter">${sectorsHtml}</div>`;
+          <div id="sectorsContainer"></div>
+        </div>
+      `;
+
+      renderHomeSectors();
+
+      const spotInput = document.getElementById('spotlightInput');
+      spotInput.addEventListener('input', (e) => {
+        homeSearchQuery = e.target.value;
+        renderHomeSectors();
+      });
+      document.getElementById('clearSpotlight')?.addEventListener('click', () => {
+        homeSearchQuery = '';
+        render();
+      });
       return;
     }
 
@@ -1463,11 +1940,11 @@
     view.innerHTML = `
       <div class="view-enter">
         <button type="button" data-nav="" class="ios-chip mb-5">
-          <span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Início
+          <span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar ao Início
         </button>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          <div class="lg:col-span-4 liquid-card p-6">
+          <div class="lg:col-span-4 liquid-card p-6 lg:sticky lg:top-6">
             <div class="flex items-center gap-3.5 mb-4">
               <div class="squircle" style="background:${m.gradient};">
                 <span class="material-symbols-rounded">${escapeHtml(m.icon)}</span>
@@ -1493,8 +1970,13 @@
 
           <div class="lg:col-span-8">
             <div id="result" class="min-h-[300px] liquid-card p-6 flex flex-col justify-center items-center text-center">
-              <span class="material-symbols-rounded text-5xl text-white/15 mb-2">travel_explore</span>
-              <p class="text-sm text-[var(--text-secondary)]">Informe o dado ao lado para iniciar a consulta via proxy remoto.</p>
+              <div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-3">
+                <span class="material-symbols-rounded text-3xl text-white/30">${escapeHtml(m.icon)}</span>
+              </div>
+              <p class="text-sm font-medium text-white mb-1">Pronto para consultar</p>
+              <p class="text-xs text-[var(--text-secondary)] max-w-xs">
+                Os dados serão roteados automaticamente pelo túnel de Proxy Remoto ativo.
+              </p>
             </div>
           </div>
         </div>
@@ -1521,8 +2003,9 @@
 
     resDiv.className = 'min-h-[300px] liquid-card p-6 flex flex-col justify-center items-center text-center';
     resDiv.innerHTML = `
-      <span class="material-symbols-rounded spinner text-4xl mb-2 text-[#0A84FF]">refresh</span>
-      <p class="text-sm font-medium text-[var(--text-secondary)]">Consultando via ${escapeHtml(RemoteProxy.getModeLabel())}...</p>
+      <span class="material-symbols-rounded spinner text-4xl mb-3 text-[#0A84FF]">refresh</span>
+      <p class="text-sm font-semibold text-white">Consultando via ${escapeHtml(RemoteProxy.getModeLabel())}</p>
+      <p class="text-xs text-[var(--text-secondary)] mt-1">Com fallback automático entre APIs...</p>
     `;
 
     try {
@@ -1598,11 +2081,19 @@
   }
 
   // ==========================================================
-  // 9. EVENTOS & BOOT DO PROXY REMOTO
+  // 9. EVENTOS & BOOT
   // ==========================================================
   document.addEventListener('click', async (e) => {
     const navEl = e.target.closest('[data-nav]');
     if (navEl) { navigate(navEl.getAttribute('data-nav')); return; }
+
+    const secEl = e.target.closest('[data-sector]');
+    if (secEl) {
+      activeSectorFilter = secEl.getAttribute('data-sector');
+      document.querySelectorAll('[data-sector]').forEach(b => b.classList.toggle('active', b === secEl));
+      renderHomeSectors();
+      return;
+    }
 
     const fillEl = e.target.closest('[data-fill]');
     if (fillEl) {
@@ -1641,8 +2132,8 @@
 
   window.addEventListener('hashchange', render);
   document.addEventListener('DOMContentLoaded', () => {
-    RemoteProxy.init();
     render();
+    runBootSequence();
   });
 })();
 </script>
