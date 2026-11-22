@@ -122,6 +122,7 @@
     align-items: center;
     gap: 6px;
     transition: background 0.2s;
+    text-decoration: none;
   }
   .btn-ghost:hover { background: rgba(255, 255, 255, 0.12); }
 
@@ -202,7 +203,7 @@ const ICON_MAP = {
   abertura: 'event', situacao: 'info', status: 'check_circle', cnae: 'category',
   natureza: 'gavel', capital: 'payments', ip: 'router', isp: 'dns', org: 'hub',
   asn: 'lan', latitude: 'location_on', longitude: 'location_on', ddd: 'call',
-  telefone: 'call', regiao: 'explore', platform: 'apps', url: 'link'
+  telefone: 'call', regiao: 'explore', platform: 'apps', url: 'link', alvo: 'target'
 };
 
 function getIcon(key) {
@@ -261,6 +262,115 @@ function getHistory(moduleId) {
 // MÓDULOS OSINT
 // ==========================================
 const MODULES = [
+  {
+    id: 'username',
+    name: 'Varredura OSINT (Web)',
+    desc: 'Redes Sociais, Adultos, Namoro e Apostas',
+    icon: 'travel_explore',
+    placeholder: 'Username, nome ou e-mail',
+    max: 60,
+    digits: false,
+    fetchApi: async (v) => {
+      const alvo = v.trim();
+      if (!alvo) throw new Error('Informe um username, nome ou e-mail.');
+      const enc = encodeURIComponent(alvo);
+      const q = (dork) => `https://www.google.com/search?q=${encodeURIComponent(dork)}`;
+
+      const checks = await Promise.all([
+        fetchJson(`https://api.github.com/users/${enc}`).then(d => d.login ? ({
+          platform: 'GitHub (Confirmado)', url: d.html_url, info: `${d.name || d.login} • ${d.public_repos} repos • ${d.followers} seguidores`
+        }) : null).catch(() => null),
+
+        fetchJson(`https://gitlab.com/api/v4/users?username=${enc}`).then(arr => arr[0] ? ({
+          platform: 'GitLab (Confirmado)', url: arr[0].web_url, info: `${arr[0].name} • Estado: ${arr[0].state}`
+        }) : null).catch(() => null),
+
+        fetchJson(`https://dev.to/api/users/by_username?url=${enc}`).then(d => d.username ? ({
+          platform: 'Dev.to (Confirmado)', url: `https://dev.to/${d.username}`, info: `${d.name || d.username} • ${d.summary || 'Sem bio'}`
+        }) : null).catch(() => null),
+
+        fetchJson(`https://hacker-news.firebaseio.com/v0/user/${enc}.json`).then(d => d && d.id ? ({
+          platform: 'Hacker News (Confirmado)', url: `https://news.ycombinator.com/user?id=${d.id}`, info: `Karma: ${d.karma}`
+        }) : null).catch(() => null)
+      ]);
+
+      const found = checks.filter(Boolean);
+
+      const categorias = [
+        {
+          titulo: 'Redes Sociais',
+          icone: 'groups',
+          dorkGeral: q(`"${alvo}" (site:instagram.com OR site:tiktok.com OR site:x.com OR site:facebook.com OR site:linkedin.com OR site:threads.net OR site:reddit.com)`),
+          itens: [
+            { nome: 'Instagram', url: `https://www.instagram.com/${enc}/` },
+            { nome: 'TikTok', url: `https://www.tiktok.com/@${enc}` },
+            { nome: 'X (Twitter)', url: `https://x.com/${enc}` },
+            { nome: 'Facebook', url: q(`site:facebook.com "${alvo}"`) },
+            { nome: 'LinkedIn', url: q(`site:linkedin.com/in "${alvo}"`) },
+            { nome: 'Threads', url: `https://www.threads.net/@${enc}` },
+            { nome: 'Reddit', url: `https://www.reddit.com/user/${enc}` },
+            { nome: 'YouTube', url: `https://www.youtube.com/@${enc}` },
+            { nome: 'Pinterest', url: `https://www.pinterest.com/${enc}/` },
+            { nome: 'Twitch', url: `https://www.twitch.tv/${enc}` }
+          ]
+        },
+        {
+          titulo: 'Sites Adultos',
+          icone: 'visibility_off',
+          dorkGeral: q(`"${alvo}" (site:onlyfans.com OR site:privacy.com.br OR site:fansly.com OR site:pornhub.com OR site:xvideos.com OR site:chaturbate.com OR site:fatalmodel.com)`),
+          itens: [
+            { nome: 'OnlyFans', url: `https://onlyfans.com/${enc}` },
+            { nome: 'Privacy', url: `https://privacy.com.br/profile/${enc}` },
+            { nome: 'Fansly', url: `https://fansly.com/${enc}` },
+            { nome: 'Pornhub', url: q(`site:pornhub.com "${alvo}"`) },
+            { nome: 'XVideos', url: q(`site:xvideos.com "${alvo}"`) },
+            { nome: 'Chaturbate', url: `https://chaturbate.com/${enc}/` },
+            { nome: 'Fatal Model', url: q(`site:fatalmodel.com "${alvo}"`) }
+          ]
+        },
+        {
+          titulo: 'Sites de Namoro',
+          icone: 'favorite',
+          dorkGeral: q(`"${alvo}" (site:tinder.com OR site:bumble.com OR site:badoo.com OR site:happn.com OR site:okcupid.com OR site:pof.com OR site:grindr.com)`),
+          itens: [
+            { nome: 'Tinder', url: q(`site:tinder.com "${alvo}"`) },
+            { nome: 'Badoo', url: q(`site:badoo.com "${alvo}"`) },
+            { nome: 'Bumble', url: q(`site:bumble.com "${alvo}"`) },
+            { nome: 'Happn', url: q(`site:happn.com "${alvo}"`) },
+            { nome: 'OkCupid', url: q(`site:okcupid.com "${alvo}"`) },
+            { nome: 'POF', url: q(`site:pof.com "${alvo}"`) },
+            { nome: 'Grindr', url: q(`site:grindr.com "${alvo}"`) }
+          ]
+        },
+        {
+          titulo: 'Sites de Aposta',
+          icone: 'casino',
+          dorkGeral: q(`"${alvo}" (site:betano.com OR site:bet365.com OR site:blaze.com OR site:stake.com OR site:pixbet.com OR site:estrelabet.com OR site:superbet.com OR site:sportingbet.com)`),
+          itens: [
+            { nome: 'Betano', url: q(`site:betano.com "${alvo}"`) },
+            { nome: 'Bet365', url: q(`site:bet365.com "${alvo}"`) },
+            { nome: 'Blaze', url: q(`site:blaze.com "${alvo}"`) },
+            { nome: 'Stake', url: q(`site:stake.com "${alvo}"`) },
+            { nome: 'Pixbet', url: q(`site:pixbet.com "${alvo}"`) },
+            { nome: 'EstrelaBet', url: q(`site:estrelabet.com "${alvo}"`) },
+            { nome: 'Superbet', url: q(`site:superbet.com "${alvo}"`) },
+            { nome: 'Sportingbet', url: q(`site:sportingbet.com "${alvo}"`) }
+          ]
+        }
+      ];
+
+      return {
+        resumo: {
+          alvo,
+          perfis_api_confirmados: found.length,
+          categorias_varredura: 'Redes Sociais, Adultos, Namoro e Apostas'
+        },
+        links: found,
+        categorias,
+        raw: { alvo, found, categorias }
+      };
+    }
+  },
   {
     id: 'cpf',
     name: 'CPF',
@@ -353,6 +463,38 @@ const MODULES = [
           cep: data.cep || data.estabelecimento?.cep || '-'
         },
         listas: socios.length ? [{ titulo: 'Quadro Societário (QSA)', itens: socios.map(s => `${s.nome} — ${s.qualificacao}`) }] : [],
+        raw: data
+      };
+    }
+  },
+  {
+    id: 'breach',
+    name: 'Vazamentos (E-mail)',
+    desc: 'XposedOrNot API',
+    icon: 'security',
+    placeholder: 'Ex: teste@exemplo.com',
+    max: 80,
+    digits: false,
+    fetchApi: async (v) => {
+      const email = v.trim();
+      if (!email.includes('@')) throw new Error('Informe um e-mail válido.');
+      const r = await fetch(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
+      if (r.status === 404) {
+        return {
+          resumo: { email, status: 'Nenhum vazamento encontrado', base: 'XposedOrNot' },
+          raw: { email, breaches: [] }
+        };
+      }
+      if (!r.ok) throw new Error(`Erro na API XposedOrNot (HTTP ${r.status}).`);
+      const data = await r.json();
+      const breaches = Array.isArray(data.breaches?.[0]) ? data.breaches[0] : (data.breaches || []);
+      return {
+        resumo: {
+          email,
+          status: breaches.length ? 'Exposto em vazamentos' : 'Seguro',
+          total_vazamentos: breaches.length
+        },
+        listas: breaches.length ? [{ titulo: 'Bases onde o e-mail apareceu', itens: breaches }] : [],
         raw: data
       };
     }
@@ -475,81 +617,6 @@ const MODULES = [
     }
   },
   {
-    id: 'username',
-    name: 'Username (OSINT)',
-    desc: 'GitHub, GitLab, Dev.to, HackerNews',
-    icon: 'person_search',
-    placeholder: 'Ex: torvalds',
-    max: 40,
-    digits: false,
-    fetchApi: async (v) => {
-      const user = v.trim();
-      if (!user) throw new Error('Informe um nome de usuário.');
-      const enc = encodeURIComponent(user);
-
-      const checks = await Promise.all([
-        fetchJson(`https://api.github.com/users/${enc}`).then(d => d.login ? ({
-          platform: 'GitHub', url: d.html_url, info: `${d.name || d.login} • ${d.public_repos} repos • ${d.followers} seguidores`
-        }) : null).catch(() => null),
-
-        fetchJson(`https://gitlab.com/api/v4/users?username=${enc}`).then(arr => arr[0] ? ({
-          platform: 'GitLab', url: arr[0].web_url, info: `${arr[0].name} • Estado: ${arr[0].state}`
-        }) : null).catch(() => null),
-
-        fetchJson(`https://dev.to/api/users/by_username?url=${enc}`).then(d => d.username ? ({
-          platform: 'Dev.to', url: `https://dev.to/${d.username}`, info: `${d.name || d.username} • ${d.summary || 'Sem bio'}`
-        }) : null).catch(() => null),
-
-        fetchJson(`https://hacker-news.firebaseio.com/v0/user/${enc}.json`).then(d => d && d.id ? ({
-          platform: 'Hacker News', url: `https://news.ycombinator.com/user?id=${d.id}`, info: `Karma: ${d.karma}`
-        }) : null).catch(() => null)
-      ]);
-
-      const found = checks.filter(Boolean);
-      return {
-        resumo: {
-          username: user,
-          perfis_encontrados: found.length,
-          plataformas_verificadas: 'GitHub, GitLab, Dev.to, Hacker News'
-        },
-        links: found,
-        raw: found
-      };
-    }
-  },
-  {
-    id: 'breach',
-    name: 'Vazamentos (E-mail)',
-    desc: 'XposedOrNot API',
-    icon: 'security',
-    placeholder: 'Ex: teste@exemplo.com',
-    max: 80,
-    digits: false,
-    fetchApi: async (v) => {
-      const email = v.trim();
-      if (!email.includes('@')) throw new Error('Informe um e-mail válido.');
-      const r = await fetch(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
-      if (r.status === 404) {
-        return {
-          resumo: { email, status: 'Nenhum vazamento encontrado', base: 'XposedOrNot' },
-          raw: { email, breaches: [] }
-        };
-      }
-      if (!r.ok) throw new Error(`Erro na API XposedOrNot (HTTP ${r.status}).`);
-      const data = await r.json();
-      const breaches = Array.isArray(data.breaches?.[0]) ? data.breaches[0] : (data.breaches || []);
-      return {
-        resumo: {
-          email,
-          status: breaches.length ? 'Exposto em vazamentos' : 'Seguro',
-          total_vazamentos: breaches.length
-        },
-        listas: breaches.length ? [{ titulo: 'Bases onde o e-mail apareceu', itens: breaches }] : [],
-        raw: data
-      };
-    }
-  },
-  {
     id: 'ddd',
     name: 'DDD (Brasil)',
     desc: 'BrasilAPI — Estado e Cidades',
@@ -597,7 +664,7 @@ function render() {
         <h1 class="text-3xl md:text-4xl font-bold mb-2">
           Pegada <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent)] to-[#BF5AF2]">Digital</span>
         </h1>
-        <p class="text-sm text-[var(--text-muted)]">Módulos OSINT integrados a APIs públicas e CPFHub.io.</p>
+        <p class="text-sm text-[var(--text-muted)]">Módulos OSINT integrados a APIs públicas, CPFHub.io e varredura web.</p>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">${cards}</div>
     `;
@@ -697,7 +764,7 @@ async function handleSearch(e, id) {
     if (data.links && data.links.length) {
       sectionsHtml += `
         <div class="mt-6">
-          <h4 class="text-xs uppercase tracking-wider text-[var(--accent)] font-bold mb-3">Perfis Encontrados</h4>
+          <h4 class="text-xs uppercase tracking-wider text-[var(--accent)] font-bold mb-3">Perfis Confirmados via API</h4>
           <div class="space-y-2">
             ${data.links.map(l => `
               <div class="data-item">
@@ -720,6 +787,30 @@ async function handleSearch(e, id) {
           <h4 class="text-xs uppercase tracking-wider text-[var(--accent)] font-bold mb-3">${escapeHtml(lista.titulo)} (${lista.itens.length})</h4>
           <div class="flex flex-wrap gap-2 max-h-60 overflow-y-auto pr-1">
             ${lista.itens.map(item => `<span class="text-xs px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[var(--text-main)]">${escapeHtml(item)}</span>`).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    if (data.categorias && data.categorias.length) {
+      sectionsHtml += data.categorias.map(cat => `
+        <div class="mt-6 p-4 rounded-2xl bg-white/[0.02] border border-[var(--glass-border)]">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h4 class="text-xs uppercase tracking-wider text-[var(--accent)] font-bold flex items-center gap-2">
+              <span class="material-symbols-rounded text-base">${escapeHtml(cat.icone)}</span>
+              ${escapeHtml(cat.titulo)}
+            </h4>
+            <a href="${escapeHtml(cat.dorkGeral)}" target="_blank" rel="noopener noreferrer" class="btn-ghost text-xs py-1 px-3">
+              <span class="material-symbols-rounded text-sm">manage_search</span> Varredura Geral (Dork)
+            </a>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            ${cat.itens.map(item => `
+              <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="btn-ghost text-xs">
+                ${escapeHtml(item.nome)}
+                <span class="material-symbols-rounded text-xs opacity-60">open_in_new</span>
+              </a>
+            `).join('')}
           </div>
         </div>
       `).join('');
