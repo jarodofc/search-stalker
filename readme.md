@@ -1,79 +1,54 @@
-# GlassOSINT • iOS Material Edition (KIIK HACKING)
+<div align="center">
 
-[![Design](https://img.shields.io/badge/UI-iOS%20Liquid%20Glass%20%7C%20Material%203-0A84FF?style=for-the-badge&logo=apple)](#)
-[![Security](https://img.shields.io/badge/Security-P2P%20E2EE%20%7C%20KIIK%20HACKING-30D158?style=for-the-badge&logo=shield)](#)
-[![Stack](https://img.shields.io/badge/Stack-HTML5%20%7C%20CSS3%20%7C%20Web%20Crypto%20API-5E5CE6?style=for-the-badge&logo=javascript)](#)
+<svg width="68" height="68" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#181D2E"/>
+      <stop offset="100%" stop-color="#07080D"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F2CC74"/>
+      <stop offset="100%" stop-color="#B5822A"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="url(#bg)" stroke="#E0B354" stroke-opacity="0.45" stroke-width="2"/>
+  <circle cx="28" cy="28" r="13" fill="none" stroke="url(#gold)" stroke-width="4"/>
+  <line x1="38" y1="38" x2="50" y2="50" stroke="#0A84FF" stroke-width="4.5" stroke-linecap="round"/>
+  <circle cx="28" cy="28" r="4" fill="#E0B354"/>
+</svg>
 
-> Painel OSINT, Central de Proxy, Web Scraping e Central Veicular em arquivo HTML único. Construído com design **iOS Liquid Glass + Material Design 3**, setorização limpa, fallback automático de APIs e camada silenciosa de criptografia P2P assinada por **KIIK HACKING**.
+# SHERLOCK 221B • iOS Material Forensics
 
----
+**Suíte Unificada de Perícia Digital, Análise de Malware, OSINT e Inteligência Web**  
+Assinado criptograficamente por **KIIK HACKING**
 
-## 📑 Sumário
-1. [Setores e Módulos](#1-setores-e-módulos)
-2. [Central de Proxy (Gateway + Listas Live)](#2-central-de-proxy-gateway--listas-live)
-3. [Redundância de APIs (Fallback)](#3-redundância-de-apis-fallback)
-4. [Segurança e Criptografia P2P (KIIK HACKING)](#4-segurança-e-criptografia-p2p-kiik-hacking)
-5. [Como Publicar](#5-como-publicar)
+[![Design](https://img.shields.io/badge/Design-iOS%20Liquid%20Glass%20%2B%20Material%203-E0B354?style=for-the-badge&logo=apple&logoColor=white)](#)
+[![Icons](https://img.shields.io/badge/Icons-Vector%20SVG%20%2B%20Material%20Symbols-0A84FF?style=for-the-badge&logo=materialdesign&logoColor=white)](#)
+[![Transport](https://img.shields.io/badge/Network-Remote%20Proxy%20Serverless-30D158?style=for-the-badge&logo=vercel&logoColor=white)](#)
+[![Crypto](https://img.shields.io/badge/Crypto-ECDH%20P--256%20%2B%20AES--256--GCM-BF5AF2?style=for-the-badge&logo=letsencrypt&logoColor=white)](#)
 
----
-
-## 1. Setores e Módulos
-
-### Setor 1 — Documentos & Veículos
-- **Consulta CPF:** Integração com `CPFHub.io` e fallback local (validação matemática e Região Fiscal).
-- **Consulta CNPJ:** Razão social, situação cadastral, CNAE, endereço e Quadro Societário (QSA).
-- **Central Veicular (MG):** Organização de Placa (detecção automática Mercosul/Cinza), RENAVAM, consulta automática do titular (CPF/CNPJ), Tabela FIPE e atalhos para **DETRAN-MG (Situação e ATPV-e), SENATRAN (SERPRO) e Multas PBH**.
-- **Consulta CEP:** Endereço completo e coordenadas geográficas.
-
-### Setor 2 — Investigação, Dorks & Vazamentos
-- **OSINT Direto (APIs):** Varredura paralela em **11 plataformas 100% compatíveis** com retorno real via API (GitHub, GitLab, Dev.to, Reddit, Hacker News, Chess.com, Lichess, Codeforces, npm, Wikipédia PT e Scratch).
-- **Central de Dorks:** Buscas filtradas no Google organizadas por categoria (Redes Sociais, Sites Adultos, Namoro e Apostas).
-- **Vazamentos (E-mail):** Verificação de exposição em bases vazadas (`XposedOrNot`) + fallback de validação MX.
-
-### Setor 3 — Sites, Proxy & Infraestrutura
-- **Central de Proxy:** Gateway CORS multi-rota e coletor de proxies HTTP/SOCKS ativos em tempo real.
-- **Proprietário de Site:** Extração de **Titular (Proprietário)**, **Documento (CNPJ/CPF em `.br`)**, e-mail de contato, registrador, datas e registros DNS (`A`, `MX`, `NS`, `TXT`) via RDAP + DoH.
-- **Web Scraper:** Extração de metadados, e-mails públicos, telefones (padrão BR), redes sociais e links externos usando o motor multi-proxy.
-- **IP & Geolocalização:** Operadora (ISP), ASN, país, cidade e coordenadas.
+</div>
 
 ---
 
-## 2. Central de Proxy (Gateway + Listas Live)
+## Sumário
 
-O módulo **Central de Proxy** reúne duas funções principais em abas:
-
-1. **Gateway URL (CORS Bypass):** Roteia requisições GET para qualquer URL pública através de 3 gateways com fallback automático (`AllOrigins` → `CodeTabs` → `CorsProxy.io`), exibindo rota utilizada, status HTTP, latência (ms), tamanho em KB e prévia da resposta com cópia e exportação assinada.
-2. **Lista de Proxies (Live):** Busca servidores proxy ativos filtráveis por protocolo (`HTTP/HTTPS`, `SOCKS4`, `SOCKS5`) e país (`Global`, `BR`, `US`, `DE`), com cópia individual (`IP:Porta`), cópia em lote e exportação em JSON assinado.
-
----
-
-## 3. Redundância de APIs (Fallback)
-
-| Módulo | Fonte Principal | Alternativas (Fallback) |
-| :--- | :--- | :--- |
-| **Central de Proxy (Gateway)** | AllOrigins Proxy | CodeTabs Proxy → CorsProxy.io |
-| **Central de Proxy (Listas)** | ProxyScrape v2 | GeoNode API → GitHub SpeedX List |
-| **Consulta CPF** | CPFHub.io | Motor Fiscal Local |
-| **Consulta CNPJ** | BrasilAPI | MinhaReceita → CNPJ.ws |
-| **Consulta CEP** | BrasilAPI v2 | ViaCEP → AwesomeAPI |
-| **Proprietário de Site** | RDAP Registro.br / RDAP.org + Google DoH | RDAP Verisign + Cloudflare DoH |
-| **Web Scraper** | AllOrigins Proxy | CodeTabs Proxy → CorsProxy.io |
-| **IP & Geolocalização** | ipwho.is | ipapi.co → FreeIPAPI |
-| **Vazamentos (E-mail)** | XposedOrNot | Google DoH (MX Check) |
+1. [Arquitetura e Identidade Visual](#1-arquitetura-e-identidade-visual)
+2. [Catálogo Completo de Funções (13 Módulos)](#2-catálogo-completo-de-funções-13-módulos)
+3. [Equações Matemáticas, Forenses e Criptográficas](#3-equações-matemáticas-forenses-e-criptográficas)
+4. [Camada de Rede e Proxy Remoto](#4-camada-de-rede-e-proxy-remoto)
+5. [Segurança e Cadeia de Custódia](#5-segurança-e-cadeia-de-custódia)
+6. [Instalação e Deploy na Vercel](#6-instalação-e-deploy-na-vercel)
 
 ---
 
-## 4. Segurança e Criptografia P2P (KIIK HACKING)
+## 1. Arquitetura e Identidade Visual
 
-- **Criptografia P2P Silenciosa:** Implementada via **Web Crypto API** (`ECDH P-256` + `AES-256-GCM`) para selar o armazenamento local sem poluir a interface.
-- **Assinatura Criptográfica:** Todo relatório copiado ou baixado em `.json` inclui assinatura **HMAC-SHA256** vinculada a `signed_by: "KIIK HACKING"`.
-- **Proteção Anti-Inspeção:** Bloqueio de `F12`, `Ctrl+Shift+I/J/C/K`, `Cmd+Option+I/J/C`, `Ctrl+U`, `Ctrl+S`, clique direito e arraste, sem falsos positivos em dispositivos móveis ou navegadores com barra lateral.
-- **Encapsulamento Total:** Código isolado em IIFE (`'use strict'`) com sanitização `escapeHtml()` contra XSS.
+O **SHERLOCK 221B** combina os padrões de superfície do **iOS Liquid Glass** (Dynamic Island, listas agrupadas translúcidas, ícones Squircle e Dock flutuante) com os componentes funcionais do **Material Design 3** (campos preenchidos com rótulo flutuante, filter chips tonais e hierarquia de elevação) sob a estética investigativa de **Baker Street**.
 
----
-
-## 5. Como Publicar
-
-1. Substitua os arquivos `index.html` e `README.md` na raiz do repositório.
-2. Envie via `.\deploy.ps1` (ou `git add . ; git commit -m "update" ; git push`).
-3. O deploy na Vercel / GitHub Pages / Cloudflare Pages entra no ar automaticamente.
+```text
+/
+├── api/
+│   └── proxy.js      # Proxy Remoto Serverless (Vercel) + Rota dedicada VirusTotal v3
+├── index.html        # Aplicação single-file (UI iOS Material + Motores Forenses locais)
+└── README.md         # Documentação técnica e especificação matemática
