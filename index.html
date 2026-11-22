@@ -8,9 +8,10 @@
 <meta name="theme-color" content="#040408">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="no-referrer">
-<title>GlassOSINT • Proxy Remoto</title>
+<title>GlassOSINT • Central Sherlock & Buscas</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230A84FF'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E">
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0">
 <style>
   :root {
@@ -172,6 +173,37 @@
   .md-input:focus ~ .md-label,
   .md-input:not(:placeholder-shown) ~ .md-label { top: 11px; font-size: 11px; font-weight: 600; color: var(--ios-blue); }
 
+  /* Dropzone Forense */
+  .dropzone-glass {
+    border: 1.5px dashed rgba(10, 132, 255, 0.55);
+    background: rgba(10, 132, 255, 0.06);
+    border-radius: 22px;
+    padding: 26px 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s var(--spring);
+  }
+  .dropzone-glass:hover, .dropzone-glass.drag-over {
+    background: rgba(10, 132, 255, 0.14);
+    border-color: #64D2FF;
+    transform: scale(1.01);
+  }
+
+  /* Mapa Embutido */
+  .map-frame-wrap {
+    border-radius: 22px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(14, 14, 20, 0.7);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+  }
+  .map-frame-wrap iframe {
+    width: 100%;
+    height: 290px;
+    border: 0;
+    display: block;
+  }
+
   .ios-btn {
     width: 100%; background: linear-gradient(180deg, #1E90FF 0%, #0A84FF 100%);
     color: #FFFFFF; font-weight: 600; font-size: 15px; padding: 14px 20px; border-radius: 17px;
@@ -223,9 +255,11 @@
   .dock-item .material-symbols-rounded { font-size: 21px; }
   .dock-item span.dock-lbl { font-size: 10px; font-weight: 600; }
 
-  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; padding: 0 4px; }
-  .section-header-left { display: flex; align-items: center; gap: 8px; }
-  .section-header h2 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-secondary); margin: 0; }
+  .section-banner {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin-bottom: 14px; padding: 12px 16px; border-radius: 20px;
+    background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.09);
+  }
 
   .view-enter { animation: iosEnter 0.3s var(--spring) forwards; }
   @keyframes iosEnter { from { opacity: 0; transform: scale(0.97) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
@@ -338,21 +372,21 @@
       <span class="material-symbols-rounded">grid_view</span>
       <span class="dock-lbl">Início</span>
     </button>
+    <button type="button" class="dock-item" data-nav="metadata" data-dock="metadata">
+      <span class="material-symbols-rounded">photo_camera</span>
+      <span class="dock-lbl">EXIF</span>
+    </button>
+    <button type="button" class="dock-item" data-nav="osint" data-dock="osint">
+      <span class="material-symbols-rounded">travel_explore</span>
+      <span class="dock-lbl">Sherlock</span>
+    </button>
     <button type="button" class="dock-item" data-nav="cpf" data-dock="cpf">
       <span class="material-symbols-rounded">fingerprint</span>
-      <span class="dock-lbl">Pessoas</span>
+      <span class="dock-lbl">Buscas</span>
     </button>
     <button type="button" class="dock-item" data-nav="atpv" data-dock="atpv">
       <span class="material-symbols-rounded">directions_car</span>
       <span class="dock-lbl">Veículos</span>
-    </button>
-    <button type="button" class="dock-item" data-nav="osint" data-dock="osint">
-      <span class="material-symbols-rounded">travel_explore</span>
-      <span class="dock-lbl">OSINT</span>
-    </button>
-    <button type="button" class="dock-item" data-nav="domain" data-dock="domain">
-      <span class="material-symbols-rounded">language</span>
-      <span class="dock-lbl">Sites</span>
     </button>
   </div>
 </nav>
@@ -409,7 +443,7 @@
         { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
       );
       const hmac = await crypto.subtle.importKey(
-        'raw', enc.encode(`${AUTHOR_SIGNATURE}::P2P::V8`),
+        'raw', enc.encode(`${AUTHOR_SIGNATURE}::P2P::V9`),
         { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
       );
       ctx = { aes, hmac };
@@ -455,7 +489,6 @@
   const RemoteProxy = (() => {
     let mode = 'initializing';
     let modeLabel = 'Conectando Proxy...';
-    let privateApiReady = false;
     let initPromise = null;
 
     const updateIndicator = (color, label) => {
@@ -483,21 +516,19 @@
               const info = await r.json();
               if (info?.ok) {
                 mode = 'vercel';
-                privateApiReady = Boolean(info.privateApiConfigured);
                 updateIndicator('#30D158', `Proxy Remoto (${info.region || 'Edge'})`);
-                return { mode, label: modeLabel, privateApiReady };
+                return { mode, label: modeLabel };
               }
             }
           } catch {}
         }
         mode = 'public-remote';
         updateIndicator('#30D158', 'Proxy Remoto Ativo');
-        return { mode, label: modeLabel, privateApiReady: false };
+        return { mode, label: modeLabel };
       })();
       return initPromise;
     }
 
-    // Chamada para módulos privados adaptados via POST /api/proxy
     async function callPrivateModule(moduleKey, params = {}) {
       await init();
       if (mode !== 'vercel') {
@@ -599,33 +630,33 @@
     };
 
     bar.style.width = '28%';
-    await Promise.all([P2PLayer.init(), sleep(380)]);
+    await Promise.all([P2PLayer.init(), sleep(360)]);
     markDone(step1, 'Ativo');
 
     markActive(step2);
     bar.style.width = '66%';
     sub.textContent = 'Negociando rota de saída com o servidor proxy...';
-    const [proxyRes] = await Promise.all([RemoteProxy.init(), sleep(480)]);
+    const [proxyRes] = await Promise.all([RemoteProxy.init(), sleep(460)]);
     markDone(step2, proxyRes.mode === 'vercel' ? 'Vercel Edge' : 'Gateway Ativo');
 
     markActive(step3);
     bar.style.width = '92%';
     sub.textContent = 'Validando integridade da assinatura KIIK HACKING...';
-    await sleep(340);
+    await sleep(320);
     markDone(step3, 'Verificada');
 
     bar.style.width = '100%';
     core.classList.add('connected');
     coreIcon.textContent = 'verified_user';
     sub.textContent = `Conectado • ${proxyRes.label}`;
-    await sleep(380);
+    await sleep(360);
 
     bootEl.classList.add('boot-done');
     setTimeout(() => bootEl.remove(), 600);
   }
 
   // ==========================================================
-  // 4. UTILITÁRIOS, VISUALIZADOR ANALÍTICO & DADOS
+  // 4. UTILITÁRIOS, MAPA EMBUTIDO & VISUALIZADOR ANALÍTICO
   // ==========================================================
   const _vault = ['Nzc4NDMzZTEyNDQ2OGIxYWE2MGYyNjgxOTE5Y2Q5MThmODUyYWZlMTc2MTA1Njk4NTgxMzg4MWNiNzJhNTUwZg=='];
   const getCpfKey = () => atob(_vault[0]);
@@ -643,7 +674,7 @@
   let activeSectorFilter = 'all';
   let homeSearchQuery = '';
   let historyCache = [];
-  try { historyCache = JSON.parse(localStorage.getItem('kiik_v8_history') || '[]'); } catch { historyCache = []; }
+  try { historyCache = JSON.parse(localStorage.getItem('kiik_v9_history') || '[]'); } catch { historyCache = []; }
 
   function escapeHtml(str) {
     return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -663,13 +694,16 @@
     proprietario:'person_check', titular:'person_check', documento:'badge', responsavel:'manage_accounts',
     registrador:'storefront', razao:'domain', fantasia:'storefront', uf:'map', estado:'map', pais:'public',
     municipio:'location_city', cidade:'location_city', cep:'markunread_mailbox', logradouro:'signpost',
-    bairro:'holiday_village', data:'calendar_today', nascimento:'cake', abertura:'event', registro:'event',
-    expiracao:'event_busy', situacao:'info', status:'check_circle', cnae:'category', capital:'payments',
-    score:'speed', renda:'payments', credito:'credit_score', ip:'router', isp:'dns', asn:'lan',
-    latitude:'location_on', longitude:'location_on', regiao:'explore', url:'link', links:'link',
-    placa:'directions_car', chassi:'directions_car', renavam:'pin', multa:'local_police',
-    processo:'gavel', tribunal:'account_balance', cnh:'id_card', telefone:'call', celular:'smartphone',
-    titulo:'title', descricao:'description', idioma:'translate', tecnologia:'memory', imagens:'image', dominio:'language'
+    endereco:'pin_drop', bairro:'holiday_village', data:'calendar_today', nascimento:'cake', abertura:'event',
+    registro:'event', expiracao:'event_busy', situacao:'info', status:'check_circle', cnae:'category',
+    capital:'payments', score:'speed', renda:'payments', credito:'credit_score', ip:'router', isp:'dns',
+    asn:'lan', latitude:'location_on', longitude:'location_on', altitude:'terrain', bussola:'explore',
+    regiao:'explore', url:'link', links:'link', placa:'directions_car', chassi:'directions_car', renavam:'pin',
+    multa:'local_police', processo:'gavel', tribunal:'account_balance', cnh:'id_card', telefone:'call',
+    celular:'smartphone', titulo:'title', descricao:'description', idioma:'translate', tecnologia:'memory',
+    imagens:'image', dominio:'language', aparelho:'smartphone', fabricante:'devices', modelo:'smartphone',
+    lente:'camera', software:'memory', iso:'iso', abertura_lente:'camera', exposicao:'shutter_speed',
+    flash:'flash_on', resolucao:'aspect_ratio', arquivo:'image', tamanho:'data_usage', hash:'fingerprint'
   };
 
   function getIcon(key) {
@@ -697,8 +731,8 @@
     historyCache.unshift({ moduleId, query, ts: Date.now() });
     historyCache = historyCache.slice(0, 20);
     try {
-      localStorage.setItem('kiik_v8_history', JSON.stringify(historyCache));
-      localStorage.setItem('kiik_v8_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
+      localStorage.setItem('kiik_v9_history', JSON.stringify(historyCache));
+      localStorage.setItem('kiik_v9_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
     } catch {}
   }
 
@@ -706,20 +740,72 @@
     return historyCache.filter(i => i.moduleId === moduleId).slice(0, 5);
   }
 
-  // Visualizador Analítico Universal (suporta objetos aninhados, arrays e fotos Base64)
+  // Widget de Mapa Interativo (OpenStreetMap + Google Maps + Street View + Apple Maps)
+  function renderMapBlock(lat, lon, label = 'Localização no Mapa') {
+    const la = Number(lat);
+    const lo = Number(lon);
+    if (!Number.isFinite(la) || !Number.isFinite(lo)) return '';
+    const d = 0.0045;
+    const bbox = `${(lo - d).toFixed(6)},${(la - d).toFixed(6)},${(lo + d).toFixed(6)},${(la + d).toFixed(6)}`;
+    const osmEmbed = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${la.toFixed(6)},${lo.toFixed(6)}`;
+    const gmaps = `https://www.google.com/maps?q=${la.toFixed(6)},${lo.toFixed(6)}`;
+    const street = `https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${la.toFixed(6)},${lo.toFixed(6)}`;
+    const apple = `https://maps.apple.com/?ll=${la.toFixed(6)},${lo.toFixed(6)}&q=${encodeURIComponent(label)}`;
+
+    return `
+      <div class="mt-5">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5 px-1">
+          <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold flex items-center gap-1.5">
+            <span class="material-symbols-rounded text-base text-[#30D158]">map</span> ${escapeHtml(label)}
+          </h4>
+          <span class="text-[11px] font-mono text-[#64D2FF]">${la.toFixed(6)}, ${lo.toFixed(6)}</span>
+        </div>
+        <div class="map-frame-wrap mb-3">
+          <iframe loading="lazy" referrerpolicy="no-referrer" src="${osmEmbed}" title="Mapa de Geolocalização"></iframe>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <a href="${gmaps}" target="_blank" rel="noopener noreferrer" class="ios-chip">
+            <span class="material-symbols-rounded text-sm text-[#30D158]">location_on</span> Google Maps
+          </a>
+          <a href="${street}" target="_blank" rel="noopener noreferrer" class="ios-chip">
+            <span class="material-symbols-rounded text-sm text-[#FF9F0A]">streetview</span> Street View
+          </a>
+          <a href="${apple}" target="_blank" rel="noopener noreferrer" class="ios-chip">
+            <span class="material-symbols-rounded text-sm text-[#0A84FF]">explore</span> Apple Maps
+          </a>
+        </div>
+      </div>
+    `;
+  }
+
+  async function reverseGeocode(lat, lon) {
+    try {
+      const { data } = await tryFallback([
+        {
+          name: 'Nominatim OSM',
+          run: () => RemoteProxy.fetchJson(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&accept-language=pt-BR`)
+        },
+        {
+          name: 'BigDataCloud Geo',
+          run: () => RemoteProxy.fetchJson(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=pt`)
+        }
+      ]);
+      if (data.display_name) return data.display_name;
+      const parts = [data.locality, data.city, data.principalSubdivision, data.countryName].filter(Boolean);
+      return parts.join(', ') || '-';
+    } catch {
+      return 'Não foi possível resolver o endereço automaticamente';
+    }
+  }
+
   function renderAnalyticResponse(payload) {
     if (!payload || typeof payload !== 'object') {
       return `<p class="text-sm text-[var(--text-secondary)]">${escapeHtml(String(payload ?? 'Sem dados.'))}</p>`;
     }
-
-    const root = payload.data && typeof payload.data === 'object' && !Array.isArray(payload.data)
-      ? payload.data
-      : payload;
-
+    const root = payload.data && typeof payload.data === 'object' && !Array.isArray(payload.data) ? payload.data : payload;
     const scalars = {};
     const sections = [];
     const images = [];
-
     const isBase64Img = (val) => typeof val === 'string' && (/^data:image\//i.test(val) || (val.length > 250 && /^[A-Za-z0-9+/=\r\n]+$/.test(val.trim())));
 
     for (const [k, v] of Object.entries(root)) {
@@ -737,33 +823,21 @@
     }
 
     let html = '';
-
     if (images.length) {
-      html += `
-        <div class="mb-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          ${images.map(img => `
-            <div class="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
-              <img src="${escapeHtml(img.src)}" alt="${escapeHtml(img.label)}" class="max-h-64 mx-auto rounded-xl object-contain">
-              <span class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] block mt-2">${escapeHtml(img.label)}</span>
-            </div>
-          `).join('')}
-        </div>
-      `;
+      html += `<div class="mb-5 grid grid-cols-1 sm:grid-cols-2 gap-4">${images.map(img => `
+        <div class="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
+          <img src="${escapeHtml(img.src)}" alt="${escapeHtml(img.label)}" class="max-h-64 mx-auto rounded-xl object-contain">
+          <span class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] block mt-2">${escapeHtml(img.label)}</span>
+        </div>`).join('')}</div>`;
     }
-
     if (Object.keys(scalars).length) html += renderIosList(scalars);
-
     for (const sec of sections) {
       if (sec.obj) {
         const flat = {};
         for (const [sk, sv] of Object.entries(sec.obj)) {
-          if (sv !== null && sv !== undefined && sv !== '') {
-            flat[sk] = typeof sv === 'object' ? JSON.stringify(sv) : sv;
-          }
+          if (sv !== null && sv !== undefined && sv !== '') flat[sk] = typeof sv === 'object' ? JSON.stringify(sv) : sv;
         }
-        if (Object.keys(flat).length) {
-          html += `<h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mt-5 mb-2 px-1">${escapeHtml(sec.titulo)}</h4>${renderIosList(flat)}`;
-        }
+        if (Object.keys(flat).length) html += `<h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mt-5 mb-2 px-1">${escapeHtml(sec.titulo)}</h4>${renderIosList(flat)}`;
       } else if (sec.itens) {
         html += `<h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mt-5 mb-2 px-1">${escapeHtml(sec.titulo)} (${sec.itens.length})</h4>`;
         if (typeof sec.itens[0] === 'object') {
@@ -779,7 +853,6 @@
         }
       }
     }
-
     return html || '<p class="text-sm text-[var(--text-secondary)]">Nenhum campo preenchido retornado.</p>';
   }
 
@@ -804,23 +877,250 @@
   }
 
   // ==========================================================
-  // 5. SETORES & TODOS OS MÓDULOS (NATIVOS + ADAPTADOS DO ZIP)
+  // 5. SETORIZAÇÃO CENTRALIZADA: SHERLOCK | BUSCAS | VEÍCULOS
   // ==========================================================
   const SECTORS = [
-    { id: 'pessoas', title: 'Pessoas, Crédito & Documentos', short: 'Pessoas', icon: 'badge' },
-    { id: 'veiculos', title: 'Veículos & Jurídico', short: 'Veículos', icon: 'directions_car' },
-    { id: 'osint', title: 'Investigação, Dorks & Vazamentos', short: 'OSINT', icon: 'travel_explore' },
-    { id: 'web', title: 'Sites, Proprietário & Infraestrutura', short: 'Sites & Infra', icon: 'language' }
+    {
+      id: 'sherlock',
+      title: 'Área Sherlock — Investigação OSINT & Forense',
+      subtitle: 'Metadados de fotos, perfis, Dorks, scraping, vazamentos e infraestrutura web',
+      short: 'Área Sherlock',
+      icon: 'policy',
+      accent: '#5E5CE6'
+    },
+    {
+      id: 'buscas',
+      title: 'Área Buscas — Pessoas, Documentos & Crédito',
+      subtitle: 'CPF, CNPJ, BigData, CADSUS, CredLink, Score, Telefone, CNH, Fotos e CEP',
+      short: 'Área Buscas',
+      icon: 'person_search',
+      accent: '#30D158'
+    },
+    {
+      id: 'veiculos',
+      title: 'Área Veículos & Jurídico',
+      subtitle: 'Central MG (DETRAN/SENATRAN/PBH), Placas, Multas, Vistoria, EAR e Processos',
+      short: 'Veículos & Jurídico',
+      icon: 'directions_car',
+      accent: '#0A84FF'
+    }
   ];
 
   const MODULES = [
-    // ==================== SETOR 1: PESSOAS & DOCUMENTOS ====================
+    // ==================== ÁREA SHERLOCK (OSINT & FORENSE) ====================
+    {
+      id: 'metadata',
+      sector: 'sherlock',
+      name: 'Metadados & EXIF (Foto)',
+      desc: 'Analisa foto enviada: extrai aparelho, câmera, data, hash SHA-256, GPS e mapa.',
+      keywords: 'metadados exif foto imagem gps localizacao mapa aparelho camera forense sherlock',
+      apisLabel: 'Forense + Mapa',
+      tagClass: 'tag-ok',
+      icon: 'photo_camera',
+      gradient: 'linear-gradient(135deg, #00C7BE 0%, #0A84FF 100%)',
+      customView: 'metadata'
+    },
+    {
+      id: 'osint',
+      sector: 'sherlock',
+      name: 'OSINT Direto (APIs)',
+      desc: 'Verifica username em 11 plataformas compatíveis roteadas pelo proxy remoto.',
+      keywords: 'osint sherlock usuario username github reddit perfis',
+      apisLabel: '11 APIs Diretas',
+      icon: 'travel_explore',
+      gradient: 'linear-gradient(135deg, #5E5CE6 0%, #3634A3 100%)',
+      placeholder: 'Username (ex: torvalds)',
+      max: 60,
+      customSearch: 'osint_api'
+    },
+    {
+      id: 'dork',
+      sector: 'sherlock',
+      name: 'Central de Dorks',
+      desc: 'Buscas avançadas no Google para Redes Sociais, Adultos, Namoro e Apostas.',
+      keywords: 'dork sherlock google redes sociais instagram tiktok apostas namoro',
+      apisLabel: 'Google Dorks',
+      icon: 'manage_search',
+      gradient: 'linear-gradient(135deg, #FF9F0A 0%, #EA580C 100%)',
+      placeholder: 'Nome, @user ou e-mail',
+      max: 80,
+      customSearch: 'dork_only'
+    },
+    {
+      id: 'scraping',
+      sector: 'sherlock',
+      name: 'Web Scraper',
+      desc: 'Extrai metadados HTML, e-mails, telefones e links públicos via proxy remoto.',
+      keywords: 'scraper sherlock html extrair links telefones emails site',
+      apisLabel: 'Proxy Remoto',
+      icon: 'code',
+      gradient: 'linear-gradient(135deg, #32ADE6 0%, #007AFF 100%)',
+      placeholder: 'Ex: https://site.com.br',
+      max: 150,
+      fetchApi: async (v) => {
+        let target = v.trim();
+        if (!target) throw new Error('Informe uma URL pública.');
+        if (!/^https?:\/\//i.test(target)) target = 'https://' + target;
+        let parsedUrl;
+        try { parsedUrl = new URL(target); } catch { throw new Error('URL inválida.'); }
+
+        const { html, via } = await RemoteProxy.fetchHtml(parsedUrl.href);
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const textContent = doc.body?.innerText || doc.body?.textContent || '';
+        const title = doc.querySelector('title')?.textContent?.trim() || '-';
+        const description = doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim() || '-';
+        const generator = doc.querySelector('meta[name="generator"]')?.getAttribute('content')?.trim() || '-';
+        const emails = [...new Set((html.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || []).filter(e => !/\.(png|jpg|jpeg|gif|svg|webp|css|js)$/i.test(e)))].slice(0, 30);
+        const telefones = [...new Set((textContent.match(/(?:\+55\s?)?(?:\(?\d{2}\)?\s?)(?:9\d{4}|\d{4})-?\d{4}/g) || []).map(t => t.trim()))].slice(0, 20);
+        const uniqueLinks = [...new Set([...doc.querySelectorAll('a[href]')].map(a => a.getAttribute('href')?.trim()).filter(h => h && /^https?:\/\//i.test(h)))];
+        const socialRx = /(instagram\.com|facebook\.com|linkedin\.com|x\.com|twitter\.com|youtube\.com|tiktok\.com|wa\.me|whatsapp\.com|t\.me|github\.com)/i;
+        const redes = uniqueLinks.filter(l => socialRx.test(l)).slice(0, 20);
+        const externos = uniqueLinks.filter(l => !l.includes(parsedUrl.hostname) && !socialRx.test(l)).slice(0, 20);
+
+        return {
+          provider: via,
+          resumo: { url: parsedUrl.href, titulo: title, descricao: description, tecnologia: generator, total_links: uniqueLinks.length, total_imagens: doc.querySelectorAll('img').length, emails_encontrados: emails.length },
+          listas: [
+            { titulo: 'E-mails Públicos', itens: emails },
+            { titulo: 'Telefones Encontrados', itens: telefones },
+            { titulo: 'Redes Sociais / Contato', itens: redes },
+            { titulo: 'Links Externos', itens: externos }
+          ].filter(l => l.itens.length > 0),
+          raw: { url: parsedUrl.href, title, description, emails, telefones, redes, externos }
+        };
+      }
+    },
+    {
+      id: 'domain',
+      sector: 'sherlock',
+      name: 'Proprietário de Site',
+      desc: 'Retorna titular (dono), CNPJ/CPF (.br), registrador, datas e DNS.',
+      keywords: 'site dominio dono proprietario whois rdap dns sherlock',
+      apisLabel: 'RDAP + 2 DNS',
+      icon: 'language',
+      gradient: 'linear-gradient(135deg, #64D2FF 0%, #0A84FF 100%)',
+      placeholder: 'Ex: uol.com.br ou site.com',
+      max: 80,
+      fetchApi: async (v) => {
+        const domain = v.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+        if (!domain || !domain.includes('.')) throw new Error('Informe um domínio válido (ex: exemplo.com.br).');
+
+        const resolveDns = async (type) => {
+          const { data } = await tryFallback([
+            { name: 'Google DoH', run: () => RemoteProxy.fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=${type}`) },
+            { name: 'Cloudflare DoH', run: () => RemoteProxy.fetchJson(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${type}`, { headers: { Accept: 'application/dns-json' } }) }
+          ]);
+          return (data?.Answer || []).map(a => a.data);
+        };
+
+        const rdapResult = await tryFallback([
+          { name: domain.endsWith('.br') ? 'RDAP Registro.br via Proxy' : 'RDAP.org via Proxy', run: () => RemoteProxy.fetchJson(domain.endsWith('.br') ? `https://rdap.registro.br/domain/${encodeURIComponent(domain)}` : `https://rdap.org/domain/${encodeURIComponent(domain)}`) },
+          { name: 'RDAP Verisign via Proxy', run: () => RemoteProxy.fetchJson(`https://rdap.verisign.com/com/v1/domain/${encodeURIComponent(domain)}`) }
+        ]).catch(() => ({ data: null, provider: 'DNS Only (RDAP indisponível)' }));
+
+        const [aRec, mxRec, nsRec, txtRec] = await Promise.all([resolveDns('A').catch(() => []), resolveDns('MX').catch(() => []), resolveDns('NS').catch(() => []), resolveDns('TXT').catch(() => [])]);
+        const rdap = rdapResult.data;
+        const owner = extractRdapOwner(rdap);
+        const events = (rdap?.events || []).reduce((acc, ev) => { acc[ev.eventAction] = ev.eventDate?.split('T')[0]; return acc; }, {});
+
+        return {
+          provider: `${rdapResult.provider} + DNS`,
+          resumo: {
+            dominio: domain, proprietario: owner.proprietario, documento_titular: owner.documento_titular,
+            email_contato: owner.email_contato, registrador: owner.registrador,
+            status_rdap: (rdap?.status || []).join(', ') || 'Não retornado',
+            registro: events.registration || '-', expiracao: events.expiration || '-'
+          },
+          listas: [
+            { titulo: 'IPs do Servidor (A)', itens: aRec },
+            { titulo: 'Servidores de E-mail (MX)', itens: mxRec },
+            { titulo: 'Nameservers (NS)', itens: nsRec },
+            { titulo: 'Registros TXT', itens: txtRec }
+          ].filter(l => l.itens.length > 0),
+          raw: { domain, owner, rdap, dns: { aRec, mxRec, nsRec, txtRec } }
+        };
+      }
+    },
+    {
+      id: 'breach',
+      sector: 'sherlock',
+      name: 'Vazamentos (E-mail)',
+      desc: 'Checa exposição em bases vazadas + validação alternativa de servidor MX.',
+      keywords: 'vazamento email breach senha seguranca sherlock',
+      apisLabel: '2 APIs Sec',
+      icon: 'security',
+      gradient: 'linear-gradient(135deg, #FF453A 0%, #C62828 100%)',
+      placeholder: 'Ex: nome@dominio.com',
+      max: 80,
+      fetchApi: async (v) => {
+        const email = v.trim();
+        if (!email.includes('@')) throw new Error('Informe um e-mail válido.');
+        const domain = email.split('@')[1];
+        const { data, provider } = await tryFallback([
+          {
+            name: 'XposedOrNot via Proxy',
+            run: async () => {
+              const r = await RemoteProxy.request(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
+              if (r.status === 404) return { resumo: { email, status: 'Nenhum vazamento encontrado' }, raw: { email, breaches: [] } };
+              if (!r.ok) throw new Error(`HTTP ${r.status}`);
+              const d = await r.json();
+              const list = Array.isArray(d.breaches?.[0]) ? d.breaches[0] : (d.breaches || []);
+              return { resumo: { email, status: list.length ? 'Exposto em vazamentos' : 'Seguro', total_vazamentos: list.length }, listas: list.length ? [{ titulo: 'Bases vazadas', itens: list }] : [], raw: d };
+            }
+          },
+          {
+            name: 'DNS MX Check via Proxy',
+            run: async () => {
+              const mx = await RemoteProxy.fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=MX`);
+              const servers = (mx?.Answer || []).map(a => a.data);
+              return { resumo: { email, dominio: domain, servidor_email: servers.length ? 'Ativo (MX válido)' : 'Sem registro MX' }, listas: servers.length ? [{ titulo: 'Servidores MX', itens: servers }] : [], raw: mx };
+            }
+          }
+        ]);
+        return { ...data, provider };
+      }
+    },
+    {
+      id: 'ip',
+      sector: 'sherlock',
+      name: 'IP & Geolocalização',
+      desc: 'Operadora, ASN e mapa de localização (vazio retorna o IP do Proxy Remoto).',
+      keywords: 'ip geo localizacao mapa operadora asn servidor proxy sherlock',
+      apisLabel: '3 APIs + Mapa',
+      icon: 'router',
+      gradient: 'linear-gradient(135deg, #BF5AF2 0%, #892CDC 100%)',
+      placeholder: 'IP alvo (vazio = IP do Proxy)',
+      max: 45,
+      optional: true,
+      fetchApi: async (v) => {
+        const target = v.trim();
+        const { data, provider } = await tryFallback([
+          { name: 'ipwho.is via Proxy', run: async () => { const r = await RemoteProxy.fetchJson(`https://ipwho.is/${encodeURIComponent(target)}`); if (r.success === false) throw new Error(r.message); return r; } },
+          { name: 'ipapi.co via Proxy', run: () => RemoteProxy.fetchJson(target ? `https://ipapi.co/${encodeURIComponent(target)}/json/` : 'https://ipapi.co/json/') },
+          { name: 'FreeIPAPI via Proxy', run: () => RemoteProxy.fetchJson(`https://freeipapi.com/api/json/${encodeURIComponent(target)}`) }
+        ]);
+        return {
+          provider,
+          coords: (data.latitude != null && data.longitude != null) ? { lat: data.latitude, lon: data.longitude, label: `Localização do IP ${data.ip || data.ipAddress || ''}` } : null,
+          resumo: {
+            ip: data.ip || data.ipAddress || target,
+            pais: `${data.country || data.country_name || data.countryName || '-'} (${data.country_code || data.countryCode || '-'})`,
+            regiao: data.region || data.regionName || '-', cidade: data.city || data.cityName || '-',
+            isp: data.connection?.isp || data.org || '-', asn: data.connection?.asn || data.asn || '-',
+            latitude: data.latitude ?? '-', longitude: data.longitude ?? '-'
+          },
+          raw: data
+        };
+      }
+    },
+
+    // ==================== ÁREA BUSCAS (PESSOAS & DOCUMENTOS) ====================
     {
       id: 'cpf',
-      sector: 'pessoas',
+      sector: 'buscas',
       name: 'CPF Completo',
-      desc: 'CPFHub.io + CPF Full (API Privada) + validação fiscal local em cascata.',
-      keywords: 'cpf pessoa documento full receita',
+      desc: 'CPF Full (API Privada) → CPFHub.io → validação fiscal local em cascata.',
+      keywords: 'cpf pessoa documento full receita buscas',
       apisLabel: '3 APIs + Fallback',
       icon: 'fingerprint',
       gradient: 'linear-gradient(135deg, #FF375F 0%, #C91D42 100%)',
@@ -872,10 +1172,10 @@
     },
     {
       id: 'cnpj',
-      sector: 'pessoas',
+      sector: 'buscas',
       name: 'Consulta CNPJ',
       desc: 'Razão social, situação, CNAE e sócios (QSA) com 3 APIs via proxy remoto.',
-      keywords: 'cnpj empresa socios qsa receita',
+      keywords: 'cnpj empresa socios qsa receita buscas',
       apisLabel: '3 APIs BR',
       icon: 'domain',
       gradient: 'linear-gradient(135deg, #30D158 0%, #1E9E3E 100%)',
@@ -911,10 +1211,10 @@
     },
     {
       id: 'bigdata',
-      sector: 'pessoas',
+      sector: 'buscas',
       name: 'BigData Pessoas',
       desc: 'Pesquisa por CPF, Nome, E-mail, Telefone, CEP, PIS, Mãe ou RG.',
-      keywords: 'bigdata cpf nome email telefone cep pis mae rg',
+      keywords: 'bigdata cpf nome email telefone cep pis mae rg buscas',
       apisLabel: 'API Privada',
       tagClass: 'tag-pro',
       icon: 'database',
@@ -936,10 +1236,10 @@
     },
     {
       id: 'cadsus',
-      sector: 'pessoas',
+      sector: 'buscas',
       name: 'CADSUS (SUS)',
       desc: 'Consulta por CPF, Nome, Telefone, CEP, Nascimento, Mãe ou Nome Parcial.',
-      keywords: 'cadsus sus saude cpf nome mae nascimento uf',
+      keywords: 'cadsus sus saude cpf nome mae nascimento uf buscas',
       apisLabel: 'API Privada',
       tagClass: 'tag-pro',
       icon: 'medical_information',
@@ -961,10 +1261,10 @@
     },
     {
       id: 'credlink',
-      sector: 'pessoas',
+      sector: 'buscas',
       name: 'CredLink',
       desc: 'Busca por CPF, E-mail, Celular, Nome + Cidade/Ano/Veículo/Mês.',
-      keywords: 'credlink cpf email celular nome cidade veiculo',
+      keywords: 'credlink cpf email celular nome cidade veiculo buscas',
       apisLabel: 'API Privada',
       tagClass: 'tag-pro',
       icon: 'hub',
@@ -988,10 +1288,10 @@
     },
     {
       id: 'financeiro_credito',
-      sector: 'pessoas',
+      sector: 'buscas',
       name: 'Score & Crédito',
       desc: 'Consulta perfil financeiro, renda presumida e score de crédito por CPF.',
-      keywords: 'score credito financeiro serasa renda cpf',
+      keywords: 'score credito financeiro serasa renda cpf buscas',
       apisLabel: 'API Privada',
       tagClass: 'tag-pro',
       icon: 'credit_score',
@@ -1008,10 +1308,10 @@
     },
     {
       id: 'telefone',
-      sector: 'pessoas',
+      sector: 'buscas',
       name: 'Consulta Telefone',
       desc: 'Localiza titular e vínculos associados ao número (DDD + 9 dígitos).',
-      keywords: 'telefone celular numero ddd titular',
+      keywords: 'telefone celular numero ddd titular buscas',
       apisLabel: 'API Privada',
       tagClass: 'tag-pro',
       icon: 'call',
@@ -1028,10 +1328,10 @@
     },
     {
       id: 'cnh_sp',
-      sector: 'pessoas',
+      sector: 'buscas',
       name: 'CNH São Paulo',
       desc: 'Consulta registro de habilitação (CNH SP) vinculada ao CPF.',
-      keywords: 'cnh sp habilitacao motorista documento cpf',
+      keywords: 'cnh sp habilitacao motorista documento cpf buscas',
       apisLabel: 'API Privada',
       tagClass: 'tag-pro',
       icon: 'id_card',
@@ -1048,10 +1348,10 @@
     },
     {
       id: 'fotos_uf',
-      sector: 'pessoas',
+      sector: 'buscas',
       name: 'Fotos Estaduais',
       desc: 'Consulta biométrica unificada por CPF para CE, ES, MA, PE, PR e RJ.',
-      keywords: 'foto retrato biometria ce es ma pe pr rj cpf',
+      keywords: 'foto retrato biometria ce es ma pe pr rj cpf buscas',
       apisLabel: '6 Estados (UF)',
       tagClass: 'tag-pro',
       icon: 'photo_camera_front',
@@ -1071,11 +1371,11 @@
     },
     {
       id: 'cep',
-      sector: 'pessoas',
+      sector: 'buscas',
       name: 'Consulta CEP',
-      desc: 'Endereço completo e coordenadas via BrasilAPI, ViaCEP e AwesomeAPI.',
-      keywords: 'cep endereco rua bairro cidade mapa',
-      apisLabel: '3 APIs BR',
+      desc: 'Endereço completo, coordenadas e mapa via BrasilAPI, ViaCEP e AwesomeAPI.',
+      keywords: 'cep endereco rua bairro cidade mapa buscas',
+      apisLabel: '3 APIs + Mapa',
       icon: 'location_on',
       gradient: 'linear-gradient(135deg, #FF9F0A 0%, #D97706 100%)',
       placeholder: 'CEP (8 dígitos)',
@@ -1089,20 +1389,22 @@
           { name: 'ViaCEP via Proxy', run: async () => { const r = await RemoteProxy.fetchJson(`https://viacep.com.br/ws/${clean}/json/`); if (r.erro) throw new Error('Não encontrado'); return r; } },
           { name: 'AwesomeAPI via Proxy', run: () => RemoteProxy.fetchJson(`https://cep.awesomeapi.com.br/json/${clean}`) }
         ]);
+        const lat = data.location?.coordinates?.latitude || data.lat;
+        const lon = data.location?.coordinates?.longitude || data.lng;
         return {
           provider,
+          coords: (lat && lon) ? { lat, lon, label: `Localização do CEP ${clean}` } : null,
           resumo: {
             cep: data.cep || clean, logradouro: data.street || data.logradouro || data.address || '-',
             bairro: data.neighborhood || data.bairro || data.district || '-', cidade: data.city || data.localidade || '-',
-            uf: data.state || data.uf || '-',
-            latitude: data.location?.coordinates?.latitude || data.lat || '-', longitude: data.location?.coordinates?.longitude || data.lng || '-'
+            uf: data.state || data.uf || '-', latitude: lat || '-', longitude: lon || '-'
           },
           raw: data
         };
       }
     },
 
-    // ==================== SETOR 2: VEÍCULOS & JURÍDICO ====================
+    // ==================== ÁREA VEÍCULOS & JURÍDICO ====================
     {
       id: 'atpv',
       sector: 'veiculos',
@@ -1213,207 +1515,257 @@
         const raw = await RemoteProxy.callPrivateModule('processos', { valor: cpf, cpf });
         return { provider: 'Processos Judiciais via Proxy', analyticRaw: raw, raw };
       }
-    },
-
-    // ==================== SETOR 3: OSINT, DORKS & VAZAMENTOS ====================
-    {
-      id: 'osint',
-      sector: 'osint',
-      name: 'OSINT Direto (APIs)',
-      desc: 'Verifica username em 11 plataformas compatíveis roteadas pelo proxy.',
-      keywords: 'osint usuario username github reddit perfis',
-      apisLabel: '11 APIs Diretas',
-      icon: 'travel_explore',
-      gradient: 'linear-gradient(135deg, #5E5CE6 0%, #3634A3 100%)',
-      placeholder: 'Username (ex: torvalds)',
-      max: 60,
-      customSearch: 'osint_api'
-    },
-    {
-      id: 'dork',
-      sector: 'osint',
-      name: 'Central de Dorks',
-      desc: 'Buscas avançadas no Google para Redes Sociais, Adultos, Namoro e Apostas.',
-      keywords: 'dork google redes sociais instagram tiktok apostas namoro',
-      apisLabel: 'Google Dorks',
-      icon: 'manage_search',
-      gradient: 'linear-gradient(135deg, #FF9F0A 0%, #EA580C 100%)',
-      placeholder: 'Nome, @user ou e-mail',
-      max: 80,
-      customSearch: 'dork_only'
-    },
-    {
-      id: 'breach',
-      sector: 'osint',
-      name: 'Vazamentos (E-mail)',
-      desc: 'Checa exposição em bases vazadas + validação alternativa de servidor MX.',
-      keywords: 'vazamento email breach senha seguranca',
-      apisLabel: '2 APIs Sec',
-      icon: 'security',
-      gradient: 'linear-gradient(135deg, #FF453A 0%, #C62828 100%)',
-      placeholder: 'Ex: nome@dominio.com',
-      max: 80,
-      fetchApi: async (v) => {
-        const email = v.trim();
-        if (!email.includes('@')) throw new Error('Informe um e-mail válido.');
-        const domain = email.split('@')[1];
-        const { data, provider } = await tryFallback([
-          {
-            name: 'XposedOrNot via Proxy',
-            run: async () => {
-              const r = await RemoteProxy.request(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
-              if (r.status === 404) return { resumo: { email, status: 'Nenhum vazamento encontrado' }, raw: { email, breaches: [] } };
-              if (!r.ok) throw new Error(`HTTP ${r.status}`);
-              const d = await r.json();
-              const list = Array.isArray(d.breaches?.[0]) ? d.breaches[0] : (d.breaches || []);
-              return { resumo: { email, status: list.length ? 'Exposto em vazamentos' : 'Seguro', total_vazamentos: list.length }, listas: list.length ? [{ titulo: 'Bases vazadas', itens: list }] : [], raw: d };
-            }
-          },
-          {
-            name: 'DNS MX Check via Proxy',
-            run: async () => {
-              const mx = await RemoteProxy.fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=MX`);
-              const servers = (mx?.Answer || []).map(a => a.data);
-              return { resumo: { email, dominio: domain, servidor_email: servers.length ? 'Ativo (MX válido)' : 'Sem registro MX' }, listas: servers.length ? [{ titulo: 'Servidores MX', itens: servers }] : [], raw: mx };
-            }
-          }
-        ]);
-        return { ...data, provider };
-      }
-    },
-
-    // ==================== SETOR 4: SITES & INFRAESTRUTURA ====================
-    {
-      id: 'domain',
-      sector: 'web',
-      name: 'Proprietário de Site',
-      desc: 'Retorna titular (dono), CNPJ/CPF (.br), registrador, datas e DNS.',
-      keywords: 'site dominio dono proprietario whois rdap dns',
-      apisLabel: 'RDAP + 2 DNS',
-      icon: 'language',
-      gradient: 'linear-gradient(135deg, #64D2FF 0%, #0A84FF 100%)',
-      placeholder: 'Ex: uol.com.br ou site.com',
-      max: 80,
-      fetchApi: async (v) => {
-        const domain = v.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
-        if (!domain || !domain.includes('.')) throw new Error('Informe um domínio válido (ex: exemplo.com.br).');
-
-        const resolveDns = async (type) => {
-          const { data } = await tryFallback([
-            { name: 'Google DoH', run: () => RemoteProxy.fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=${type}`) },
-            { name: 'Cloudflare DoH', run: () => RemoteProxy.fetchJson(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${type}`, { headers: { Accept: 'application/dns-json' } }) }
-          ]);
-          return (data?.Answer || []).map(a => a.data);
-        };
-
-        const rdapResult = await tryFallback([
-          { name: domain.endsWith('.br') ? 'RDAP Registro.br via Proxy' : 'RDAP.org via Proxy', run: () => RemoteProxy.fetchJson(domain.endsWith('.br') ? `https://rdap.registro.br/domain/${encodeURIComponent(domain)}` : `https://rdap.org/domain/${encodeURIComponent(domain)}`) },
-          { name: 'RDAP Verisign via Proxy', run: () => RemoteProxy.fetchJson(`https://rdap.verisign.com/com/v1/domain/${encodeURIComponent(domain)}`) }
-        ]).catch(() => ({ data: null, provider: 'DNS Only (RDAP indisponível)' }));
-
-        const [aRec, mxRec, nsRec, txtRec] = await Promise.all([resolveDns('A').catch(() => []), resolveDns('MX').catch(() => []), resolveDns('NS').catch(() => []), resolveDns('TXT').catch(() => [])]);
-        const rdap = rdapResult.data;
-        const owner = extractRdapOwner(rdap);
-        const events = (rdap?.events || []).reduce((acc, ev) => { acc[ev.eventAction] = ev.eventDate?.split('T')[0]; return acc; }, {});
-
-        return {
-          provider: `${rdapResult.provider} + DNS`,
-          resumo: {
-            dominio: domain, proprietario: owner.proprietario, documento_titular: owner.documento_titular,
-            email_contato: owner.email_contato, registrador: owner.registrador,
-            status_rdap: (rdap?.status || []).join(', ') || 'Não retornado',
-            registro: events.registration || '-', expiracao: events.expiration || '-'
-          },
-          listas: [
-            { titulo: 'IPs do Servidor (A)', itens: aRec },
-            { titulo: 'Servidores de E-mail (MX)', itens: mxRec },
-            { titulo: 'Nameservers (NS)', itens: nsRec },
-            { titulo: 'Registros TXT', itens: txtRec }
-          ].filter(l => l.itens.length > 0),
-          raw: { domain, owner, rdap, dns: { aRec, mxRec, nsRec, txtRec } }
-        };
-      }
-    },
-    {
-      id: 'scraping',
-      sector: 'web',
-      name: 'Web Scraper',
-      desc: 'Extrai metadados, e-mails, telefones e links públicos via proxy remoto.',
-      keywords: 'scraper html extrair links telefones emails site',
-      apisLabel: 'Proxy Remoto',
-      icon: 'code',
-      gradient: 'linear-gradient(135deg, #32ADE6 0%, #007AFF 100%)',
-      placeholder: 'Ex: https://site.com.br',
-      max: 150,
-      fetchApi: async (v) => {
-        let target = v.trim();
-        if (!target) throw new Error('Informe uma URL pública.');
-        if (!/^https?:\/\//i.test(target)) target = 'https://' + target;
-        let parsedUrl;
-        try { parsedUrl = new URL(target); } catch { throw new Error('URL inválida.'); }
-
-        const { html, via } = await RemoteProxy.fetchHtml(parsedUrl.href);
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        const textContent = doc.body?.innerText || doc.body?.textContent || '';
-        const title = doc.querySelector('title')?.textContent?.trim() || '-';
-        const description = doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim() || '-';
-        const generator = doc.querySelector('meta[name="generator"]')?.getAttribute('content')?.trim() || '-';
-        const emails = [...new Set((html.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || []).filter(e => !/\.(png|jpg|jpeg|gif|svg|webp|css|js)$/i.test(e)))].slice(0, 30);
-        const telefones = [...new Set((textContent.match(/(?:\+55\s?)?(?:\(?\d{2}\)?\s?)(?:9\d{4}|\d{4})-?\d{4}/g) || []).map(t => t.trim()))].slice(0, 20);
-        const uniqueLinks = [...new Set([...doc.querySelectorAll('a[href]')].map(a => a.getAttribute('href')?.trim()).filter(h => h && /^https?:\/\//i.test(h)))];
-        const socialRx = /(instagram\.com|facebook\.com|linkedin\.com|x\.com|twitter\.com|youtube\.com|tiktok\.com|wa\.me|whatsapp\.com|t\.me|github\.com)/i;
-        const redes = uniqueLinks.filter(l => socialRx.test(l)).slice(0, 20);
-        const externos = uniqueLinks.filter(l => !l.includes(parsedUrl.hostname) && !socialRx.test(l)).slice(0, 20);
-
-        return {
-          provider: via,
-          resumo: { url: parsedUrl.href, titulo: title, descricao: description, tecnologia: generator, total_links: uniqueLinks.length, total_imagens: doc.querySelectorAll('img').length, emails_encontrados: emails.length },
-          listas: [
-            { titulo: 'E-mails Públicos', itens: emails },
-            { titulo: 'Telefones Encontrados', itens: telefones },
-            { titulo: 'Redes Sociais / Contato', itens: redes },
-            { titulo: 'Links Externos', itens: externos }
-          ].filter(l => l.itens.length > 0),
-          raw: { url: parsedUrl.href, title, description, emails, telefones, redes, externos }
-        };
-      }
-    },
-    {
-      id: 'ip',
-      sector: 'web',
-      name: 'IP & Geolocalização',
-      desc: 'Operadora, ASN e coordenadas (vazio retorna o IP do Proxy Remoto).',
-      keywords: 'ip geo localizacao operadora asn servidor proxy',
-      apisLabel: '3 APIs Geo',
-      icon: 'router',
-      gradient: 'linear-gradient(135deg, #BF5AF2 0%, #892CDC 100%)',
-      placeholder: 'IP alvo (vazio = IP do Proxy)',
-      max: 45,
-      optional: true,
-      fetchApi: async (v) => {
-        const target = v.trim();
-        const { data, provider } = await tryFallback([
-          { name: 'ipwho.is via Proxy', run: async () => { const r = await RemoteProxy.fetchJson(`https://ipwho.is/${encodeURIComponent(target)}`); if (r.success === false) throw new Error(r.message); return r; } },
-          { name: 'ipapi.co via Proxy', run: () => RemoteProxy.fetchJson(target ? `https://ipapi.co/${encodeURIComponent(target)}/json/` : 'https://ipapi.co/json/') },
-          { name: 'FreeIPAPI via Proxy', run: () => RemoteProxy.fetchJson(`https://freeipapi.com/api/json/${encodeURIComponent(target)}`) }
-        ]);
-        return {
-          provider,
-          resumo: {
-            ip: data.ip || data.ipAddress || target,
-            pais: `${data.country || data.country_name || data.countryName || '-'} (${data.country_code || data.countryCode || '-'})`,
-            regiao: data.region || data.regionName || '-', cidade: data.city || data.cityName || '-',
-            isp: data.connection?.isp || data.org || '-', asn: data.connection?.asn || data.asn || '-',
-            latitude: data.latitude ?? '-', longitude: data.longitude ?? '-'
-          },
-          raw: data
-        };
-      }
     }
   ];
 
   // ==========================================================
-  // 6. OSINT DIRETO & CENTRAL DE DORKS
+  // 6. MÓDULO FORENSE DE METADADOS & EXIF (FOTO + GPS + MAPA)
+  // ==========================================================
+  async function computeSha256(arrayBuffer) {
+    if (!window.crypto?.subtle) return 'Indisponível (requer HTTPS)';
+    const digest = await crypto.subtle.digest('SHA-256', arrayBuffer);
+    return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  function formatDateExif(val) {
+    if (!val) return '-';
+    if (val instanceof Date && !isNaN(val)) return val.toLocaleString('pt-BR');
+    return String(val);
+  }
+
+  function renderMetadataView(view) {
+    view.innerHTML = `
+      <div class="view-enter">
+        <button type="button" data-nav="" class="ios-chip mb-5">
+          <span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar ao Início
+        </button>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          <div class="lg:col-span-5 liquid-card p-6 lg:sticky lg:top-6">
+            <div class="flex items-center gap-3.5 mb-4">
+              <div class="squircle" style="background:linear-gradient(135deg,#00C7BE,#0A84FF)">
+                <span class="material-symbols-rounded">photo_camera</span>
+              </div>
+              <div>
+                <h2 class="text-lg font-bold leading-tight">Metadados & EXIF</h2>
+                <span class="pill-tag tag-ok mt-1">Forense • GPS • Mapa</span>
+              </div>
+            </div>
+            <p class="text-xs text-[var(--text-secondary)] mb-5 leading-relaxed">
+              Envie uma foto original (JPG, HEIC, PNG, TIFF ou WebP). A análise extrai aparelho, câmera, data, hash SHA-256, coordenadas GPS e localiza o ponto no mapa.
+            </p>
+
+            <input type="file" id="metaFileInput" accept="image/*,.heic,.heif,.tif,.tiff" class="hidden">
+            <div id="metaDropzone" class="dropzone-glass">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-[#0A84FF]/20 border border-[#0A84FF]/40 flex items-center justify-center mb-3">
+                <span class="material-symbols-rounded text-3xl text-[#64D2FF]">add_photo_alternate</span>
+              </div>
+              <p class="text-sm font-semibold text-white mb-1">Toque ou arraste a foto aqui</p>
+              <p class="text-[11px] text-[var(--text-secondary)]">Processamento forense local no navegador (JPEG, HEIC, PNG, WebP)</p>
+            </div>
+
+            <div id="metaPreviewBox" class="hidden mt-4 p-3 rounded-2xl bg-white/5 border border-white/10">
+              <img id="metaPreviewImg" src="" alt="Prévia da foto" class="w-full max-h-56 object-contain rounded-xl mb-2">
+              <p id="metaPreviewName" class="text-xs text-[var(--text-secondary)] text-center truncate"></p>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7">
+            <div id="metaResult" class="min-h-[340px] liquid-card p-6 flex flex-col justify-center items-center text-center">
+              <div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-3">
+                <span class="material-symbols-rounded text-3xl text-white/30">pin_drop</span>
+              </div>
+              <p class="text-sm font-medium text-white mb-1">Aguardando imagem</p>
+              <p class="text-xs text-[var(--text-secondary)] max-w-sm">
+                Dica: fotos enviadas diretamente da galeria ou por arquivo/e-mail preservam o EXIF e GPS; redes sociais e WhatsApp (modo padrão) costumam remover esses dados.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const fileInput = document.getElementById('metaFileInput');
+    const dropzone = document.getElementById('metaDropzone');
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('drag-over');
+      const file = e.dataTransfer?.files?.[0];
+      if (file) analyzePhotoMetadata(file);
+    });
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files?.[0];
+      if (file) analyzePhotoMetadata(file);
+    });
+  }
+
+  async function analyzePhotoMetadata(file) {
+    const resDiv = document.getElementById('metaResult');
+    const prevBox = document.getElementById('metaPreviewBox');
+    const prevImg = document.getElementById('metaPreviewImg');
+    const prevName = document.getElementById('metaPreviewName');
+
+    const objectUrl = URL.createObjectURL(file);
+    prevBox.classList.remove('hidden');
+    prevImg.src = objectUrl;
+    prevName.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+
+    resDiv.className = 'min-h-[340px] liquid-card p-6 flex flex-col justify-center items-center text-center';
+    resDiv.innerHTML = `
+      <span class="material-symbols-rounded spinner text-4xl mb-3 text-[#0A84FF]">refresh</span>
+      <p class="text-sm font-semibold text-white">Extraindo metadados EXIF, XMP e GPS...</p>
+      <p class="text-xs text-[var(--text-secondary)] mt-1">Calculando hash forense SHA-256 e resolvendo mapa...</p>
+    `;
+
+    try {
+      const [buffer, dimensions] = await Promise.all([
+        file.arrayBuffer(),
+        new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
+          img.onerror = () => resolve({ w: null, h: null });
+          img.src = objectUrl;
+        })
+      ]);
+
+      const sha256 = await computeSha256(buffer);
+
+      let exifAll = null;
+      let gpsOnly = null;
+      if (window.exifr) {
+        try {
+          exifAll = await window.exifr.parse(file, { tiff: true, exif: true, gps: true, xmp: true, iptc: true, ifd0: true });
+        } catch {}
+        try {
+          gpsOnly = await window.exifr.gps(file);
+        } catch {}
+      }
+
+      const lat = gpsOnly?.latitude ?? exifAll?.latitude ?? null;
+      const lon = gpsOnly?.longitude ?? exifAll?.longitude ?? null;
+      const hasGps = Number.isFinite(Number(lat)) && Number.isFinite(Number(lon));
+
+      let resolvedAddress = null;
+      if (hasGps) {
+        resolvedAddress = await reverseGeocode(Number(lat), Number(lon));
+      }
+
+      const make = exifAll?.Make || '';
+      const model = exifAll?.Model || '';
+      const aparelho = [make, model].filter(Boolean).join(' ').trim() || 'Não informado nos metadados';
+      const mp = (dimensions.w && dimensions.h) ? `${((dimensions.w * dimensions.h) / 1e6).toFixed(2)} MP` : '-';
+
+      const arquivoInfo = {
+        arquivo: file.name,
+        tamanho: file.size >= 1048576 ? `${(file.size / 1048576).toFixed(2)} MB` : `${(file.size / 1024).toFixed(1)} KB`,
+        tipo_mime: file.type || 'Desconhecido',
+        resolucao: (dimensions.w && dimensions.h) ? `${dimensions.w} × ${dimensions.h} px (${mp})` : '-',
+        ultima_modificacao: file.lastModified ? new Date(file.lastModified).toLocaleString('pt-BR') : '-',
+        hash_sha256: sha256
+      };
+
+      const cameraInfo = {
+        aparelho,
+        fabricante: exifAll?.Make || '-',
+        modelo: exifAll?.Model || '-',
+        software_so: exifAll?.Software || exifAll?.HostComputer || '-',
+        lente: exifAll?.LensModel || exifAll?.LensInfo || '-',
+        data_captura: formatDateExif(exifAll?.DateTimeOriginal || exifAll?.CreateDate),
+        abertura_lente: exifAll?.FNumber ? `f/${exifAll.FNumber}` : '-',
+        exposicao: exifAll?.ExposureTime ? (exifAll.ExposureTime < 1 ? `1/${Math.round(1 / exifAll.ExposureTime)}s` : `${exifAll.ExposureTime}s`) : '-',
+        iso: exifAll?.ISO || '-',
+        distancia_focal: exifAll?.FocalLength ? `${exifAll.FocalLength} mm` : '-',
+        flash: exifAll?.Flash || '-'
+      };
+
+      const gpsInfo = hasGps ? {
+        latitude: Number(lat).toFixed(6),
+        longitude: Number(lon).toFixed(6),
+        endereco_aproximado: resolvedAddress,
+        altitude: exifAll?.GPSAltitude != null ? `${Number(exifAll.GPSAltitude).toFixed(1)} m` : '-',
+        direcao_bussola: exifAll?.GPSImgDirection != null ? `${Number(exifAll.GPSImgDirection).toFixed(1)}°` : '-'
+      } : null;
+
+      // Metadados brutos extras
+      const rawTags = {};
+      if (exifAll && typeof exifAll === 'object') {
+        for (const [k, v] of Object.entries(exifAll)) {
+          if (v !== null && v !== undefined && v !== '' && !(v instanceof Uint8Array)) {
+            rawTags[k] = v instanceof Date ? v.toISOString() : (typeof v === 'object' ? JSON.stringify(v) : String(v));
+          }
+        }
+      }
+
+      lastModuleId = 'metadados-exif';
+      lastResultData = { arquivo: arquivoInfo, camera: cameraInfo, gps: gpsInfo, exif_bruto: rawTags };
+
+      const gpsBanner = hasGps
+        ? `<div class="mb-5 p-4 rounded-2xl bg-[#30D158]/12 border border-[#30D158]/35">
+             <div class="flex items-center gap-2 mb-1">
+               <span class="material-symbols-rounded text-[#30D158] text-xl">my_location</span>
+               <span class="text-xs uppercase tracking-wider text-[#30D158] font-bold">Geolocalização GPS Encontrada</span>
+             </div>
+             <p class="text-sm font-semibold text-white">${escapeHtml(resolvedAddress)}</p>
+           </div>`
+        : `<div class="mb-5 p-4 rounded-2xl bg-[#FF9F0A]/12 border border-[#FF9F0A]/30">
+             <div class="flex items-center gap-2 mb-1">
+               <span class="material-symbols-rounded text-[#FF9F0A] text-xl">location_off</span>
+               <span class="text-xs uppercase tracking-wider text-[#FF9F0A] font-bold">Sem Coordenadas GPS na Imagem</span>
+             </div>
+             <p class="text-xs text-[var(--text-secondary)]">Esta foto não contém tags GPS embutidas (comum em capturas de tela ou imagens baixadas de WhatsApp/Instagram).</p>
+           </div>`;
+
+      resDiv.className = 'min-h-[340px] liquid-card p-6 text-left';
+      resDiv.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-rounded text-[#30D158] text-2xl">check_circle</span>
+              <h3 class="font-bold text-lg">Laudo de Metadados</h3>
+            </div>
+            <span class="text-[11px] text-[#0A84FF] font-semibold">Aparelho: ${escapeHtml(aparelho)}</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button type="button" class="ios-chip" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button>
+            <button type="button" class="ios-chip" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button>
+            <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#0A84FF]">verified</span> Assinado</button>
+          </div>
+        </div>
+
+        ${gpsBanner}
+        ${hasGps ? renderIosList(gpsInfo) + renderMapBlock(lat, lon, 'Local Exato da Captura') : ''}
+
+        <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mt-5 mb-2 px-1">Aparelho & Câmera (EXIF)</h4>
+        ${renderIosList(cameraInfo)}
+
+        <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mt-5 mb-2 px-1">Arquivo & Integridade Forense</h4>
+        ${renderIosList(arquivoInfo)}
+
+        ${Object.keys(rawTags).length ? `
+          <details class="mt-5">
+            <summary class="cursor-pointer text-xs uppercase tracking-wider text-[#0A84FF] font-semibold px-1 py-2">
+              Ver todas as tags EXIF/XMP brutas (${Object.keys(rawTags).length})
+            </summary>
+            <div class="mt-2">${renderIosList(rawTags)}</div>
+          </details>
+        ` : ''}
+      `;
+    } catch (err) {
+      resDiv.className = 'min-h-[340px] liquid-card p-6 flex flex-col justify-center items-center text-center';
+      resDiv.innerHTML = `
+        <span class="material-symbols-rounded text-5xl mb-2 text-[#FF453A]">error</span>
+        <h3 class="font-bold text-base mb-1">Erro ao analisar imagem</h3>
+        <p class="text-xs text-[var(--text-secondary)] max-w-md">${escapeHtml(err.message)}</p>
+      `;
+    }
+  }
+
+  // ==========================================================
+  // 7. OSINT DIRETO & CENTRAL DE DORKS
   // ==========================================================
   function getCompatibleOsintApis(alvo) {
     const enc = encodeURIComponent(alvo);
@@ -1577,11 +1929,10 @@
   }
 
   // ==========================================================
-  // 7. VIEW DINÂMICA MULTI-PARÂMETRO (BIGDATA / CADSUS / CREDLINK / FOTOS)
+  // 8. VIEW MULTI-PARÂMETRO (BIGDATA / CADSUS / CREDLINK / FOTOS)
   // ==========================================================
   function renderMultiPrivateView(view, m) {
     const cfg = m.privateConfig;
-
     view.innerHTML = `
       <div class="view-enter">
         <button type="button" data-nav="" class="ios-chip mb-5">
@@ -1610,9 +1961,7 @@
                   ${cfg.types.map(t => `<option value="${escapeHtml(t.value)}">${escapeHtml(t.label)}</option>`).join('')}
                 </select>
               </div>
-
               <div id="multiFields"></div>
-
               <button type="submit" class="ios-btn mt-1">
                 <span class="material-symbols-rounded text-lg">search</span> Consultar
               </button>
@@ -1657,7 +2006,6 @@
           </div>
         `;
       }).join('');
-
       fieldsBox.querySelectorAll('[data-digits="1"]').forEach(inp => {
         inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g, ''); });
       });
@@ -1675,7 +2023,6 @@
       const params = {};
       if (!cfg.dynamicModuleFromType) params.tipo = selectedType;
       for (const [k, v] of fd.entries()) params[k] = String(v).trim();
-
       const targetModuleKey = cfg.dynamicModuleFromType ? selectedType : cfg.moduleKey;
 
       btn.disabled = true;
@@ -1699,7 +2046,7 @@
               <span class="text-[11px] text-[#0A84FF] font-semibold">Módulo: ${escapeHtml(targetModuleKey)} • Proxy Remoto</span>
             </div>
             <div class="flex flex-wrap gap-2">
-              <button type="button" class="ios-chip" onclick="window.print()"><span class="material-symbols-rounded text-sm">print</span> PDF</button>
+              <button type="button" class="ios-chip" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button>
               <button type="button" class="ios-chip" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button>
               <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#0A84FF]">verified</span> Assinado</button>
             </div>
@@ -1721,7 +2068,7 @@
   }
 
   // ==========================================================
-  // 8. CENTRAL VEICULAR (MG)
+  // 9. CENTRAL VEICULAR (MG)
   // ==========================================================
   function navigate(id) { window.location.hash = id ? '#' + id : ''; }
 
@@ -1919,7 +2266,7 @@
   }
 
   // ==========================================================
-  // 9. HOME SCREEN & ROTEADOR
+  // 10. HOME SCREEN & ROTEADOR
   // ==========================================================
   function renderHomeSectors() {
     const container = document.getElementById('sectorsContainer');
@@ -1939,14 +2286,20 @@
       totalRendered += items.length;
 
       return `
-        <section class="mb-8">
-          <div class="section-header">
-            <div class="section-header-left">
-              <span class="material-symbols-rounded text-base text-[#0A84FF]">${escapeHtml(sec.icon)}</span>
-              <h2>${escapeHtml(sec.title)}</h2>
+        <section class="mb-9">
+          <div class="section-banner">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:${sec.accent}24; border:1px solid ${sec.accent}55;">
+                <span class="material-symbols-rounded text-xl" style="color:${sec.accent}">${escapeHtml(sec.icon)}</span>
+              </div>
+              <div class="min-w-0">
+                <h2 class="text-sm font-bold text-white leading-tight truncate">${escapeHtml(sec.title)}</h2>
+                <p class="text-[11px] text-[var(--text-secondary)] truncate mt-0.5">${escapeHtml(sec.subtitle)}</p>
+              </div>
             </div>
-            <span class="text-[11px] text-[var(--text-tertiary)] font-semibold">${items.length} módulo(s)</span>
+            <span class="pill-tag tag-info shrink-0">${items.length}</span>
           </div>
+
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             ${items.map(m => `
               <div class="liquid-card app-widget p-5 flex flex-col justify-between gap-4" data-nav="${escapeHtml(m.id)}">
@@ -1988,15 +2341,15 @@
         <div class="view-enter">
           <div class="mb-7">
             <div class="mb-5 px-1">
-              <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">Central de Inteligência</h1>
+              <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">Central de Investigação</h1>
               <p class="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
-                ${MODULES.length} módulos setorizados com roteamento via Proxy Remoto e visualização analítica.
+                Separado entre <strong>Área Sherlock (OSINT & Forense)</strong>, <strong>Área Buscas</strong> e <strong>Veículos</strong>.
               </p>
             </div>
 
             <div class="spotlight-bar mb-4">
               <span class="material-symbols-rounded text-[var(--text-secondary)] text-xl">search</span>
-              <input type="text" id="spotlightInput" class="spotlight-input" placeholder="Buscar módulo (ex: CPF, placa, CADSUS, BigData, multas, dork...)" value="${escapeHtml(homeSearchQuery)}" autocomplete="off">
+              <input type="text" id="spotlightInput" class="spotlight-input" placeholder="Buscar ferramenta (ex: metadados, foto, EXIF, CPF, placa, CADSUS, dork...)" value="${escapeHtml(homeSearchQuery)}" autocomplete="off">
               ${homeSearchQuery ? '<button type="button" id="clearSpotlight" class="text-[var(--text-secondary)] hover:text-white"><span class="material-symbols-rounded text-lg">close</span></button>' : ''}
             </div>
 
@@ -2024,6 +2377,7 @@
 
     const m = MODULES.find(x => x.id === hash);
     if (!m) return navigate('');
+    if (m.customView === 'metadata') { renderMetadataView(view); return; }
     if (m.customView === 'atpv') { renderAtpvView(view); return; }
     if (m.customView === 'multi_private') { renderMultiPrivateView(view, m); return; }
 
@@ -2120,6 +2474,7 @@
         html = renderAnalyticResponse(data.analyticRaw);
       } else {
         if (data.resumo) html += renderIosList(data.resumo);
+        if (data.coords) html += renderMapBlock(data.coords.lat, data.coords.lon, data.coords.label);
         if (data.listas?.length) {
           html += data.listas.map(l => `
             <div class="mt-5">
@@ -2143,7 +2498,7 @@
             ${data.provider ? `<span class="text-[11px] text-[#0A84FF] font-semibold">Fonte: ${escapeHtml(data.provider)}</span>` : ''}
           </div>
           <div class="flex flex-wrap gap-2">
-            <button type="button" class="ios-chip" onclick="window.print()"><span class="material-symbols-rounded text-sm">print</span> PDF</button>
+            <button type="button" class="ios-chip" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button>
             <button type="button" class="ios-chip" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button>
             <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#0A84FF]">verified</span> Assinado</button>
           </div>
@@ -2187,7 +2542,7 @@
   }
 
   // ==========================================================
-  // 10. EVENTOS & BOOT
+  // 11. EVENTOS CENTRALIZADOS & BOOT
   // ==========================================================
   document.addEventListener('click', async (e) => {
     const navEl = e.target.closest('[data-nav]');
@@ -2200,6 +2555,9 @@
       renderHomeSectors();
       return;
     }
+
+    const printEl = e.target.closest('[data-print]');
+    if (printEl) { window.print(); return; }
 
     const fillEl = e.target.closest('[data-fill]');
     if (fillEl) {
