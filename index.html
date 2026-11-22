@@ -55,7 +55,7 @@
   }
   .liquid-glass.interactive:active { transform: scale(0.98); }
 
-  .input-group { position: relative; margin-bottom: 20px; }
+  .input-group { position: relative; margin-bottom: 16px; }
   .input-glass {
     width: 100%;
     padding: 20px 16px 10px;
@@ -105,6 +105,7 @@
     justify-content: center;
     gap: 8px;
     transition: all 0.2s var(--ease-spring);
+    text-decoration: none;
   }
   .btn-primary:hover { background: #0070e0; box-shadow: 0 8px 24px var(--accent-glow); }
   .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -197,7 +198,7 @@
         <span class="text-[11px] text-[var(--text-muted)] font-medium tracking-wider uppercase">Pegada Digital</span>
       </div>
     </div>
-    <span class="badge hidden sm:inline-flex">OSINT Multi-Fontes</span>
+    <span class="badge hidden sm:inline-flex">OSINT + DETRAN-MG</span>
   </header>
 
   <main id="view" class="w-full"></main>
@@ -208,7 +209,9 @@
 // CONFIGURAÇÃO
 // ==========================================
 const CONFIG = {
-  cpfKey: '778433e124468b1aa60f2681919cd918f852afe1761056985813881cb72a550f'
+  cpfKey: '778433e124468b1aa60f2681919cd918f852afe1761056985813881cb72a550f',
+  detranAtpvUrl: 'https://detran.mg.gov.br/veiculos/transferencias/emitir-a-autorizacao-para-transferencia-de-propriedade-do-veiculo-atpv-e',
+  portalMgUrl: 'https://www.mg.gov.br/servico/transferir-propriedade-de-veiculo-vendedor'
 };
 
 let lastResultData = null;
@@ -222,6 +225,15 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
+function copyText(text, btnEl) {
+  navigator.clipboard.writeText(text);
+  if (btnEl) {
+    const old = btnEl.innerHTML;
+    btnEl.innerHTML = '<span class="material-symbols-rounded text-sm text-[var(--success)]">check</span> Copiado';
+    setTimeout(() => { btnEl.innerHTML = old; }, 1400);
+  }
+}
+
 const ICON_MAP = {
   cnpj: 'badge', cpf: 'fingerprint', email: 'mail', nome: 'person', name: 'person',
   razao: 'domain', fantasia: 'storefront', uf: 'map', estado: 'map', pais: 'public',
@@ -231,7 +243,8 @@ const ICON_MAP = {
   abertura: 'event', situacao: 'info', status: 'check_circle', cnae: 'category',
   natureza: 'gavel', capital: 'payments', ip: 'router', isp: 'dns', org: 'hub',
   asn: 'lan', latitude: 'location_on', longitude: 'location_on', ddd: 'call',
-  telefone: 'call', regiao: 'explore', platform: 'apps', url: 'link', alvo: 'target'
+  telefone: 'call', regiao: 'explore', platform: 'apps', url: 'link', alvo: 'target',
+  placa: 'directions_car', renavam: 'pin', valor: 'payments'
 };
 
 function getIcon(key) {
@@ -326,10 +339,7 @@ function buildOsintTargets(alvo) {
             try {
               const r = await fetch(`https://api.github.com/users/${enc}`);
               if (r.status === 404) return { status: 'notfound', label: 'Não encontrado' };
-              if (r.ok) {
-                const d = await r.json();
-                return { status: 'found', label: 'Encontrado', info: `${d.public_repos} repos` };
-              }
+              if (r.ok) { const d = await r.json(); return { status: 'found', label: 'Encontrado', info: `${d.public_repos} repos` }; }
             } catch (e) {}
             return { status: 'manual', label: 'Verificar' };
           }
@@ -365,30 +375,12 @@ function buildOsintTargets(alvo) {
             return await checkViaProxy(`https://www.reddit.com/user/${enc}`, ['page not found', 'nobody on reddit goes by that name']);
           }
         },
-        {
-          id: 'instagram', nome: 'Instagram', url: `https://www.instagram.com/${enc}/`,
-          check: () => checkViaProxy(`https://www.instagram.com/${enc}/`, ['page isn\'t available', 'página não está disponível'])
-        },
-        {
-          id: 'tiktok', nome: 'TikTok', url: `https://www.tiktok.com/@${enc}`,
-          check: () => checkViaProxy(`https://www.tiktok.com/@${enc}`, ['couldn\'t find this account', 'não foi possível encontrar'])
-        },
-        {
-          id: 'x', nome: 'X (Twitter)', url: `https://x.com/${enc}`,
-          check: () => checkViaProxy(`https://x.com/${enc}`, ['this account doesn’t exist', 'esta conta não existe'])
-        },
-        {
-          id: 'twitch', nome: 'Twitch', url: `https://www.twitch.tv/${enc}`,
-          check: () => checkViaProxy(`https://www.twitch.tv/${enc}`, ['unless you’ve got a time machine'])
-        },
-        {
-          id: 'youtube', nome: 'YouTube', url: `https://www.youtube.com/@${enc}`,
-          check: () => checkViaProxy(`https://www.youtube.com/@${enc}`, ['this page isn\'t available'])
-        },
-        {
-          id: 'facebook', nome: 'Facebook', url: q(`site:facebook.com "${alvo}"`),
-          check: async () => ({ status: 'manual', label: 'Busca Google' })
-        }
+        { id: 'instagram', nome: 'Instagram', url: `https://www.instagram.com/${enc}/`, check: () => checkViaProxy(`https://www.instagram.com/${enc}/`, ["page isn't available", 'página não está disponível']) },
+        { id: 'tiktok', nome: 'TikTok', url: `https://www.tiktok.com/@${enc}`, check: () => checkViaProxy(`https://www.tiktok.com/@${enc}`, ["couldn't find this account", 'não foi possível encontrar']) },
+        { id: 'x', nome: 'X (Twitter)', url: `https://x.com/${enc}`, check: () => checkViaProxy(`https://x.com/${enc}`, ['this account doesn’t exist', 'esta conta não existe']) },
+        { id: 'twitch', nome: 'Twitch', url: `https://www.twitch.tv/${enc}`, check: () => checkViaProxy(`https://www.twitch.tv/${enc}`, ['unless you’ve got a time machine']) },
+        { id: 'youtube', nome: 'YouTube', url: `https://www.youtube.com/@${enc}`, check: () => checkViaProxy(`https://www.youtube.com/@${enc}`, ["this page isn't available"]) },
+        { id: 'facebook', nome: 'Facebook', url: q(`site:facebook.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Busca Google' }) }
       ]
     },
     {
@@ -396,34 +388,13 @@ function buildOsintTargets(alvo) {
       icone: 'visibility_off',
       dorkGeral: q(`"${alvo}" (site:onlyfans.com OR site:privacy.com.br OR site:fansly.com OR site:pornhub.com OR site:xvideos.com OR site:chaturbate.com OR site:fatalmodel.com)`),
       itens: [
-        {
-          id: 'onlyfans', nome: 'OnlyFans', url: `https://onlyfans.com/${enc}`,
-          check: () => checkViaProxy(`https://onlyfans.com/${enc}`, ['sorry this page is not available'])
-        },
-        {
-          id: 'privacy', nome: 'Privacy', url: `https://privacy.com.br/profile/${enc}`,
-          check: () => checkViaProxy(`https://privacy.com.br/profile/${enc}`, ['não encontrado', '404'])
-        },
-        {
-          id: 'fansly', nome: 'Fansly', url: `https://fansly.com/${enc}`,
-          check: () => checkViaProxy(`https://fansly.com/${enc}`, ['page not found'])
-        },
-        {
-          id: 'chaturbate', nome: 'Chaturbate', url: `https://chaturbate.com/${enc}/`,
-          check: () => checkViaProxy(`https://chaturbate.com/${enc}/`, ['page not found'])
-        },
-        {
-          id: 'pornhub', nome: 'Pornhub', url: `https://www.pornhub.com/users/${enc}`,
-          check: () => checkViaProxy(`https://www.pornhub.com/users/${enc}`, ['error 404', 'page not found'])
-        },
-        {
-          id: 'xvideos', nome: 'XVideos', url: `https://www.xvideos.com/profiles/${enc}`,
-          check: () => checkViaProxy(`https://www.xvideos.com/profiles/${enc}`, ['404', 'not found'])
-        },
-        {
-          id: 'fatalmodel', nome: 'Fatal Model', url: q(`site:fatalmodel.com "${alvo}"`),
-          check: async () => ({ status: 'manual', label: 'Busca Google' })
-        }
+        { id: 'onlyfans', nome: 'OnlyFans', url: `https://onlyfans.com/${enc}`, check: () => checkViaProxy(`https://onlyfans.com/${enc}`, ['sorry this page is not available']) },
+        { id: 'privacy', nome: 'Privacy', url: `https://privacy.com.br/profile/${enc}`, check: () => checkViaProxy(`https://privacy.com.br/profile/${enc}`, ['não encontrado', '404']) },
+        { id: 'fansly', nome: 'Fansly', url: `https://fansly.com/${enc}`, check: () => checkViaProxy(`https://fansly.com/${enc}`, ['page not found']) },
+        { id: 'chaturbate', nome: 'Chaturbate', url: `https://chaturbate.com/${enc}/`, check: () => checkViaProxy(`https://chaturbate.com/${enc}/`, ['page not found']) },
+        { id: 'pornhub', nome: 'Pornhub', url: `https://www.pornhub.com/users/${enc}`, check: () => checkViaProxy(`https://www.pornhub.com/users/${enc}`, ['error 404', 'page not found']) },
+        { id: 'xvideos', nome: 'XVideos', url: `https://www.xvideos.com/profiles/${enc}`, check: () => checkViaProxy(`https://www.xvideos.com/profiles/${enc}`, ['404', 'not found']) },
+        { id: 'fatalmodel', nome: 'Fatal Model', url: q(`site:fatalmodel.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Busca Google' }) }
       ]
     },
     {
@@ -456,9 +427,16 @@ function buildOsintTargets(alvo) {
 }
 
 // ==========================================
-// MÓDULOS OSINT
+// MÓDULOS OSINT + DETRAN-MG
 // ==========================================
 const MODULES = [
+  {
+    id: 'atpv',
+    name: 'ATPV-e (DETRAN-MG)',
+    desc: 'Preparador + Acesso Oficial CET-MG',
+    icon: 'directions_car',
+    customView: 'atpv'
+  },
   {
     id: 'username',
     name: 'Varredura OSINT (Web)',
@@ -706,6 +684,134 @@ function navigate(id) {
   window.location.hash = id ? '#' + id : '';
 }
 
+function renderAtpvView(view) {
+  view.innerHTML = `
+    <button onclick="navigate('')" class="liquid-glass interactive inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6">
+      <span class="material-symbols-rounded text-lg">arrow_back</span> Voltar
+    </button>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div class="lg:col-span-5 liquid-glass p-6">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-12 h-12 rounded-2xl bg-[var(--accent-glow)] flex items-center justify-center border border-[var(--accent)]/30">
+            <span class="material-symbols-rounded text-2xl text-[var(--accent)]">directions_car</span>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold leading-tight">ATPV-e (DETRAN-MG)</h2>
+            <p class="text-xs text-[var(--text-muted)]">Preparador de Transferência de Propriedade</p>
+          </div>
+        </div>
+        <form id="atpvForm" onsubmit="handleAtpvPrepare(event)">
+          <div class="input-group">
+            <input type="text" id="atpvPlaca" class="input-glass uppercase" placeholder=" " maxlength="7" required>
+            <label for="atpvPlaca" class="input-label">Placa do Veículo (Ex: ABC1D23)</label>
+          </div>
+          <div class="input-group">
+            <input type="text" id="atpvRenavam" class="input-glass" placeholder=" " maxlength="11" required>
+            <label for="atpvRenavam" class="input-label">RENAVAM (11 dígitos)</label>
+          </div>
+          <div class="input-group">
+            <input type="text" id="atpvCompradorDoc" class="input-glass" placeholder=" " maxlength="18" required>
+            <label for="atpvCompradorDoc" class="input-label">CPF ou CNPJ do Comprador</label>
+          </div>
+          <div class="input-group">
+            <input type="text" id="atpvCompradorNome" class="input-glass" placeholder=" " maxlength="80" required>
+            <label for="atpvCompradorNome" class="input-label">Nome Completo / Razão Social</label>
+          </div>
+          <div class="input-group">
+            <input type="email" id="atpvEmail" class="input-glass" placeholder=" " maxlength="80">
+            <label for="atpvEmail" class="input-label">E-mail do Comprador</label>
+          </div>
+          <div class="input-group">
+            <input type="text" id="atpvValor" class="input-glass" placeholder=" " maxlength="20" required>
+            <label for="atpvValor" class="input-label">Valor da Venda (Ex: 45.000,00)</label>
+          </div>
+          <button type="submit" class="btn-primary w-full">
+            <span class="material-symbols-rounded text-lg">fact_check</span> Preparar Dados da ATPV-e
+          </button>
+        </form>
+      </div>
+
+      <div class="lg:col-span-7 space-y-4">
+        <div id="atpvResult" class="liquid-glass p-6">
+          <div class="flex items-center gap-2 mb-3">
+            <span class="material-symbols-rounded text-[var(--accent)]">info</span>
+            <h3 class="font-bold text-base">Acesso Oficial DETRAN-MG / CET-MG</h3>
+          </div>
+          <p class="text-sm text-[var(--text-muted)] mb-5">
+            A emissão oficial da ATPV-e em Minas Gerais exige autenticação via <strong>Gov.br (Prata ou Ouro)</strong> no Portal Cidadão, MGApp ou CDT. Preencha os dados ao lado para gerar o painel de cópia rápida em 1 clique e clique abaixo para abrir o serviço oficial.
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <a href="${CONFIG.detranAtpvUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary">
+              <span class="material-symbols-rounded text-lg">open_in_new</span> Emitir ATPV-e no DETRAN-MG
+            </a>
+            <a href="${CONFIG.portalMgUrl}" target="_blank" rel="noopener noreferrer" class="btn-ghost">
+              <span class="material-symbols-rounded text-base">account_balance</span> Portal MG (Vendedor)
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function handleAtpvPrepare(e) {
+  e.preventDefault();
+  const dados = {
+    placa: document.getElementById('atpvPlaca').value.trim().toUpperCase(),
+    renavam: document.getElementById('atpvRenavam').value.replace(/\D/g, ''),
+    documento_comprador: document.getElementById('atpvCompradorDoc').value.trim(),
+    nome_comprador: document.getElementById('atpvCompradorNome').value.trim(),
+    email_comprador: document.getElementById('atpvEmail').value.trim() || '-',
+    valor_venda: document.getElementById('atpvValor').value.trim()
+  };
+  lastResultData = dados;
+
+  const campos = [
+    { label: 'Placa', val: dados.placa },
+    { label: 'RENAVAM', val: dados.renavam },
+    { label: 'CPF / CNPJ Comprador', val: dados.documento_comprador },
+    { label: 'Nome do Comprador', val: dados.nome_comprador },
+    { label: 'E-mail Comprador', val: dados.email_comprador },
+    { label: 'Valor da Venda', val: `R$ ${dados.valor_venda}` }
+  ];
+
+  const box = document.getElementById('atpvResult');
+  box.innerHTML = `
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-[var(--glass-border)]">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-rounded text-[var(--success)] text-2xl">check_circle</span>
+        <h3 class="font-bold text-lg">Dados Prontos para ATPV-e</h3>
+      </div>
+      <div class="flex gap-2">
+        <button type="button" class="btn-ghost" onclick="downloadJson('atpv-${escapeHtml(dados.placa)}')">
+          <span class="material-symbols-rounded text-base">download</span> Salvar JSON
+        </button>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+      ${campos.map(c => `
+        <div class="site-card">
+          <div class="flex flex-col min-w-0">
+            <span class="data-label">${escapeHtml(c.label)}</span>
+            <span class="data-value truncate">${escapeHtml(c.val)}</span>
+          </div>
+          <button type="button" class="btn-ghost text-xs py-1.5 px-2.5" onclick="copyText('${escapeHtml(c.val)}', this)">
+            <span class="material-symbols-rounded text-sm">content_copy</span> Copiar
+          </button>
+        </div>
+      `).join('')}
+    </div>
+    <div class="flex flex-wrap gap-3">
+      <a href="${CONFIG.detranAtpvUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary">
+        <span class="material-symbols-rounded text-lg">open_in_new</span> Abrir Emissão ATPV-e (DETRAN-MG)
+      </a>
+      <a href="${CONFIG.portalMgUrl}" target="_blank" rel="noopener noreferrer" class="btn-ghost">
+        <span class="material-symbols-rounded text-base">account_balance</span> Portal MG (Vendedor)
+      </a>
+    </div>
+  `;
+}
+
 function render() {
   const view = document.getElementById('view');
   const hash = window.location.hash.replace('#', '');
@@ -726,15 +832,20 @@ function render() {
         <h1 class="text-3xl md:text-4xl font-bold mb-2">
           Pegada <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent)] to-[#BF5AF2]">Digital</span>
         </h1>
-        <p class="text-sm text-[var(--text-muted)]">Módulos OSINT com verificação em tempo real, CPFHub.io e APIs públicas.</p>
+        <p class="text-sm text-[var(--text-muted)]">Módulos OSINT com verificação em tempo real, CPFHub.io, APIs públicas e DETRAN-MG.</p>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">${cards}</div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">${cards}</div>
     `;
     return;
   }
 
   const m = MODULES.find(x => x.id === hash);
   if (!m) return navigate('');
+
+  if (m.customView === 'atpv') {
+    renderAtpvView(view);
+    return;
+  }
 
   const history = getHistory(m.id);
   const historyHtml = history.length ? `
