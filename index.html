@@ -5,372 +5,383 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#07080D">
+<meta name="theme-color" content="#090B10">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="no-referrer">
-<title>SHERLOCK 221B • iOS Material Forensics</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230E111A'/%3E%3Ccircle cx='14' cy='14' r='6.5' fill='none' stroke='%23E0B354' stroke-width='2.4'/%3E%3Cpath d='M19 19l5.5 5.5' stroke='%230A84FF' stroke-width='2.6' stroke-linecap='round'/%3E%3Ccircle cx='14' cy='14' r='2.2' fill='%23E0B354'/%3E%3C/svg%3E">
+<title>SHERLOCK 221B • Investigation Workstation</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230F121B'/%3E%3Ccircle cx='14' cy='14' r='6.5' fill='none' stroke='%23D9A74A' stroke-width='2.3'/%3E%3Cpath d='M19 19l5.5 5.5' stroke='%230A84FF' stroke-width='2.6' stroke-linecap='round'/%3E%3Ccircle cx='14' cy='14' r='2' fill='%23D9A74A'/%3E%3C/svg%3E">
 <script src="https://cdn.tailwindcss.com"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0">
 <style>
   :root {
-    --bg-base: #07080D;
-    --m3-surface: rgba(24, 27, 38, 0.60);
-    --m3-surface-high: rgba(34, 38, 52, 0.72);
-    --m3-outline: rgba(255, 255, 255, 0.11);
-    --m3-outline-gold: rgba(224, 179, 84, 0.28);
-    --glass-specular: rgba(255, 240, 206, 0.24);
-    --text-primary: #F7F5F0;
-    --text-secondary: rgba(235, 232, 224, 0.68);
-    --text-tertiary: rgba(235, 232, 224, 0.42);
-    --sherlock-gold: #E0B354;
-    --sherlock-gold-dark: #B5822A;
-    --ios-blue: #0A84FF;
-    --ios-teal: #5AC8FA;
-    --ios-green: #30D158;
-    --ios-red: #FF453A;
-    --ios-orange: #FF9F0A;
-    --ios-purple: #BF5AF2;
-    --spring: cubic-bezier(0.22, 1, 0.36, 1);
+    --canvas: #090B10;
+    --sidebar-bg: rgba(13, 16, 24, 0.88);
+    --topbar-bg: rgba(13, 16, 24, 0.78);
+    --surface-1: rgba(20, 24, 35, 0.74);
+    --surface-2: rgba(28, 33, 48, 0.72);
+    --surface-hover: rgba(38, 44, 64, 0.78);
+    --border-subtle: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+    --border-gold: rgba(217, 167, 74, 0.30);
+    --specular: rgba(255, 244, 218, 0.14);
+    --text-1: #F3F4F6;
+    --text-2: #9CA3AF;
+    --text-3: #6B7280;
+    --gold: #D9A74A;
+    --gold-soft: rgba(217, 167, 74, 0.14);
+    --blue: #0A84FF;
+    --cyan: #5AC8FA;
+    --green: #30D158;
+    --red: #FF453A;
+    --orange: #FF9F0A;
+    --purple: #BF5AF2;
+    --sidebar-w: 276px;
+    --topbar-h: 60px;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  * {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-    -webkit-user-select: none;
-  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
   input, textarea, select, pre, code { user-select: text; -webkit-user-select: text; }
 
   html, body {
-    margin: 0; padding: 0; min-height: 100vh;
-    background-color: var(--bg-base);
-    color: var(--text-primary);
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    margin: 0; padding: 0; height: 100%; background: var(--canvas); color: var(--text-1);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+    -webkit-font-smoothing: antialiased; overflow: hidden;
   }
 
-  .font-sherlock { font-family: 'Cinzel', Georgia, serif; letter-spacing: 0.05em; }
-  .font-mono-tech { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .font-crest { font-family: 'Cinzel', Georgia, serif; letter-spacing: 0.06em; }
+  .font-mono-code { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
 
-  /* Fundo iOS Material + Sherlock 221B */
-  .ambient-canvas {
-    position: fixed; inset: 0; z-index: -1; overflow: hidden;
-    background: radial-gradient(circle at 50% 0%, #121626 0%, #07080D 72%);
+  /* Subtle Forensic Mesh Background */
+  .bg-workstation {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background:
+      radial-gradient(circle at 18% 0%, rgba(217, 167, 74, 0.09), transparent 42%),
+      radial-gradient(circle at 88% 12%, rgba(10, 132, 255, 0.09), transparent 44%),
+      linear-gradient(180deg, #0B0E16 0%, #07090E 100%);
   }
-  .ambient-grid {
-    position: absolute; inset: 0; opacity: 0.045;
-    background-image:
-      linear-gradient(rgba(224, 179, 84, 0.5) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(224, 179, 84, 0.5) 1px, transparent 1px);
-    background-size: 44px 44px;
-    mask-image: radial-gradient(circle at 50% 22%, #000 0%, transparent 76%);
-    -webkit-mask-image: radial-gradient(circle at 50% 22%, #000 0%, transparent 76%);
+  .bg-grid {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.035;
+    background-image: linear-gradient(rgba(217,167,74,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(217,167,74,0.6) 1px, transparent 1px);
+    background-size: 36px 36px;
   }
-  .ambient-orb {
-    position: absolute; border-radius: 50%; filter: blur(105px); opacity: 0.30;
-    will-change: transform; animation: drift 20s ease-in-out infinite alternate;
-  }
-  .orb-gold { width: 48vw; height: 48vw; max-width: 560px; max-height: 560px; top: -15%; left: -12%; background: radial-gradient(circle, #D8A440, transparent 70%); }
-  .orb-blue { width: 46vw; height: 46vw; max-width: 540px; max-height: 540px; top: 8%; right: -14%; background: radial-gradient(circle, #0A84FF, transparent 70%); opacity: 0.24; animation-delay: -6s; }
-  .orb-emerald { width: 42vw; height: 42vw; max-width: 480px; max-height: 480px; bottom: -16%; left: 26%; background: radial-gradient(circle, #30D158, transparent 70%); opacity: 0.14; animation-delay: -11s; }
-  @keyframes drift { 0% { transform: translate3d(0,0,0) scale(1); } 100% { transform: translate3d(24px,18px,0) scale(1.06); } }
 
-  /* Tela de Boot Animada (Proxy Remoto) */
-  #proxyBoot {
-    position: fixed; inset: 0; z-index: 99990;
-    display: flex; align-items: center; justify-content: center; padding: 24px;
-    background: rgba(7, 8, 13, 0.90);
-    backdrop-filter: blur(40px) saturate(190%);
-    -webkit-backdrop-filter: blur(40px) saturate(190%);
-    transition: opacity 0.45s var(--spring), transform 0.45s var(--spring), visibility 0.45s;
+  /* =========================================================
+     APP SHELL — WORKSTATION PROFISSIONAL (SIDEBAR + TOPBAR + MAIN)
+     ========================================================= */
+  .app-shell {
+    display: flex; height: 100vh; width: 100vw; overflow: hidden;
   }
-  #proxyBoot.boot-done { opacity: 0; transform: scale(1.03); visibility: hidden; pointer-events: none; }
-  .boot-panel {
-    width: 100%; max-width: 400px; padding: 30px 26px 24px; border-radius: 32px;
-    background: linear-gradient(155deg, rgba(255, 250, 240, 0.09) 0%, rgba(20, 23, 34, 0.85) 100%);
-    border: 1px solid var(--m3-outline-gold);
-    box-shadow: 0 28px 68px rgba(0,0,0,0.75), inset 0 1px 0 var(--glass-specular);
-    text-align: center;
+
+  /* Left Navigation Sidebar */
+  .sidebar {
+    width: var(--sidebar-w); flex-shrink: 0; height: 100vh;
+    background: var(--sidebar-bg);
+    backdrop-filter: blur(28px) saturate(180%); -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border-right: 1px solid var(--border-subtle);
+    display: flex; flex-direction: column;
+    z-index: 50; transition: transform 0.28s var(--ease);
   }
-  .radar-wrap { position: relative; width: 92px; height: 92px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; }
-  .radar-ring { position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid rgba(224,179,84,0.55); animation: radarPulse 2s cubic-bezier(0.16,1,0.3,1) infinite; }
-  .radar-ring.r2 { animation-delay: 0.65s; }
-  .radar-ring.r3 { animation-delay: 1.3s; }
-  @keyframes radarPulse { 0% { transform: scale(0.62); opacity: 0.9; } 100% { transform: scale(1.52); opacity: 0; } }
-  .radar-core {
-    position: relative; z-index: 2; width: 62px; height: 62px; border-radius: 19px;
-    background: linear-gradient(140deg, #E0B354 0%, #9E6E1F 100%);
+  .sidebar-brand {
+    height: var(--topbar-h); padding: 0 18px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border-subtle); flex-shrink: 0;
+  }
+  .sidebar-scroll {
+    flex: 1; overflow-y: auto; padding: 14px 12px;
+    scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.12) transparent;
+  }
+  .sidebar-section-label {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-3); padding: 14px 10px 6px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-item {
+    width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 9px 11px; margin-bottom: 2px; border-radius: 12px;
+    background: transparent; border: 1px solid transparent;
+    color: var(--text-2); font-size: 13px; font-weight: 500; text-align: left;
+    cursor: pointer; transition: all 0.18s var(--ease);
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.05); color: var(--text-1); }
+  .nav-item.active {
+    background: linear-gradient(90deg, rgba(217,167,74,0.16) 0%, rgba(217,167,74,0.05) 100%);
+    border-color: var(--border-gold); color: #FFFFFF; font-weight: 600;
+  }
+  .nav-item .nav-ic {
+    width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 12px 28px rgba(224,179,84,0.38), inset 0 1.5px 1px rgba(255,255,255,0.55);
-    transition: background 0.35s ease, box-shadow 0.35s ease;
+    background: rgba(255,255,255,0.05); color: var(--text-2);
+    transition: all 0.18s ease;
   }
-  .radar-core.connected { background: linear-gradient(140deg, #30D158 0%, #0D9488 100%); box-shadow: 0 12px 28px rgba(48,209,88,0.42), inset 0 1.5px 1px rgba(255,255,255,0.55); }
-  .boot-track { width: 100%; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.09); overflow: hidden; margin: 16px 0; }
-  .boot-fill { height: 100%; width: 12%; border-radius: 999px; background: linear-gradient(90deg, #0A84FF, #E0B354, #30D158); transition: width 0.38s var(--spring); }
-  .boot-step { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 9px 12px; border-radius: 14px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.07); font-size: 12px; color: var(--text-secondary); transition: all 0.25s ease; }
-  .boot-step.active { background: rgba(224,179,84,0.12); border-color: rgba(224,179,84,0.36); color: #FFFFFF; }
-  .boot-step.done { background: rgba(48,209,88,0.10); border-color: rgba(48,209,88,0.28); color: #FFFFFF; }
+  .nav-item.active .nav-ic { background: rgba(217,167,74,0.22); color: var(--gold); }
+  .nav-item .nav-ic .material-symbols-rounded { font-size: 17px; }
 
-  /* Superfícies iOS Material 3 */
-  .ios-m3-card {
-    background: linear-gradient(155deg, rgba(255, 250, 240, 0.075) 0%, var(--m3-surface) 100%);
-    backdrop-filter: blur(34px) saturate(200%);
-    -webkit-backdrop-filter: blur(34px) saturate(200%);
-    border: 1px solid var(--m3-outline);
-    box-shadow: 0 16px 38px rgba(0,0,0,0.48), inset 0 1px 0 var(--glass-specular);
-    border-radius: 26px;
-    transition: transform 0.26s var(--spring), border-color 0.22s ease, box-shadow 0.26s ease, background 0.22s ease;
+  .sidebar-footer {
+    padding: 12px 14px; border-top: 1px solid var(--border-subtle); flex-shrink: 0;
+    background: rgba(9, 11, 16, 0.55);
   }
 
-  .module-tile { cursor: pointer; position: relative; overflow: hidden; }
-  .module-tile:hover {
-    transform: translateY(-4px);
-    border-color: rgba(224, 179, 84, 0.42);
-    box-shadow: 0 22px 46px rgba(0,0,0,0.56), 0 0 26px rgba(224,179,84,0.09), inset 0 1px 0 rgba(255,240,206,0.38);
-  }
-  .module-tile:active { transform: scale(0.97); }
-
-  /* Dynamic Island Header */
-  .dynamic-island {
-    background: rgba(14, 16, 24, 0.86);
-    backdrop-filter: blur(26px) saturate(195%);
-    -webkit-backdrop-filter: blur(26px) saturate(195%);
-    border: 1px solid var(--m3-outline-gold);
-    box-shadow: 0 10px 26px rgba(0,0,0,0.58), inset 0 1px 0 rgba(255,240,206,0.16);
-    border-radius: 999px;
-    padding: 7px 15px;
-    display: inline-flex; align-items: center; gap: 9px;
-    transition: transform 0.22s var(--spring);
-  }
-  .dynamic-island:active { transform: scale(0.96); }
-
-  /* iOS Squircle Vector Icon */
-  .squircle {
-    width: 48px; height: 48px; border-radius: 15px;
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    box-shadow: 0 9px 20px rgba(0,0,0,0.42), inset 0 1.5px 1px rgba(255,255,255,0.45), inset 0 -2px 5px rgba(0,0,0,0.28);
-  }
-  .squircle .material-symbols-rounded { font-size: 24px; color: #FFFFFF; }
-
-  /* Spotlight Search + Material 3 Filter Chips */
-  .spotlight-bar {
-    background: rgba(255, 250, 240, 0.06);
-    backdrop-filter: blur(24px) saturate(185%);
-    -webkit-backdrop-filter: blur(24px) saturate(185%);
-    border: 1px solid rgba(255, 255, 255, 0.13);
-    border-radius: 20px;
-    display: flex; align-items: center; padding: 0 16px;
-    box-shadow: 0 10px 28px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.16);
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-  .spotlight-bar:focus-within {
-    border-color: var(--sherlock-gold);
-    box-shadow: 0 0 0 3px rgba(224,179,84,0.20), 0 12px 30px rgba(0,0,0,0.42);
-  }
-  .spotlight-input { width: 100%; background: transparent; border: none; outline: none; color: #FFFFFF; font-size: 15px; padding: 13px 10px; }
-  .spotlight-input::placeholder { color: var(--text-tertiary); }
-
-  .m3-chips-row { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: none; }
-  .m3-chips-row::-webkit-scrollbar { display: none; }
-  .m3-filter-chip {
-    flex-shrink: 0; padding: 8px 15px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
-    background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.11); color: var(--text-secondary);
-    cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
-    transition: all 0.22s var(--spring);
-  }
-  .m3-filter-chip:hover { background: rgba(224,179,84,0.14); color: #FFFFFF; border-color: rgba(224,179,84,0.34); }
-  .m3-filter-chip.active {
-    background: linear-gradient(135deg, #E0B354 0%, #C28E2E 100%);
-    border-color: rgba(255,244,214,0.5); color: #090A0F;
-    box-shadow: 0 6px 18px rgba(224,179,84,0.34);
+  /* Main Area (Topbar + Scrollable Canvas) */
+  .main-column {
+    flex: 1; min-width: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden;
   }
 
-  /* Material 3 Filled Glass Inputs */
-  .m3-field { position: relative; margin-bottom: 13px; }
+  .topbar {
+    height: var(--topbar-h); flex-shrink: 0; padding: 0 20px;
+    background: var(--topbar-bg);
+    backdrop-filter: blur(26px) saturate(180%); -webkit-backdrop-filter: blur(26px) saturate(180%);
+    border-bottom: 1px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    z-index: 30;
+  }
+
+  .workspace-scroll {
+    flex: 1; overflow-y: auto; padding: 22px 24px 36px;
+    scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.14) transparent;
+  }
+
+  /* Mobile Sidebar Drawer Backdrop */
+  #mobileBackdrop {
+    display: none; position: fixed; inset: 0; z-index: 45;
+    background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(4px);
+  }
+  #mobileBackdrop.open { display: block; }
+
+  @media (max-width: 1023px) {
+    .sidebar { position: fixed; left: 0; top: 0; bottom: 0; transform: translateX(-100%); box-shadow: 20px 0 50px rgba(0,0,0,0.7); }
+    .sidebar.open { transform: translateX(0); }
+    .workspace-scroll { padding: 16px 14px 28px; }
+    .topbar { padding: 0 14px; }
+  }
+
+  /* =========================================================
+     SURFACES, PANELS & MATERIAL 3 + iOS CONTROLS
+     ========================================================= */
+  .panel {
+    background: var(--surface-1);
+    backdrop-filter: blur(26px) saturate(185%); -webkit-backdrop-filter: blur(26px) saturate(185%);
+    border: 1px solid var(--border-subtle);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.36), inset 0 1px 0 var(--specular);
+    border-radius: 18px;
+  }
+
+  .panel-header {
+    padding: 14px 18px; border-bottom: 1px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+
+  /* Command Bar Button (Topbar) */
+  .cmd-trigger {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 7px 12px; border-radius: 11px;
+    background: rgba(255,255,255,0.045); border: 1px solid var(--border-subtle);
+    color: var(--text-2); font-size: 12.5px; cursor: pointer;
+    transition: all 0.18s ease; min-width: 190px; justify-content: space-between;
+  }
+  .cmd-trigger:hover { background: rgba(255,255,255,0.08); border-color: var(--border-gold); color: var(--text-1); }
+  .kbd {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 6px;
+    border-radius: 6px; background: rgba(255,255,255,0.08); border: 1px solid var(--border-strong); color: var(--text-2);
+  }
+
+  /* Overview Directory Table / Matrix Rows */
+  .matrix-row {
+    display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.8fr) auto;
+    align-items: center; gap: 14px; padding: 13px 18px;
+    border-bottom: 1px solid var(--border-subtle);
+    cursor: pointer; transition: background 0.15s ease;
+  }
+  .matrix-row:last-child { border-bottom: none; }
+  .matrix-row:hover { background: rgba(217, 167, 74, 0.06); }
+  @media (max-width: 767px) {
+    .matrix-row { grid-template-columns: 1fr auto; gap: 8px; padding: 13px 14px; }
+    .matrix-desc-col { display: none; }
+  }
+
+  .tool-icon {
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.32), 0 4px 12px rgba(0,0,0,0.35);
+  }
+  .tool-icon .material-symbols-rounded { font-size: 19px; color: #FFFFFF; }
+
+  /* Form Controls (Material 3 Outlined Glass) */
+  .field-wrap { margin-bottom: 14px; }
+  .field-lbl {
+    display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text-2); margin-bottom: 6px;
+  }
   .m3-input, .m3-textarea {
-    width: 100%; padding: 22px 16px 8px;
-    background: rgba(14, 17, 26, 0.58);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 16px; color: #FFFFFF; font-size: 15px; outline: none;
+    width: 100%; padding: 11px 14px; border-radius: 12px;
+    background: rgba(9, 11, 16, 0.65); border: 1px solid var(--border-strong);
+    color: #FFFFFF; font-size: 14px; outline: none; transition: all 0.18s ease;
+  }
+  .m3-textarea { min-height: 120px; resize: vertical; font-size: 12.5px; line-height: 1.5; }
+  .m3-input:focus, .m3-textarea:focus {
+    border-color: var(--gold); background: rgba(9, 11, 16, 0.88);
+    box-shadow: 0 0 0 3px rgba(217, 167, 74, 0.18);
+  }
+
+  /* Action Buttons */
+  .btn-exec {
+    width: 100%; padding: 11px 16px; border-radius: 12px; border: none; cursor: pointer;
+    background: linear-gradient(180deg, #E5B95C 0%, #BF8B2C 100%);
+    color: #090B10; font-size: 13.5px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+    box-shadow: 0 6px 18px rgba(217,167,74,0.26), inset 0 1px 0 rgba(255,255,255,0.45);
+    transition: transform 0.16s var(--ease), opacity 0.16s ease;
+  }
+  .btn-exec:active { transform: scale(0.98); }
+  .btn-exec:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border-radius: 10px;
+    background: rgba(255,255,255,0.05); border: 1px solid var(--border-subtle);
+    color: var(--text-1); font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none;
+    transition: all 0.16s ease;
+  }
+  .btn-ghost:hover { background: rgba(217,167,74,0.14); border-color: var(--border-gold); }
+  .btn-ghost:active { transform: scale(0.96); }
+
+  /* Evidence Key-Value Table (Forensic Style) */
+  .kv-table { border: 1px solid var(--border-subtle); border-radius: 14px; overflow: hidden; background: rgba(9, 11, 16, 0.50); }
+  .kv-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px 14px; border-bottom: 1px solid var(--border-subtle);
+    transition: background 0.14s ease;
+  }
+  .kv-row:last-child { border-bottom: none; }
+  .kv-row:hover { background: rgba(255,255,255,0.03); }
+
+  /* Status Badges */
+  .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 7px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .b-gold { background: rgba(217,167,74,0.16); color: var(--gold); border: 1px solid rgba(217,167,74,0.28); }
+  .b-blue { background: rgba(10,132,255,0.16); color: var(--cyan); border: 1px solid rgba(10,132,255,0.25); }
+  .b-ok { background: rgba(48,209,88,0.15); color: var(--green); border: 1px solid rgba(48,209,88,0.25); }
+  .b-err { background: rgba(255,69,58,0.15); color: var(--red); border: 1px solid rgba(255,69,58,0.28); }
+  .b-warn { background: rgba(255,159,10,0.15); color: var(--orange); border: 1px solid rgba(255,159,10,0.28); }
+
+  /* Dropzone, Map, ELA, Code */
+  .dropzone {
+    border: 1.5px dashed rgba(217,167,74,0.45); background: rgba(217,167,74,0.045);
+    border-radius: 14px; padding: 20px 14px; text-align: center; cursor: pointer;
     transition: all 0.2s ease;
   }
-  .m3-textarea { padding: 14px 16px; min-height: 118px; resize: vertical; font-size: 13px; }
-  .m3-input:focus, .m3-textarea:focus {
-    background: rgba(14, 17, 26, 0.80);
-    border-color: var(--sherlock-gold);
-    box-shadow: 0 0 0 3px rgba(224,179,84,0.22);
-  }
-  .m3-label {
-    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-    color: var(--text-secondary); font-size: 14px; pointer-events: none; transition: all 0.2s ease;
-  }
-  .m3-input:focus ~ .m3-label, .m3-input:not(:placeholder-shown) ~ .m3-label {
-    top: 11px; font-size: 11px; font-weight: 700; color: var(--sherlock-gold);
+  .dropzone:hover, .dropzone.drag-over { background: rgba(217,167,74,0.12); border-color: var(--gold); }
+
+  .map-frame { border-radius: 14px; overflow: hidden; border: 1px solid var(--border-gold); background: #0B0E16; }
+  .map-frame iframe { width: 100%; height: 290px; border: 0; display: block; }
+
+  .code-viewer {
+    background: #07090F; border: 1px solid var(--border-subtle); border-radius: 12px;
+    padding: 13px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; line-height: 1.55;
+    color: #E5DFD2; max-height: 270px; overflow: auto; white-space: pre-wrap; word-break: break-word;
   }
 
-  /* Botões iOS Material */
-  .btn-primary {
-    width: 100%;
-    background: linear-gradient(180deg, #EBC369 0%, #C6902E 100%);
-    color: #090A0F; font-weight: 700; font-size: 15px;
-    padding: 13.5px 20px; border-radius: 16px; border: none; cursor: pointer;
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    box-shadow: 0 8px 22px rgba(224,179,84,0.30), inset 0 1px 0 rgba(255,255,255,0.48);
-    transition: transform 0.2s var(--spring), opacity 0.2s ease;
-  }
-  .btn-primary:active { transform: scale(0.97); }
-  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  .ela-box { border-radius: 14px; overflow: hidden; border: 1px solid var(--border-gold); background: #000; }
+  .ela-box canvas, .ela-box img { width: 100%; max-height: 380px; object-fit: contain; display: block; margin: 0 auto; }
+  input[type="range"].gold-range { width: 100%; accent-color: var(--gold); cursor: pointer; }
 
-  .chip-action {
-    background: rgba(255,255,255,0.075); border: 1px solid rgba(255,255,255,0.14);
-    color: #FFFFFF; font-size: 12px; font-weight: 600; padding: 7px 13px; border-radius: 999px;
-    cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
-    transition: transform 0.2s var(--spring), background 0.2s ease, border-color 0.2s ease;
-  }
-  .chip-action:hover { background: rgba(224,179,84,0.16); border-color: rgba(224,179,84,0.38); }
-  .chip-action:active { transform: scale(0.95); }
-
-  /* Inset Grouped List (iOS Style) */
-  .ios-group { background: rgba(14, 16, 24, 0.62); border: 1px solid rgba(255,255,255,0.09); border-radius: 20px; overflow: hidden; }
-  .ios-row {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: 12.5px 16px; border-bottom: 0.5px solid rgba(255,255,255,0.08);
-    text-decoration: none; color: inherit; transition: background 0.15s ease;
-  }
-  .ios-row:last-child { border-bottom: none; }
-  .ios-row:hover { background: rgba(224,179,84,0.06); }
-
-  /* Badges */
-  .tag-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
-  .t-gold { background: rgba(224,179,84,0.16); color: var(--sherlock-gold); border: 1px solid rgba(224,179,84,0.28); }
-  .t-blue { background: rgba(10,132,255,0.18); color: var(--ios-teal); }
-  .t-ok { background: rgba(48,209,88,0.16); color: var(--ios-green); }
-  .t-err { background: rgba(255,69,58,0.16); color: var(--ios-red); }
-  .t-warn { background: rgba(255,159,10,0.16); color: var(--ios-orange); }
-
-  /* Dropzone, Mapa, Código e ELA */
-  .dropzone {
-    border: 1.5px dashed rgba(224,179,84,0.52); background: rgba(224,179,84,0.055);
-    border-radius: 20px; padding: 22px 16px; text-align: center; cursor: pointer;
-    transition: all 0.24s var(--spring);
-  }
-  .dropzone:hover, .dropzone.drag-over { background: rgba(224,179,84,0.13); border-color: #F4CF7B; transform: scale(1.01); }
-
-  .map-box { border-radius: 20px; overflow: hidden; border: 1px solid var(--m3-outline-gold); background: rgba(14,16,24,0.72); box-shadow: 0 14px 30px rgba(0,0,0,0.45); }
-  .map-box iframe { width: 100%; height: 280px; border: 0; display: block; }
-
-  .code-box {
-    background: rgba(6, 7, 11, 0.74); border: 1px solid rgba(224,179,84,0.20);
-    border-radius: 16px; padding: 14px; font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-size: 12px; line-height: 1.55; color: #EAE1CE; max-height: 270px; overflow: auto;
-    white-space: pre-wrap; word-break: break-word;
+  .kpi-tile {
+    padding: 13px 15px; border-radius: 14px; background: var(--surface-1);
+    border: 1px solid var(--border-subtle); display: flex; flex-direction: column; gap: 4px;
   }
 
-  .ela-stage { border-radius: 18px; overflow: hidden; border: 1px solid rgba(224,179,84,0.28); background: #000; }
-  .ela-stage canvas, .ela-stage img { width: 100%; height: auto; max-height: 380px; object-fit: contain; display: block; margin: 0 auto; }
-  input[type="range"].gold-range { width: 100%; accent-color: #E0B354; cursor: pointer; }
-
-  .kpi-box { padding: 11px; border-radius: 16px; text-align: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); }
-
-  /* Floating iOS Dock */
-  .dock-wrap { position: fixed; left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom)); z-index: 60; display: flex; justify-content: center; pointer-events: none; padding: 0 14px; }
-  .ios-dock {
-    pointer-events: auto; display: inline-flex; align-items: center; gap: 5px; padding: 7px 9px; border-radius: 26px;
-    background: rgba(14, 16, 24, 0.82); backdrop-filter: blur(32px) saturate(210%); -webkit-backdrop-filter: blur(32px) saturate(210%);
-    border: 1px solid rgba(224,179,84,0.24);
-    box-shadow: 0 18px 42px rgba(0,0,0,0.72), inset 0 1px 0 rgba(255,240,206,0.22);
+  /* Command Palette Modal */
+  #cmdModal {
+    position: fixed; inset: 0; z-index: 80; display: none; align-items: flex-start; justify-content: center;
+    padding: 11vh 16px 24px; background: rgba(4, 6, 10, 0.72); backdrop-filter: blur(10px);
   }
-  .dock-btn {
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-    padding: 7px 13px; border-radius: 18px; background: transparent; border: none; color: var(--text-secondary);
-    cursor: pointer; transition: all 0.22s var(--spring);
-  }
-  .dock-btn:hover { color: #FFFFFF; background: rgba(224,179,84,0.10); }
-  .dock-btn.active { color: var(--sherlock-gold); background: rgba(224,179,84,0.18); box-shadow: inset 0 0 0 1px rgba(224,179,84,0.45); }
-  .dock-btn .material-symbols-rounded { font-size: 21px; }
-  .dock-btn span.lbl { font-size: 10px; font-weight: 600; }
-
-  .sector-head {
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    margin-bottom: 14px; padding: 11px 15px; border-radius: 18px;
-    background: linear-gradient(90deg, rgba(224,179,84,0.08) 0%, rgba(255,255,255,0.025) 100%);
-    border: 1px solid rgba(224,179,84,0.18);
+  #cmdModal.open { display: flex; }
+  .cmd-dialog {
+    width: 100%; max-width: 560px; border-radius: 18px; overflow: hidden;
+    background: rgba(17, 21, 32, 0.96); border: 1px solid var(--border-gold);
+    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.75);
   }
 
-  .io-meta {
-    display: flex; align-items: center; gap: 6px; margin-top: 10px; padding-top: 10px;
-    border-top: 0.5px solid rgba(255,255,255,0.08);
-    font-size: 11px; color: var(--text-tertiary);
+  /* Session Case Drawer (Right Slide-Over) */
+  #caseDrawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: 340px; max-width: 92vw; z-index: 75;
+    background: rgba(13, 16, 24, 0.95); backdrop-filter: blur(28px);
+    border-left: 1px solid var(--border-gold); box-shadow: -20px 0 50px rgba(0,0,0,0.65);
+    transform: translateX(100%); transition: transform 0.28s var(--ease);
+    display: flex; flex-direction: column;
   }
+  #caseDrawer.open { transform: translateX(0); }
 
-  .view-enter { animation: enterAnim 0.28s var(--spring) forwards; }
-  @keyframes enterAnim { from { opacity: 0; transform: scale(0.975) translateY(8px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-  .spinner { animation: spin 0.9s linear infinite; }
-  @keyframes spin { 100% { transform: rotate(360deg); } }
+  /* Boot Modal (Proxy Remoto) */
+  #proxyBoot {
+    position: fixed; inset: 0; z-index: 99990; display: flex; align-items: center; justify-content: center; padding: 20px;
+    background: rgba(7, 9, 14, 0.93); backdrop-filter: blur(28px);
+    transition: opacity 0.4s var(--ease), visibility 0.4s;
+  }
+  #proxyBoot.boot-done { opacity: 0; visibility: hidden; pointer-events: none; }
+  .boot-box {
+    width: 100%; max-width: 400px; padding: 28px 24px; border-radius: 22px;
+    background: rgba(18, 22, 33, 0.92); border: 1px solid var(--border-gold);
+    box-shadow: 0 28px 70px rgba(0,0,0,0.8); text-align: center;
+  }
+  .boot-track { width: 100%; height: 5px; border-radius: 999px; background: rgba(255,255,255,0.08); overflow: hidden; margin: 16px 0; }
+  .boot-fill { height: 100%; width: 14%; border-radius: 999px; background: linear-gradient(90deg, var(--blue), var(--gold), var(--green)); transition: width 0.35s var(--ease); }
+  .boot-line {
+    display: flex; align-items: center; justify-content: space-between; padding: 8px 11px; border-radius: 10px;
+    background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); font-size: 12px; color: var(--text-2);
+  }
+  .boot-line.active { border-color: var(--border-gold); color: #FFF; background: rgba(217,167,74,0.09); }
+  .boot-line.done { border-color: rgba(48,209,88,0.28); color: #FFF; background: rgba(48,209,88,0.08); }
 
+  /* Anti-Inspection Overlay */
   #securityLock {
-    position: fixed; inset: 0; z-index: 99999; background: rgba(5,6,10,0.95);
-    backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+    position: fixed; inset: 0; z-index: 99999; background: rgba(6,8,12,0.96); backdrop-filter: blur(24px);
     display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px;
   }
   #securityLock.active { display: flex; }
 
+  .fade-in { animation: fadeIn 0.22s var(--ease) forwards; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .spinner { animation: spin 0.85s linear infinite; }
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+
   @media print {
-    .ambient-canvas, header, footer, .dock-wrap, #proxyBoot, #securityLock, button { display: none !important; }
-    body { background: #fff !important; color: #000 !important; }
-    .ios-m3-card, .ios-group { border: 1px solid #ccc !important; box-shadow: none !important; background: #fff !important; color: #000 !important; }
+    .sidebar, .topbar, #proxyBoot, #securityLock, #cmdModal, #caseDrawer, button { display: none !important; }
+    html, body, .app-shell, .main-column, .workspace-scroll { height: auto !important; overflow: visible !important; background: #fff !important; color: #000 !important; }
+    .panel, .kv-table { border: 1px solid #ccc !important; background: #fff !important; box-shadow: none !important; }
     .text-white { color: #000 !important; }
   }
 </style>
 </head>
-<body class="pb-28">
+<body>
 
-<div class="ambient-canvas">
-  <div class="ambient-grid"></div>
-  <div class="ambient-orb orb-gold"></div>
-  <div class="ambient-orb orb-blue"></div>
-  <div class="ambient-orb orb-emerald"></div>
-</div>
+<div class="bg-workstation"></div>
+<div class="bg-grid"></div>
 
-<!-- BOOT ANIMADO SHERLOCK 221B + PROXY REMOTO -->
+<!-- BOOT ANIMADO PROXY REMOTO -->
 <div id="proxyBoot">
-  <div class="boot-panel">
-    <div class="radar-wrap">
-      <div class="radar-ring"></div>
-      <div class="radar-ring r2"></div>
-      <div class="radar-ring r3"></div>
-      <div id="bootCore" class="radar-core">
-        <svg id="bootCoreSvg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#090A0F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="7"/>
-          <path d="M20 20l-3.8-3.8"/>
-          <circle cx="11" cy="11" r="2.2" fill="#090A0F"/>
-        </svg>
-      </div>
+  <div class="boot-box">
+    <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-[#D9A74A]/15 border border-[#D9A74A]/40 flex items-center justify-center">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D9A74A" stroke-width="2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="6.8"/><path d="M20 20l-4-4"/><circle cx="11" cy="11" r="2" fill="#D9A74A"/>
+      </svg>
     </div>
-
-    <span class="text-[10px] font-mono-tech uppercase tracking-[0.22em] text-[#E0B354] block mb-1">BAKER STREET • 221B</span>
-    <h1 class="font-sherlock text-xl font-bold text-white">Sherlock Forensics</h1>
-    <p id="bootSubtitle" class="text-xs text-[var(--text-secondary)] mt-1">Iniciando túnel Proxy Remoto e criptografia P2P...</p>
-
+    <span class="text-[10px] font-mono-code uppercase tracking-[0.22em] text-[#D9A74A] block mb-1">BAKER STREET • 221B</span>
+    <h1 class="font-crest text-lg font-bold text-white">Investigation Workstation</h1>
+    <p id="bootSubtitle" class="text-xs text-[var(--text-2)] mt-1">Inicializando túnel Proxy Remoto e custódia P2P...</p>
     <div class="boot-track"><div id="bootBar" class="boot-fill"></div></div>
-
     <div class="space-y-2 text-left">
-      <div id="stepP2P" class="boot-step active">
-        <span class="flex items-center gap-2"><span class="material-symbols-rounded text-base text-[#E0B354]">encrypted</span> Criptografia P2P (ECDH + AES-256)</span>
+      <div id="stepP2P" class="boot-line active">
+        <span class="flex items-center gap-2"><span class="material-symbols-rounded text-base text-[#D9A74A]">encrypted</span> Sessão P2P (ECDH + AES-256)</span>
         <span class="material-symbols-rounded text-sm spinner" data-step-icon>refresh</span>
       </div>
-      <div id="stepProxy" class="boot-step">
+      <div id="stepProxy" class="boot-line">
         <span class="flex items-center gap-2"><span class="material-symbols-rounded text-base text-[#5AC8FA]">hub</span> Túnel Proxy Remoto</span>
         <span class="text-[11px] font-semibold" data-step-icon>Aguardando</span>
       </div>
-      <div id="stepSig" class="boot-step">
-        <span class="flex items-center gap-2"><span class="material-symbols-rounded text-base text-[#30D158]">verified_user</span> Assinatura KIIK HACKING</span>
+      <div id="stepSig" class="boot-line">
+        <span class="flex items-center gap-2"><span class="material-symbols-rounded text-base text-[#30D158]">verified_user</span> Selo KIIK HACKING</span>
         <span class="text-[11px] font-semibold" data-step-icon>Aguardando</span>
       </div>
     </div>
@@ -379,77 +390,132 @@
 
 <!-- BLOQUEIO ANTI-INSPEÇÃO -->
 <div id="securityLock">
-  <div class="w-20 h-20 rounded-[24px] bg-[#FF453A]/20 border border-[#FF453A]/40 flex items-center justify-center mb-5">
-    <span class="material-symbols-rounded text-5xl text-[#FF453A]">lock</span>
+  <div class="w-16 h-16 rounded-2xl bg-[#FF453A]/15 border border-[#FF453A]/40 flex items-center justify-center mb-4">
+    <span class="material-symbols-rounded text-4xl text-[#FF453A]">lock</span>
   </div>
-  <h2 class="font-sherlock text-xl font-bold mb-1.5">Dossiê Protegido</h2>
-  <p class="text-sm text-[var(--text-secondary)] max-w-sm mb-5">Atalho de inspeção bloqueado. A sessão será restaurada automaticamente.</p>
-  <span class="dynamic-island text-xs font-semibold text-[#E0B354]">
-    <span class="material-symbols-rounded text-sm">verified_user</span> KIIK HACKING • P2P E2EE
-  </span>
+  <h2 class="font-crest text-lg font-bold mb-1">Dossiê Protegido</h2>
+  <p class="text-xs text-[var(--text-2)] max-w-sm mb-4">Atalho de inspeção bloqueado. A estação de trabalho será restaurada automaticamente.</p>
+  <span class="badge b-gold">KIIK HACKING • P2P E2EE</span>
 </div>
 
-<!-- CONTEÚDO PRINCIPAL -->
-<div class="max-w-5xl mx-auto px-4 pt-4 sm:pt-6">
-  <header class="flex flex-wrap items-center justify-between gap-2.5 mb-7">
-    <button type="button" data-nav="" class="dynamic-island cursor-pointer">
-      <span id="proxyDot" class="w-2.5 h-2.5 rounded-full bg-[#FF9F0A] shadow-[0_0_8px_#FF9F0A]"></span>
-      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#E0B354" stroke-width="2.2" stroke-linecap="round">
-        <circle cx="11" cy="11" r="6.8"/><path d="M20 20l-4-4"/>
-      </svg>
-      <span class="font-sherlock font-bold text-sm text-[#E0B354]">SHERLOCK 221B</span>
-      <span id="proxyLabel" class="text-[11px] text-[var(--text-secondary)] font-medium">• Conectando...</span>
-    </button>
+<!-- BACKDROP MOBILE -->
+<div id="mobileBackdrop"></div>
 
-    <div class="dynamic-island text-[11px] font-semibold text-[var(--text-secondary)]">
-      <span class="material-symbols-rounded text-sm text-[#30D158]">verified_user</span>
-      <span>KIIK HACKING • iOS M3</span>
+<!-- COMMAND PALETTE (CTRL+K) -->
+<div id="cmdModal">
+  <div class="cmd-dialog">
+    <div class="flex items-center gap-2.5 px-4 py-3 border-b border-white/10">
+      <span class="material-symbols-rounded text-[#D9A74A]">search</span>
+      <input type="text" id="cmdInput" class="w-full bg-transparent border-0 outline-none text-sm text-white placeholder:text-gray-500" placeholder="Ir para módulo (ex: VirusTotal, EXIF, ELA, CNPJ, Dorks...)" autocomplete="off">
+      <button type="button" id="cmdClose" class="kbd cursor-pointer">ESC</button>
     </div>
-  </header>
-
-  <main id="view" class="w-full"></main>
-
-  <footer class="mt-10 flex justify-center">
-    <div class="px-4 py-2 rounded-full text-[11px] text-[var(--text-tertiary)] text-center">
-      Assinado por <strong class="text-[#E0B354]">KIIK HACKING</strong> • Sherlock 221B • Proxy Remoto + P2P ECDH P-256
-    </div>
-  </footer>
+    <div id="cmdList" class="max-h-80 overflow-y-auto p-2"></div>
+  </div>
 </div>
 
-<!-- FLOATING iOS DOCK -->
-<nav class="dock-wrap" aria-label="Navegação rápida">
-  <div class="ios-dock">
-    <button type="button" class="dock-btn" data-nav="" data-dock="">
-      <span class="material-symbols-rounded">grid_view</span>
-      <span class="lbl">Início</span>
+<!-- DRAWER DO DOSSIÊ DA SESSÃO -->
+<aside id="caseDrawer" aria-label="Dossiê da Sessão">
+  <div class="panel-header">
+    <div>
+      <h3 class="text-sm font-bold text-white flex items-center gap-2">
+        <span class="material-symbols-rounded text-base text-[#D9A74A]">folder_special</span> Dossiê da Sessão
+      </h3>
+      <span id="drawerCaseId" class="text-[11px] font-mono-code text-[var(--text-3)]">CASE-221B</span>
+    </div>
+    <button type="button" id="closeDrawerBtn" class="btn-ghost px-2 py-1"><span class="material-symbols-rounded text-base">close</span></button>
+  </div>
+  <div id="drawerBody" class="flex-1 overflow-y-auto p-3.5 space-y-2.5"></div>
+  <div class="p-3.5 border-t border-white/10 space-y-2">
+    <button type="button" id="exportFullCaseBtn" class="btn-exec">
+      <span class="material-symbols-rounded text-base">verified</span> Exportar Dossiê Assinado
     </button>
-    <button type="button" class="dock-btn" data-nav="virustotal" data-dock="virustotal">
-      <span class="material-symbols-rounded">bug_report</span>
-      <span class="lbl">VirusTotal</span>
-    </button>
-    <button type="button" class="dock-btn" data-nav="metadata" data-dock="metadata">
-      <span class="material-symbols-rounded">photo_camera</span>
-      <span class="lbl">EXIF</span>
-    </button>
-    <button type="button" class="dock-btn" data-nav="custody" data-dock="custody">
-      <span class="material-symbols-rounded">fingerprint</span>
-      <span class="lbl">Custódia</span>
-    </button>
-    <button type="button" class="dock-btn" data-nav="osint" data-dock="osint">
-      <span class="material-symbols-rounded">travel_explore</span>
-      <span class="lbl">Sherlock</span>
+    <button type="button" id="clearCaseBtn" class="btn-ghost w-full justify-center text-xs text-[#FF453A]">
+      <span class="material-symbols-rounded text-sm">delete_sweep</span> Limpar Registros da Sessão
     </button>
   </div>
-</nav>
+</aside>
+
+<!-- APP SHELL PROFISSIONAL -->
+<div class="app-shell">
+  <!-- SIDEBAR FIXA (DESKTOP) / DRAWER (MOBILE) -->
+  <aside id="sidebar" class="sidebar" aria-label="Navegação de Módulos">
+    <div class="sidebar-brand">
+      <button type="button" data-nav="" class="flex items-center gap-2.5 bg-transparent border-0 cursor-pointer p-0 text-left">
+        <div class="w-9 h-9 rounded-xl bg-[#D9A74A]/15 border border-[#D9A74A]/40 flex items-center justify-center shrink-0">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D9A74A" stroke-width="2.1" stroke-linecap="round">
+            <circle cx="11" cy="11" r="6.8"/><path d="M20 20l-4-4"/><circle cx="11" cy="11" r="2" fill="#D9A74A"/>
+          </svg>
+        </div>
+        <div>
+          <span class="font-crest text-sm font-bold text-[#D9A74A] block leading-none">SHERLOCK 221B</span>
+          <span class="text-[10px] font-mono-code text-[var(--text-3)] tracking-wider">FORENSIC WORKSTATION</span>
+        </div>
+      </button>
+      <button type="button" id="closeMobileSidebar" class="lg:hidden btn-ghost px-1.5 py-1"><span class="material-symbols-rounded text-base">close</span></button>
+    </div>
+
+    <div id="sidebarNav" class="sidebar-scroll"></div>
+
+    <div class="sidebar-footer">
+      <div class="flex items-center justify-between gap-2 mb-1.5">
+        <span class="flex items-center gap-2 text-[11px] font-semibold text-white">
+          <span id="proxyDot" class="w-2 h-2 rounded-full bg-[#FF9F0A] shadow-[0_0_8px_#FF9F0A]"></span>
+          <span id="proxyLabel">Conectando Proxy...</span>
+        </span>
+        <span class="text-[10px] font-mono-code text-[#30D158]">E2EE</span>
+      </div>
+      <div class="flex items-center justify-between text-[10px] font-mono-code text-[var(--text-3)]">
+        <span>ECDH P-256 • AES-256</span>
+        <span class="text-[#D9A74A] font-semibold">KIIK HACKING</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- COLUNA PRINCIPAL -->
+  <div class="main-column">
+    <header class="topbar">
+      <div class="flex items-center gap-3 min-w-0">
+        <button type="button" id="openMobileSidebar" class="lg:hidden btn-ghost px-2 py-1.5">
+          <span class="material-symbols-rounded text-lg">menu</span>
+        </button>
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <span id="topSectorBadge" class="badge b-gold hidden sm:inline-flex">221B</span>
+            <h1 id="topTitle" class="text-sm sm:text-base font-bold text-white truncate">Central de Investigação</h1>
+          </div>
+          <p id="topSubtitle" class="text-[11px] text-[var(--text-3)] truncate hidden sm:block">Plataforma unificada de perícia digital, OSINT e inteligência web</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <button type="button" id="openCmdBtn" class="cmd-trigger hidden md:inline-flex">
+          <span class="flex items-center gap-2"><span class="material-symbols-rounded text-base text-[#D9A74A]">search</span> Busca rápida...</span>
+          <span class="kbd">Ctrl K</span>
+        </button>
+        <button type="button" id="openCmdMobile" class="md:hidden btn-ghost px-2.5 py-1.5" title="Buscar módulo">
+          <span class="material-symbols-rounded text-base text-[#D9A74A]">search</span>
+        </button>
+        <button type="button" id="openDrawerBtn" class="btn-ghost">
+          <span class="material-symbols-rounded text-base text-[#D9A74A]">folder_special</span>
+          <span class="hidden sm:inline">Dossiê</span>
+          <span id="evidenceCountBadge" class="px-1.5 py-0.5 rounded-md text-[10px] font-mono-code bg-[#D9A74A]/20 text-[#D9A74A]">0</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="workspace" class="workspace-scroll"></main>
+  </div>
+</div>
 
 <script>
 (() => {
   'use strict';
 
   // =========================================================================
-  // 1. PROTEÇÃO CLIENT-SIDE (SEM FALSOS POSITIVOS NO MOBILE)
+  // 1. PROTEÇÃO CLIENT-SIDE
   // =========================================================================
   const AUTHOR_SIGNATURE = 'KIIK HACKING';
+  const CASE_ID = `CASE-221B-${new Date().toISOString().slice(2, 10).replace(/-/g, '')}`;
   const lockOverlay = document.getElementById('securityLock');
   let lockTimer = null;
 
@@ -463,6 +529,17 @@
   document.addEventListener('dragstart', (e) => e.preventDefault());
   document.addEventListener('keydown', (e) => {
     const key = (e.key || '').toUpperCase();
+    if ((e.ctrlKey || e.metaKey) && key === 'K') {
+      e.preventDefault();
+      openCmdPalette();
+      return;
+    }
+    if (key === 'ESCAPE') {
+      closeCmdPalette();
+      closeCaseDrawer();
+      closeMobileNav();
+      return;
+    }
     const blocked =
       key === 'F12' ||
       (e.ctrlKey && e.shiftKey && ['I', 'J', 'C', 'K'].includes(key)) ||
@@ -490,7 +567,7 @@
           { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
         );
         const hmac = await crypto.subtle.importKey(
-          'raw', enc.encode(`${AUTHOR_SIGNATURE}::SHERLOCK221B::IOSM3`),
+          'raw', enc.encode(`${AUTHOR_SIGNATURE}::WORKSTATION::221B`),
           { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
         );
         ctx = { aes, hmac };
@@ -519,7 +596,8 @@
         }
       } catch {}
       return {
-        dossier_suite: 'SHERLOCK 221B • iOS MATERIAL',
+        case_id: CASE_ID,
+        workstation: 'SHERLOCK 221B • FORENSIC COMMAND',
         signed_by: AUTHOR_SIGNATURE,
         protocol: 'P2P-ECDH-P256-AES256GCM',
         proxy_transport: RemoteProxy.getModeLabel(),
@@ -533,7 +611,7 @@
   })();
 
   // =========================================================================
-  // 3. CAMADA DE TRANSPORTE VIA PROXY REMOTO + ROTA VIRUSTOTAL v3
+  // 3. PROXY REMOTO + ROTA VIRUSTOTAL v3
   // =========================================================================
   const RemoteProxy = (() => {
     let mode = 'initializing';
@@ -546,7 +624,7 @@
       const dot = document.getElementById('proxyDot');
       const txt = document.getElementById('proxyLabel');
       if (dot) { dot.style.backgroundColor = color; dot.style.boxShadow = `0 0 8px ${color}`; }
-      if (txt) txt.textContent = `• ${label}`;
+      if (txt) txt.textContent = label;
     };
 
     async function timeoutFetch(url, options = {}, timeoutMs = 11000) {
@@ -582,9 +660,7 @@
 
     async function queryVirusTotal(type, target, customKey = '') {
       await init();
-      if (mode !== 'vercel') {
-        throw new Error('A API v3 do VirusTotal exige o proxy serverless (/api/proxy.js) publicado na Vercel.');
-      }
+      if (mode !== 'vercel') throw new Error('A API v3 do VirusTotal exige /api/proxy.js publicado na Vercel.');
       const headers = customKey ? { 'X-VT-Key': customKey } : {};
       const r = await timeoutFetch(`/api/proxy?vt=1&type=${encodeURIComponent(type)}&target=${encodeURIComponent(target)}`, { headers }, 12500);
       const data = await r.json().catch(() => ({}));
@@ -605,7 +681,6 @@
           }
         } catch {}
       }
-
       try {
         const r = await timeoutFetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
         if (r.ok) {
@@ -617,7 +692,6 @@
           }
         }
       } catch {}
-
       try {
         const r = await timeoutFetch(`https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
         if (r.ok || r.status === 404) {
@@ -625,7 +699,6 @@
           return { ok: r.ok, status: r.status, text: () => Promise.resolve(txt), json: () => Promise.resolve(JSON.parse(txt)), via: 'Proxy Remoto (CorsProxy)' };
         }
       } catch {}
-
       try {
         const r = await timeoutFetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
         if (r.ok || r.status === 404) {
@@ -633,7 +706,6 @@
           return { ok: r.ok, status: r.status, text: () => Promise.resolve(txt), json: () => Promise.resolve(JSON.parse(txt)), via: 'Proxy Remoto (CodeTabs)' };
         }
       } catch {}
-
       const direct = await timeoutFetch(targetUrl, options, timeoutMs);
       const txt = await direct.text();
       return { ok: direct.ok, status: direct.status, text: () => Promise.resolve(txt), json: () => Promise.resolve(JSON.parse(txt)), via: 'Fallback Direto' };
@@ -660,79 +732,112 @@
   async function runBootSequence() {
     const bootEl = document.getElementById('proxyBoot');
     if (!bootEl) return;
-    const closeBoot = () => {
+    const finish = () => {
       if (!bootEl.classList.contains('boot-done')) {
         bootEl.classList.add('boot-done');
-        setTimeout(() => bootEl.remove(), 500);
+        setTimeout(() => bootEl.remove(), 450);
       }
     };
-    const failsafe = setTimeout(closeBoot, 3400);
+    const failsafe = setTimeout(finish, 3300);
 
     try {
-      const bar = document.getElementById('bootBar');
-      const sub = document.getElementById('bootSubtitle');
-      const core = document.getElementById('bootCore');
+      const bar = document.getElementById('bootBar'), sub = document.getElementById('bootSubtitle');
       const s1 = document.getElementById('stepP2P'), s2 = document.getElementById('stepProxy'), s3 = document.getElementById('stepSig');
-
       const done = (el, txt) => {
         el.classList.remove('active'); el.classList.add('done');
         const ic = el.querySelector('[data-step-icon]');
         if (ic) { ic.className = 'text-[11px] font-bold text-[#30D158] flex items-center gap-1'; ic.innerHTML = `<span class="material-symbols-rounded text-sm">check_circle</span> ${txt}`; }
       };
-      const active = (el) => {
+      const act = (el) => {
         el.classList.add('active');
         const ic = el.querySelector('[data-step-icon]');
-        if (ic) { ic.className = 'material-symbols-rounded text-sm spinner text-[#E0B354]'; ic.textContent = 'refresh'; }
+        if (ic) { ic.className = 'material-symbols-rounded text-sm spinner text-[#D9A74A]'; ic.textContent = 'refresh'; }
       };
 
-      bar.style.width = '30%';
-      await Promise.all([P2PLayer.init(), sleep(280)]);
+      bar.style.width = '32%';
+      await Promise.all([P2PLayer.init(), sleep(260)]);
       done(s1, 'Ativo');
 
-      active(s2); bar.style.width = '68%'; sub.textContent = 'Conectando ao servidor Proxy Remoto...';
-      const [proxyRes] = await Promise.all([RemoteProxy.init(), sleep(380)]);
+      act(s2); bar.style.width = '70%'; sub.textContent = 'Sincronizando túnel Proxy Remoto...';
+      const [proxyRes] = await Promise.all([RemoteProxy.init(), sleep(360)]);
       done(s2, proxyRes.mode === 'vercel' ? 'Vercel Edge' : 'Gateway');
 
-      active(s3); bar.style.width = '94%'; sub.textContent = 'Validando assinatura KIIK HACKING...';
-      await sleep(240);
-      done(s3, 'Autêntica');
+      act(s3); bar.style.width = '95%'; sub.textContent = 'Verificando assinatura KIIK HACKING...';
+      await sleep(220);
+      done(s3, 'Validado');
 
       bar.style.width = '100%';
-      core.classList.add('connected');
-      sub.textContent = `Pronto • ${proxyRes.label}`;
-      await sleep(280);
+      sub.textContent = `Estação Pronta • ${proxyRes.label}`;
+      await sleep(240);
+      const kpiProxy = document.getElementById('kpiProxyVal');
+      if (kpiProxy) kpiProxy.textContent = proxyRes.label;
     } catch {} finally {
       clearTimeout(failsafe);
-      closeBoot();
+      finish();
     }
   }
 
   // =========================================================================
-  // 4. UTILITÁRIOS FORENSES (HASHES, ENTROPIA, MAGIC BYTES, CNPJ MOD 11, MAPA)
+  // 4. ESTADO DA SESSÃO, DOSSIÊ DE EVIDÊNCIAS & UTILITÁRIOS FORENSES
   // =========================================================================
   let lastResultData = null;
   let lastModuleId = 'sherlock';
-  let activeSectorFilter = 'all';
-  let homeSearchQuery = '';
   let pendingVtQuery = '';
+  let sessionEvidences = [];
   let historyCache = [];
-  try { historyCache = JSON.parse(localStorage.getItem('sherlock221b_history') || '[]'); } catch { historyCache = []; }
+  try { historyCache = JSON.parse(localStorage.getItem('sherlock_ws_history') || '[]'); } catch { historyCache = []; }
 
   const escapeHtml = (str) => String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   const formatCnpj = (d) => { const s = String(d || '').replace(/\D/g, ''); return s.length === 14 ? s.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5') : s; };
 
+  function recordEvidence(moduleId, target, payload) {
+    lastModuleId = moduleId;
+    lastResultData = payload;
+    const mod = MODULES.find(m => m.id === moduleId);
+    sessionEvidences.unshift({
+      id: `EV-${String(sessionEvidences.length + 1).padStart(3, '0')}`,
+      moduleId,
+      moduleName: mod ? mod.name : moduleId,
+      target: String(target || '-').slice(0, 64),
+      ts: new Date().toLocaleTimeString('pt-BR'),
+      payload
+    });
+    sessionEvidences = sessionEvidences.slice(0, 40);
+    updateEvidenceUI();
+  }
+
+  function updateEvidenceUI() {
+    const badge = document.getElementById('evidenceCountBadge');
+    if (badge) badge.textContent = String(sessionEvidences.length);
+    const kpiEv = document.getElementById('kpiEvidenceCount');
+    if (kpiEv) kpiEv.textContent = String(sessionEvidences.length);
+    renderCaseDrawerBody();
+  }
+
+  function renderCaseDrawerBody() {
+    const body = document.getElementById('drawerBody');
+    const idEl = document.getElementById('drawerCaseId');
+    if (idEl) idEl.textContent = CASE_ID;
+    if (!body) return;
+    if (!sessionEvidences.length) {
+      body.innerHTML = `<div class="p-6 text-center text-xs text-[var(--text-3)]"><span class="material-symbols-rounded text-3xl text-white/15 block mb-2">inventory_2</span>Nenhuma evidência coletada nesta sessão. Execute qualquer módulo para registrar automaticamente.</div>`;
+      return;
+    }
+    body.innerHTML = sessionEvidences.map(ev => `
+      <div class="p-3 rounded-xl bg-white/[0.03] border border-white/10">
+        <div class="flex items-center justify-between gap-2 mb-1">
+          <span class="text-[10px] font-mono-code font-bold text-[#D9A74A]">${escapeHtml(ev.id)} • ${escapeHtml(ev.moduleName)}</span>
+          <span class="text-[10px] font-mono-code text-[var(--text-3)]">${escapeHtml(ev.ts)}</span>
+        </div>
+        <p class="text-xs font-mono-code text-white truncate">${escapeHtml(ev.target)}</p>
+      </div>`).join('');
+  }
+
   function isValidCnpj(cnpj) {
     const s = String(cnpj || '').replace(/\D/g, '');
     if (s.length !== 14 || /^(\d)\1{13}$/.test(s)) return false;
-    const calc = (base, weights) => {
-      let sum = 0;
-      for (let i = 0; i < weights.length; i++) sum += Number(base[i]) * weights[i];
-      const mod = sum % 11;
-      return mod < 2 ? 0 : 11 - mod;
-    };
-    const d1 = calc(s, [5,4,3,2,9,8,7,6,5,4,3,2]);
-    const d2 = calc(s, [6,5,4,3,2,9,8,7,6,5,4,3,2]);
-    return d1 === Number(s[12]) && d2 === Number(s[13]);
+    const calc = (base, w) => { let sum = 0; for (let i = 0; i < w.length; i++) sum += Number(base[i]) * w[i]; const m = sum % 11; return m < 2 ? 0 : 11 - m; };
+    return calc(s, [5,4,3,2,9,8,7,6,5,4,3,2]) === Number(s[12]) && calc(s, [6,5,4,3,2,9,8,7,6,5,4,3,2]) === Number(s[13]);
   }
 
   function calcShannonEntropy(arrayBuffer) {
@@ -740,21 +845,14 @@
     if (!bytes.length) return { bits: '0.000', classif: 'Vazio' };
     const freq = new Uint32Array(256);
     for (let i = 0; i < bytes.length; i++) freq[bytes[i]]++;
-    let h = 0;
-    const n = bytes.length;
-    for (let i = 0; i < 256; i++) {
-      if (freq[i] > 0) {
-        const p = freq[i] / n;
-        h -= p * Math.log2(p);
-      }
-    }
+    let h = 0, n = bytes.length;
+    for (let i = 0; i < 256; i++) if (freq[i] > 0) { const p = freq[i] / n; h -= p * Math.log2(p); }
     const classif = h >= 7.5 ? 'Alta (Criptografado / Comprimido / Packed)' : (h >= 5.0 ? 'Moderada (Binário / Mídia)' : 'Baixa (Texto / Estruturado)');
     return { bits: h.toFixed(3), classif };
   }
 
   function toBase64Url(str) {
-    let bin = '';
-    new TextEncoder().encode(str).forEach(b => { bin += String.fromCharCode(b); });
+    let bin = ''; new TextEncoder().encode(str).forEach(b => { bin += String.fromCharCode(b); });
     return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
 
@@ -762,18 +860,17 @@
     navigator.clipboard?.writeText(text).catch(() => {});
     if (btnEl) {
       const old = btnEl.innerHTML;
-      btnEl.innerHTML = '<span class="material-symbols-rounded text-sm text-[#30D158]">check</span> Copiado';
-      setTimeout(() => { btnEl.innerHTML = old; }, 1300);
+      btnEl.innerHTML = '<span class="material-symbols-rounded text-sm text-[#30D158]">check</span>';
+      setTimeout(() => { btnEl.innerHTML = old; }, 1200);
     }
   }
 
   async function digestHex(algo, buffer) {
     if (!window.crypto?.subtle) return 'Indisponível (requer HTTPS)';
-    const d = await crypto.subtle.digest(algo, buffer);
-    return Array.from(new Uint8Array(d)).map(b => b.toString(16).padStart(2, '0')).join('');
+    return Array.from(new Uint8Array(await crypto.subtle.digest(algo, buffer))).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
-  const MAGIC_SIGNATURES = [
+  const MAGIC_SIGS = [
     { name: 'Imagem JPEG', exts: ['jpg','jpeg','jfif'], test: (h) => h.startsWith('FFD8FF') },
     { name: 'Imagem PNG', exts: ['png'], test: (h) => h.startsWith('89504E470D0A1A0A') },
     { name: 'Imagem GIF', exts: ['gif'], test: (h) => h.startsWith('47494638') },
@@ -795,11 +892,9 @@
     const hexRaw = Array.from(new Uint8Array(arrayBuffer.slice(0, 16))).map(b => b.toString(16).padStart(2, '0').toUpperCase()).join('');
     const hexSpaced = hexRaw.match(/.{1,2}/g)?.join(' ') || '-';
     const ext = fileName.includes('.') ? fileName.split('.').pop().toLowerCase() : '';
-    const match = MAGIC_SIGNATURES.find(sig => sig.test(hexRaw));
+    const match = MAGIC_SIGS.find(sig => sig.test(hexRaw));
     const spoofAlert = Boolean(match && ext && !match.exts.includes(ext));
-    const status = match
-      ? (spoofAlert ? `ALERTA: Extensão (.${ext}) diverge do cabeçalho real (${match.name})` : `Assinatura autêntica (${match.name})`)
-      : 'Texto puro ou binário genérico';
+    const status = match ? (spoofAlert ? `ALERTA: Extensão (.${ext}) diverge do cabeçalho real (${match.name})` : `Assinatura autêntica (${match.name})`) : 'Texto puro ou binário genérico';
     return { hexSpaced, detected: match ? match.name : 'Texto / Desconhecido', ext: ext ? `.${ext}` : 'Sem extensão', spoofAlert, status };
   }
 
@@ -817,24 +912,22 @@
     if (cur.length >= 6) found.push(cur.trim());
     const rx = /(https?:\/\/|[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|photoshop|adobe|iphone|samsung|xiaomi|android|windows|macos|ffmpeg|python|creator|author|producer|gimp|canva|whatsapp|telegram)/i;
     const unique = [...new Set(found.filter(s => s.length <= 160))];
-    return { highlighted: unique.filter(s => rx.test(s)).slice(0, 25), sample: unique.slice(0, 20), total: unique.length };
+    return { highlighted: unique.filter(s => rx.test(s)).slice(0, 25), total: unique.length };
   }
 
   const ICON_MAP = {
     cnpj:'badge', razao:'domain', fantasia:'storefront', situacao:'info', cnae:'category', natureza:'gavel',
-    porte:'business_center', capital:'payments', municipio:'location_city', logradouro:'signpost',
-    bairro:'holiday_village', cep:'markunread_mailbox', uf:'map', telefone:'call', email:'mail', emails:'mail',
-    proprietario:'person_check', titular:'person_check', registro_titular:'badge', registrador:'storefront',
-    pais:'public', cidade:'location_city', endereco:'pin_drop', data:'calendar_today', abertura:'event',
-    registro:'event', expiracao:'event_busy', status:'check_circle', ip:'router', isp:'dns', asn:'lan',
-    latitude:'location_on', longitude:'location_on', altitude:'terrain', bussola:'explore', regiao:'explore',
-    url:'link', links:'link', titulo:'title', descricao:'description', idioma:'translate', tecnologia:'memory',
-    imagens:'image', dominio:'language', aparelho:'smartphone', fabricante:'devices', modelo:'smartphone',
-    lente:'camera', software:'memory', iso:'iso', abertura_lente:'camera', exposicao:'shutter_speed',
-    flash:'flash_on', resolucao:'aspect_ratio', arquivo:'description', tamanho:'data_usage', hash:'fingerprint',
+    porte:'business_center', capital:'payments', municipio:'location_city', logradouro:'signpost', bairro:'holiday_village',
+    cep:'markunread_mailbox', telefone:'call', email:'mail', proprietario:'person_check', registro_titular:'badge',
+    registrador:'storefront', pais:'public', cidade:'location_city', endereco:'pin_drop', data:'calendar_today',
+    abertura:'event', registro:'event', expiracao:'event_busy', status:'check_circle', ip:'router', isp:'dns', asn:'lan',
+    latitude:'location_on', longitude:'location_on', altitude:'terrain', regiao:'explore', url:'link', links:'link',
+    titulo:'title', descricao:'description', tecnologia:'memory', imagens:'image', dominio:'language', aparelho:'smartphone',
+    fabricante:'devices', modelo:'smartphone', lente:'camera', software:'memory', iso:'iso', abertura_lente:'camera',
+    exposicao:'shutter_speed', resolucao:'aspect_ratio', arquivo:'description', tamanho:'data_usage', hash:'fingerprint',
     sha:'fingerprint', magic:'memory', extensao:'rule', assin:'verified_user', servidor:'dns', vazamentos:'security',
-    subdominios:'account_tree', certificados:'workspace_premium', erro:'analytics', reputacao:'shield',
-    pulsos:'radar', ameaca:'bug_report', classificacao:'gpp_maybe', alvo:'target', tipo:'category', entropia:'equalizer'
+    subdominios:'account_tree', certificados:'workspace_premium', erro:'analytics', reputacao:'shield', pulsos:'radar',
+    classificacao:'gpp_maybe', alvo:'target', tipo:'category', entropia:'equalizer', veredito:'gpp_maybe'
   };
 
   function getIcon(key) {
@@ -858,16 +951,14 @@
     historyCache.unshift({ moduleId, query, ts: Date.now() });
     historyCache = historyCache.slice(0, 20);
     try {
-      localStorage.setItem('sherlock221b_history', JSON.stringify(historyCache));
-      localStorage.setItem('sherlock221b_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
+      localStorage.setItem('sherlock_ws_history', JSON.stringify(historyCache));
+      localStorage.setItem('sherlock_ws_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
     } catch {}
   }
 
-  function getHistory(moduleId) {
-    return historyCache.filter(i => i.moduleId === moduleId).slice(0, 5);
-  }
+  const getHistory = (moduleId) => historyCache.filter(i => i.moduleId === moduleId).slice(0, 5);
 
-  function renderMapBlock(lat, lon, label = 'Localização no Mapa') {
+  function renderMapBlock(lat, lon, label = 'Geolocalização no Mapa') {
     const la = Number(lat), lo = Number(lon);
     if (!Number.isFinite(la) || !Number.isFinite(lo)) return '';
     const d = 0.0045;
@@ -875,17 +966,15 @@
     const osm = `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${la.toFixed(6)},${lo.toFixed(6)}`;
     return `
       <div class="mt-5">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-2 px-1">
-          <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold flex items-center gap-1.5">
-            <span class="material-symbols-rounded text-base text-[#E0B354]">map</span> ${escapeHtml(label)}
-          </h4>
-          <span class="text-[11px] font-mono-tech text-[#E0B354]">${la.toFixed(6)}, ${lo.toFixed(6)}</span>
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+          <span class="text-xs font-semibold uppercase tracking-wider text-[var(--text-2)] flex items-center gap-1.5"><span class="material-symbols-rounded text-base text-[#D9A74A]">map</span> ${escapeHtml(label)}</span>
+          <span class="text-[11px] font-mono-code text-[#D9A74A]">${la.toFixed(6)}, ${lo.toFixed(6)}</span>
         </div>
-        <div class="map-box mb-3"><iframe loading="lazy" referrerpolicy="no-referrer" src="${osm}" title="Mapa Forense"></iframe></div>
+        <div class="map-frame mb-2.5"><iframe loading="lazy" referrerpolicy="no-referrer" src="${osm}" title="Mapa Forense"></iframe></div>
         <div class="flex flex-wrap gap-2">
-          <a href="https://www.google.com/maps?q=${la.toFixed(6)},${lo.toFixed(6)}" target="_blank" rel="noopener noreferrer" class="chip-action"><span class="material-symbols-rounded text-sm text-[#30D158]">location_on</span> Google Maps</a>
-          <a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${la.toFixed(6)},${lo.toFixed(6)}" target="_blank" rel="noopener noreferrer" class="chip-action"><span class="material-symbols-rounded text-sm text-[#E0B354]">streetview</span> Street View</a>
-          <a href="https://maps.apple.com/?ll=${la.toFixed(6)},${lo.toFixed(6)}&q=${encodeURIComponent(label)}" target="_blank" rel="noopener noreferrer" class="chip-action"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">explore</span> Apple Maps</a>
+          <a href="https://www.google.com/maps?q=${la.toFixed(6)},${lo.toFixed(6)}" target="_blank" rel="noopener noreferrer" class="btn-ghost"><span class="material-symbols-rounded text-sm text-[#30D158]">location_on</span> Google Maps</a>
+          <a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${la.toFixed(6)},${lo.toFixed(6)}" target="_blank" rel="noopener noreferrer" class="btn-ghost"><span class="material-symbols-rounded text-sm text-[#D9A74A]">streetview</span> Street View</a>
+          <a href="https://maps.apple.com/?ll=${la.toFixed(6)},${lo.toFixed(6)}&q=${encodeURIComponent(label)}" target="_blank" rel="noopener noreferrer" class="btn-ghost"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">explore</span> Apple Maps</a>
         </div>
       </div>`;
   }
@@ -919,30 +1008,26 @@
   }
 
   // =========================================================================
-  // 5. CATÁLOGO DECLARADO DE SETORES & MÓDULOS (13 FERRAMENTAS)
+  // 5. CATÁLOGO DECLARADO DE SETORES & 13 MÓDULOS
   // =========================================================================
   const SECTORS = [
-    { id: 'forense', title: 'Laboratório Forense', subtitle: 'Malware, EXIF/GPS, adulteração ELA, cadeia de custódia e decodificação', short: 'Forense', icon: 'biotech', accent: '#E0B354' },
-    { id: 'sherlock', title: 'Rastreamento Sherlock', subtitle: 'OSINT em APIs diretas, Google Dorks forenses e vazamentos de e-mail', short: 'Sherlock', icon: 'policy', accent: '#5AC8FA' },
-    { id: 'web', title: 'Web, SSL & Empresas', subtitle: 'Certificados crt.sh, proprietário RDAP, scraper, IP no mapa e CNPJ', short: 'Web & CNPJ', icon: 'language', accent: '#30D158' }
+    { id: 'forense', title: 'Laboratório Forense', icon: 'biotech', accent: '#D9A74A' },
+    { id: 'sherlock', title: 'Rastreamento Sherlock', icon: 'policy', accent: '#5AC8FA' },
+    { id: 'web', title: 'Web, SSL & Empresas', icon: 'language', accent: '#30D158' }
   ];
 
   const MODULES = [
-    // --- SETOR 1: LABORATÓRIO FORENSE ---
-    { id: 'virustotal', sector: 'forense', name: 'VirusTotal', summary: 'Escaneia arquivos, hashes, URLs, domínios e IPs contra 70+ motores.', io: 'Hash / URL / Arquivo → Laudo AV', badge: 'VT v3 + OTX', badgeClass: 't-err', icon: 'bug_report', gradient: 'linear-gradient(135deg,#0A84FF,#1D4ED8)', keywords: 'virustotal virus malware hash sha256 md5 url dominio ip', customView: 'virustotal' },
-    { id: 'metadata', sector: 'forense', name: 'Metadados EXIF', summary: 'Extrai aparelho, câmera, data real, hash SHA-256 e localização GPS.', io: 'Foto Original → EXIF + Mapa', badge: 'GPS + Mapa', badgeClass: 't-gold', icon: 'photo_camera', gradient: 'linear-gradient(135deg,#E0B354,#9E6E1F)', keywords: 'metadados exif foto gps mapa aparelho camera', customView: 'metadata' },
-    { id: 'ela', sector: 'forense', name: 'Análise ELA', summary: 'Revela cortes, edições e montagens por variação de compressão JPEG.', io: 'Imagem → Mapa ELA (PNG)', badge: 'Adulteração', badgeClass: 't-gold', icon: 'compare', gradient: 'linear-gradient(135deg,#FF453A,#9B1C26)', keywords: 'ela adulteracao fraude montagem edicao imagem', customView: 'ela' },
-    { id: 'custody', sector: 'forense', name: 'Custódia & Hex', summary: 'Gera SHA-256/512/1, entropia de Shannon e detecta extensão falsa.', io: 'Arquivo → Hashes + Magic Bytes', badge: 'Integridade', badgeClass: 't-gold', icon: 'fingerprint', gradient: 'linear-gradient(135deg,#5AC8FA,#1E5BB8)', keywords: 'custodia hash sha256 entropia magic bytes spoofing', customView: 'custody' },
-    { id: 'decoder', sector: 'forense', name: 'Decodificador', summary: 'Identifica e decodifica JWT, Base64, Hex, URL e Unix Timestamp.', io: 'Artefato Texto → Dados Legíveis', badge: '5 Motores', badgeClass: 't-gold', icon: 'terminal', gradient: 'linear-gradient(135deg,#BF5AF2,#6B21A8)', keywords: 'jwt base64 hex url timestamp decoder', customView: 'decoder' },
-
-    // --- SETOR 2: RASTREAMENTO SHERLOCK ---
-    { id: 'osint', sector: 'sherlock', name: 'Sherlock OSINT', summary: 'Varre 11 plataformas compatíveis em paralelo com retorno em tempo real.', io: 'Username → Perfis Ativos', badge: '11 APIs', badgeClass: 't-blue', icon: 'travel_explore', gradient: 'linear-gradient(135deg,#5E5CE6,#312E81)', keywords: 'osint sherlock username github reddit perfis', placeholder: 'Username (ex: torvalds)', max: 60, customSearch: 'osint_api' },
-    { id: 'dork', sector: 'sherlock', name: 'Dorks Forenses', summary: 'Gera buscas filtradas para PDFs, planilhas, pastes e redes sociais.', io: 'Termo / Alvo → Dorks Google', badge: '4 Categorias', badgeClass: 't-warn', icon: 'manage_search', gradient: 'linear-gradient(135deg,#FF9F0A,#B45309)', keywords: 'dork google pdf pastes redes sociais', placeholder: 'Nome, domínio, @user ou termo', max: 90, customSearch: 'dork_only' },
+    { id: 'virustotal', sector: 'forense', name: 'VirusTotal', summary: 'Análise de arquivos (SHA-256 local), hashes, URLs, domínios e IPs em 70+ motores AV.', io: 'Hash / URL / Arquivo → Laudo AV', badge: 'VT v3 + OTX', badgeClass: 'b-err', icon: 'bug_report', gradient: 'linear-gradient(135deg,#0A84FF,#1D4ED8)', keywords: 'virustotal virus malware hash sha256 md5 url dominio ip', customView: 'virustotal' },
+    { id: 'metadata', sector: 'forense', name: 'Metadados EXIF', summary: 'Extração forense de aparelho, câmera, data real, SHA-256 e GPS no mapa.', io: 'Foto Original → EXIF + Mapa', badge: 'GPS + Mapa', badgeClass: 'b-gold', icon: 'photo_camera', gradient: 'linear-gradient(135deg,#D9A74A,#94641A)', keywords: 'metadados exif foto gps mapa aparelho camera', customView: 'metadata' },
+    { id: 'ela', sector: 'forense', name: 'Análise ELA', summary: 'Detecção visual de recortes, colagens e edições por erro de compressão JPEG.', io: 'Imagem → Mapa ELA (PNG)', badge: 'Adulteração', badgeClass: 'b-gold', icon: 'compare', gradient: 'linear-gradient(135deg,#FF453A,#9B1C26)', keywords: 'ela adulteracao fraude montagem photoshop', customView: 'ela' },
+    { id: 'custody', sector: 'forense', name: 'Custódia & Hex', summary: 'Hashes SHA-256/512/1, entropia de Shannon, spoofing de extensão e strings.', io: 'Arquivo → Hashes + Magic Bytes', badge: 'Integridade', badgeClass: 'b-gold', icon: 'fingerprint', gradient: 'linear-gradient(135deg,#5AC8FA,#1E5BB8)', keywords: 'custodia hash sha256 entropia magic bytes spoofing', customView: 'custody' },
+    { id: 'decoder', sector: 'forense', name: 'Decodificador', summary: 'Inspeção automática de JWT, Unix Timestamp, Base64, Hex e URL Encoding.', io: 'Artefato Texto → Legível', badge: '5 Motores', badgeClass: 'b-gold', icon: 'terminal', gradient: 'linear-gradient(135deg,#BF5AF2,#6B21A8)', keywords: 'jwt base64 hex url timestamp decoder', customView: 'decoder' },
+    { id: 'osint', sector: 'sherlock', name: 'Sherlock OSINT', summary: 'Varredura paralela de username em 11 APIs públicas compatíveis.', io: 'Username → 11 Plataformas', badge: '11 APIs', badgeClass: 'b-blue', icon: 'travel_explore', gradient: 'linear-gradient(135deg,#5E5CE6,#312E81)', keywords: 'osint sherlock username github reddit perfis', placeholder: 'Username (ex: torvalds)', max: 60, customSearch: 'osint_api' },
+    { id: 'dork', sector: 'sherlock', name: 'Dorks Forenses', summary: 'Google Hacking para PDFs, planilhas, diretórios, pastes e redes sociais.', io: 'Termo / Alvo → Dorks Google', badge: '4 Categorias', badgeClass: 'b-warn', icon: 'manage_search', gradient: 'linear-gradient(135deg,#FF9F0A,#B45309)', keywords: 'dork google pdf pastes redes sociais', placeholder: 'Nome, domínio, @user ou termo', max: 90, customSearch: 'dork_only' },
     {
-      id: 'breach', sector: 'sherlock', name: 'Vazamentos', summary: 'Checa exposição de e-mail em bases vazadas com fallback DNS MX.', io: 'E-mail → Bases Expostas', badge: '2 APIs', badgeClass: 't-err', icon: 'security', gradient: 'linear-gradient(135deg,#E5484D,#8C1D24)', keywords: 'vazamento email breach senha', placeholder: 'Ex: nome@dominio.com', max: 80,
+      id: 'breach', sector: 'sherlock', name: 'Vazamentos', summary: 'Checagem de exposição de e-mail em bases vazadas + fallback DNS MX.', io: 'E-mail → Bases Expostas', badge: '2 APIs', badgeClass: 'b-err', icon: 'security', gradient: 'linear-gradient(135deg,#E5484D,#8C1D24)', keywords: 'vazamento email breach senha', placeholder: 'Ex: nome@dominio.com', max: 80,
       fetchApi: async (v) => {
-        const email = v.trim();
-        if (!email.includes('@')) throw new Error('Informe um e-mail válido.');
+        const email = v.trim(); if (!email.includes('@')) throw new Error('Informe um e-mail válido.');
         const domain = email.split('@')[1];
         const { data, provider } = await tryFallback([
           {
@@ -951,8 +1036,7 @@
               const r = await RemoteProxy.request(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
               if (r.status === 404) return { resumo: { email, status: 'Nenhum vazamento encontrado' }, raw: { email, breaches: [] } };
               if (!r.ok) throw new Error(`HTTP ${r.status}`);
-              const d = await r.json();
-              const list = Array.isArray(d.breaches?.[0]) ? d.breaches[0] : (d.breaches || []);
+              const d = await r.json(), list = Array.isArray(d.breaches?.[0]) ? d.breaches[0] : (d.breaches || []);
               return { resumo: { email, status: list.length ? 'Exposto em vazamentos' : 'Seguro', total_vazamentos: list.length }, listas: list.length ? [{ titulo: 'Bases vazadas', itens: list }] : [], raw: d };
             }
           },
@@ -968,10 +1052,8 @@
         return { ...data, provider };
       }
     },
-
-    // --- SETOR 3: WEB, SSL & EMPRESAS ---
     {
-      id: 'ssl_crt', sector: 'web', name: 'Subdomínios SSL', summary: 'Mapeia subdomínios e certificados emitidos via transparência crt.sh.', io: 'Domínio → Subdomínios + CAs', badge: 'crt.sh + Alt', badgeClass: 't-ok', icon: 'workspace_premium', gradient: 'linear-gradient(135deg,#00C7BE,#0F766E)', keywords: 'ssl crt.sh subdominios certificados recon', placeholder: 'Ex: exemplo.com.br', max: 80,
+      id: 'ssl_crt', sector: 'web', name: 'Subdomínios SSL', summary: 'Enumeração de subdomínios e certificados via Certificate Transparency.', io: 'Domínio → Subdomínios + CAs', badge: 'crt.sh + Alt', badgeClass: 'b-ok', icon: 'workspace_premium', gradient: 'linear-gradient(135deg,#00C7BE,#0F766E)', keywords: 'ssl crt.sh subdominios certificados recon', placeholder: 'Ex: exemplo.com.br', max: 80,
       fetchApi: async (v) => {
         const domain = v.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
         if (!domain || !domain.includes('.')) throw new Error('Informe um domínio válido.');
@@ -987,11 +1069,7 @@
                 if (r.issuer_name) issuers.add(r.issuer_name.match(/O=([^,]+)/)?.[1] || r.issuer_name.slice(0, 50));
               }
               const subs = [...subSet].sort().slice(0, 120);
-              return {
-                resumo: { dominio_base: domain, total_certificados: rows.length, subdominios_unicos: subSet.size, autoridades_emissoras: issuers.size, ultimo_certificado: (rows[0]?.entry_timestamp || '').split('T')[0] || '-' },
-                listas: [{ titulo: 'Subdomínios Descobertos', itens: subs }, { titulo: 'Autoridades Certificadoras', itens: [...issuers].slice(0, 20) }].filter(l => l.itens.length > 0),
-                raw: { domain, total_certs: rows.length, subdomains: subs, issuers: [...issuers] }
-              };
+              return { resumo: { dominio_base: domain, total_certificados: rows.length, subdominios_unicos: subSet.size, autoridades_emissoras: issuers.size, ultimo_certificado: (rows[0]?.entry_timestamp || '').split('T')[0] || '-' }, listas: [{ titulo: 'Subdomínios Descobertos', itens: subs }, { titulo: 'Autoridades Certificadoras', itens: [...issuers].slice(0, 20) }].filter(l => l.itens.length > 0), raw: { domain, total_certs: rows.length, subdomains: subs } };
             }
           },
           {
@@ -1009,7 +1087,7 @@
       }
     },
     {
-      id: 'domain', sector: 'web', name: 'Dono de Site', summary: 'Consulta titular, registrador, vigência e DNS (A, MX, NS, TXT).', io: 'Domínio → RDAP + DNS', badge: 'RDAP + DNS', badgeClass: 't-blue', icon: 'language', gradient: 'linear-gradient(135deg,#5AC8FA,#0A84FF)', keywords: 'site dominio dono proprietario whois rdap dns', placeholder: 'Ex: uol.com.br ou site.com', max: 80,
+      id: 'domain', sector: 'web', name: 'Dono de Site', summary: 'Identificação de titular, registrador, datas e registros DNS (A/MX/NS/TXT).', io: 'Domínio → RDAP + DNS', badge: 'RDAP + DNS', badgeClass: 'b-blue', icon: 'language', gradient: 'linear-gradient(135deg,#5AC8FA,#0A84FF)', keywords: 'site dominio dono proprietario whois rdap dns', placeholder: 'Ex: uol.com.br ou site.com', max: 80,
       fetchApi: async (v) => {
         const domain = v.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
         if (!domain || !domain.includes('.')) throw new Error('Informe um domínio válido.');
@@ -1036,10 +1114,9 @@
       }
     },
     {
-      id: 'scraping', sector: 'web', name: 'Web Scraper', summary: 'Extrai metadados HTML, e-mails, telefones BR e links públicos.', io: 'URL → Contatos + Links', badge: 'Proxy HTML', badgeClass: 't-blue', icon: 'code', gradient: 'linear-gradient(135deg,#32ADE6,#0369A1)', keywords: 'scraper html links telefones emails site', placeholder: 'Ex: https://site.com.br', max: 150,
+      id: 'scraping', sector: 'web', name: 'Web Scraper', summary: 'Coleta de metadados HTML, e-mails, telefones BR e links via Proxy Remoto.', io: 'URL → Contatos + Links', badge: 'Proxy HTML', badgeClass: 'b-blue', icon: 'code', gradient: 'linear-gradient(135deg,#32ADE6,#0369A1)', keywords: 'scraper html links telefones emails site', placeholder: 'Ex: https://site.com.br', max: 150,
       fetchApi: async (v) => {
-        let target = v.trim();
-        if (!target) throw new Error('Informe uma URL pública.');
+        let target = v.trim(); if (!target) throw new Error('Informe uma URL pública.');
         if (!/^https?:\/\//i.test(target)) target = 'https://' + target;
         let parsedUrl; try { parsedUrl = new URL(target); } catch { throw new Error('URL inválida.'); }
         const { html, via } = await RemoteProxy.fetchHtml(parsedUrl.href);
@@ -1058,7 +1135,7 @@
       }
     },
     {
-      id: 'ip', sector: 'web', name: 'IP & Mapa', summary: 'Localiza operadora, ASN e coordenadas (vazio retorna IP do Proxy).', io: 'IP → ISP + ASN + Mapa', badge: '3 APIs + Mapa', badgeClass: 't-blue', icon: 'router', gradient: 'linear-gradient(135deg,#8B5CF6,#5B21B6)', keywords: 'ip geo localizacao mapa operadora asn proxy', placeholder: 'IP alvo (vazio = IP do Proxy)', max: 45, optional: true,
+      id: 'ip', sector: 'web', name: 'IP & Mapa', summary: 'Geolocalização, operadora e ASN (vazio retorna IP de saída do Proxy).', io: 'IP → ISP + ASN + Mapa', badge: '3 APIs + Mapa', badgeClass: 'b-blue', icon: 'router', gradient: 'linear-gradient(135deg,#8B5CF6,#5B21B6)', keywords: 'ip geo localizacao mapa operadora asn proxy', placeholder: 'IP alvo (vazio = IP do Proxy)', max: 45, optional: true,
       fetchApi: async (v) => {
         const target = v.trim();
         const { data, provider } = await tryFallback([
@@ -1075,7 +1152,7 @@
       }
     },
     {
-      id: 'cnpj', sector: 'web', name: 'Consulta CNPJ', summary: 'Valida Módulo 11 e puxa razão social, CNAEs e Quadro Societário.', io: 'CNPJ 14d → Empresa + QSA', badge: '3 APIs BR', badgeClass: 't-ok', icon: 'domain', gradient: 'linear-gradient(135deg,#30D158,#15803D)', keywords: 'cnpj empresa razao social socios qsa receita cnae', placeholder: 'CNPJ (14 dígitos)', max: 18, digits: true,
+      id: 'cnpj', sector: 'web', name: 'Consulta CNPJ', summary: 'Validação Módulo 11 + dados cadastrais, CNAEs e Quadro Societário (QSA).', io: 'CNPJ 14d → Empresa + QSA', badge: '3 APIs BR', badgeClass: 'b-ok', icon: 'domain', gradient: 'linear-gradient(135deg,#30D158,#15803D)', keywords: 'cnpj empresa razao social socios qsa receita cnae', placeholder: 'CNPJ (14 dígitos)', max: 18, digits: true,
       fetchApi: async (v) => {
         const clean = v.replace(/\D/g, '');
         if (!isValidCnpj(clean)) throw new Error('CNPJ inválido pelos dígitos verificadores (Módulo 11).');
@@ -1108,7 +1185,208 @@
   ];
 
   // =========================================================================
-  // 6. VIEWS FORENSES ESPECIALIZADAS
+  // 6. SIDEBAR, TOPBAR, COMMAND PALETTE & CASE DRAWER
+  // =========================================================================
+  function renderSidebar(activeHash) {
+    const nav = document.getElementById('sidebarNav');
+    if (!nav) return;
+    nav.innerHTML = `
+      <button type="button" class="nav-item ${activeHash === '' ? 'active' : ''}" data-nav="">
+        <span class="flex items-center gap-2.5 min-w-0">
+          <span class="nav-ic"><span class="material-symbols-rounded">dashboard</span></span>
+          <span class="truncate">Central do Caso</span>
+        </span>
+        <span class="text-[10px] font-mono-code text-[var(--text-3)]">${MODULES.length}</span>
+      </button>
+      ${SECTORS.map(sec => {
+        const items = MODULES.filter(m => m.sector === sec.id);
+        return `
+          <div class="sidebar-section-label">
+            <span>${escapeHtml(sec.title)}</span>
+            <span class="font-mono-code">${items.length}</span>
+          </div>
+          ${items.map(m => `
+            <button type="button" class="nav-item ${activeHash === m.id ? 'active' : ''}" data-nav="${m.id}">
+              <span class="flex items-center gap-2.5 min-w-0">
+                <span class="nav-ic"><span class="material-symbols-rounded">${m.icon}</span></span>
+                <span class="truncate">${escapeHtml(m.name)}</span>
+              </span>
+              <span class="material-symbols-rounded text-sm opacity-40">chevron_right</span>
+            </button>`).join('')}`;
+      }).join('')}`;
+  }
+
+  function updateTopbar(sectorLabel, title, subtitle) {
+    const b = document.getElementById('topSectorBadge');
+    const t = document.getElementById('topTitle');
+    const s = document.getElementById('topSubtitle');
+    if (b) b.textContent = sectorLabel;
+    if (t) t.textContent = title;
+    if (s) s.textContent = subtitle;
+  }
+
+  function openMobileNav() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('mobileBackdrop').classList.add('open');
+  }
+  function closeMobileNav() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('mobileBackdrop').classList.remove('open');
+  }
+  function openCaseDrawer() {
+    renderCaseDrawerBody();
+    document.getElementById('caseDrawer').classList.add('open');
+    document.getElementById('mobileBackdrop').classList.add('open');
+  }
+  function closeCaseDrawer() {
+    document.getElementById('caseDrawer').classList.remove('open');
+    if (!document.getElementById('sidebar').classList.contains('open')) {
+      document.getElementById('mobileBackdrop').classList.remove('open');
+    }
+  }
+
+  function renderCmdList(query = '') {
+    const list = document.getElementById('cmdList');
+    const q = query.trim().toLowerCase();
+    const matches = MODULES.filter(m => !q || `${m.name} ${m.summary} ${m.io} ${m.keywords}`.toLowerCase().includes(q));
+    list.innerHTML = matches.length ? matches.map(m => `
+      <button type="button" class="nav-item" data-cmd-nav="${m.id}">
+        <span class="flex items-center gap-3 min-w-0">
+          <span class="tool-icon" style="background:${m.gradient}; width:32px; height:32px;"><span class="material-symbols-rounded" style="font-size:17px;">${m.icon}</span></span>
+          <span class="min-w-0">
+            <span class="block text-sm font-semibold text-white truncate">${escapeHtml(m.name)}</span>
+            <span class="block text-[11px] font-mono-code text-[var(--text-3)] truncate">${escapeHtml(m.io)}</span>
+          </span>
+        </span>
+        <span class="badge ${m.badgeClass}">${escapeHtml(m.badge)}</span>
+      </button>`).join('') : `<div class="p-6 text-center text-xs text-[var(--text-3)]">Nenhum módulo encontrado.</div>`;
+  }
+
+  function openCmdPalette() {
+    const modal = document.getElementById('cmdModal');
+    const input = document.getElementById('cmdInput');
+    modal.classList.add('open');
+    input.value = '';
+    renderCmdList('');
+    setTimeout(() => input.focus(), 40);
+  }
+  function closeCmdPalette() {
+    document.getElementById('cmdModal').classList.remove('open');
+  }
+
+  // =========================================================================
+  // 7. VISÃO GERAL — CENTRAL DO CASO (EXECUTIVE WORKSTATION DASHBOARD)
+  // =========================================================================
+  function renderOverview(ws) {
+    updateTopbar(CASE_ID, 'Central de Investigação', 'Visão consolidada dos setores forenses, OSINT e inteligência web');
+    ws.innerHTML = `
+      <div class="fade-in max-w-6xl mx-auto space-y-5">
+        <!-- KPI Telemetry Strip -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div class="kpi-tile">
+            <span class="text-[10px] font-mono-code uppercase tracking-wider text-[var(--text-3)]">Módulos Ativos</span>
+            <span class="text-xl font-bold font-mono-code text-white">${MODULES.length} <span class="text-xs font-normal text-[#D9A74A]">declarados</span></span>
+          </div>
+          <div class="kpi-tile">
+            <span class="text-[10px] font-mono-code uppercase tracking-wider text-[var(--text-3)]">Túnel de Rede</span>
+            <span id="kpiProxyVal" class="text-sm font-bold font-mono-code text-[#30D158] truncate mt-1">${escapeHtml(RemoteProxy.getModeLabel())}</span>
+          </div>
+          <div class="kpi-tile">
+            <span class="text-[10px] font-mono-code uppercase tracking-wider text-[var(--text-3)]">Evidências na Sessão</span>
+            <span id="kpiEvidenceCount" class="text-xl font-bold font-mono-code text-[#5AC8FA]">${sessionEvidences.length}</span>
+          </div>
+          <div class="kpi-tile">
+            <span class="text-[10px] font-mono-code uppercase tracking-wider text-[var(--text-3)]">Selo de Custódia</span>
+            <span class="text-sm font-bold font-mono-code text-[#D9A74A] mt-1">KIIK HACKING • E2EE</span>
+          </div>
+        </div>
+
+        <!-- Master Investigation Directory + Live Timeline -->
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+          <div class="xl:col-span-8 space-y-5">
+            ${SECTORS.map(sec => {
+              const items = MODULES.filter(m => m.sector === sec.id);
+              return `
+                <section class="panel overflow-hidden">
+                  <div class="panel-header">
+                    <div class="flex items-center gap-2.5">
+                      <span class="material-symbols-rounded text-lg" style="color:${sec.accent}">${sec.icon}</span>
+                      <h2 class="text-xs font-bold uppercase tracking-wider text-white">${escapeHtml(sec.title)}</h2>
+                    </div>
+                    <span class="badge b-gold">${items.length} módulos</span>
+                  </div>
+                  <div>
+                    ${items.map(m => `
+                      <div class="matrix-row" data-nav="${m.id}">
+                        <div class="flex items-center gap-3 min-w-0">
+                          <div class="tool-icon" style="background:${m.gradient};"><span class="material-symbols-rounded">${m.icon}</span></div>
+                          <div class="min-w-0">
+                            <span class="block text-sm font-semibold text-white truncate">${escapeHtml(m.name)}</span>
+                            <span class="block text-[11px] font-mono-code text-[#D9A74A] truncate">${escapeHtml(m.io)}</span>
+                          </div>
+                        </div>
+                        <p class="matrix-desc-col text-xs text-[var(--text-2)] leading-snug m-0">${escapeHtml(m.summary)}</p>
+                        <div class="flex items-center gap-2 shrink-0">
+                          <span class="badge ${m.badgeClass}">${escapeHtml(m.badge)}</span>
+                          <span class="material-symbols-rounded text-base text-[var(--text-3)]">chevron_right</span>
+                        </div>
+                      </div>`).join('')}
+                  </div>
+                </section>`;
+            }).join('')}
+          </div>
+
+          <!-- Right Sidebar: Case Timeline & Shortcuts -->
+          <div class="xl:col-span-4 space-y-5">
+            <section class="panel overflow-hidden">
+              <div class="panel-header">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                  <span class="material-symbols-rounded text-base text-[#D9A74A]">timeline</span> Linha do Tempo do Caso
+                </h3>
+                <span class="text-[10px] font-mono-code text-[var(--text-3)]">${CASE_ID}</span>
+              </div>
+              <div class="p-4">
+                ${sessionEvidences.length ? `
+                  <div class="space-y-2.5 max-h-80 overflow-y-auto mb-3">
+                    ${sessionEvidences.slice(0, 8).map(ev => `
+                      <div class="p-2.5 rounded-xl bg-white/[0.03] border border-white/10">
+                        <div class="flex justify-between text-[10px] font-mono-code mb-0.5">
+                          <span class="text-[#D9A74A] font-semibold">${escapeHtml(ev.id)} • ${escapeHtml(ev.moduleName)}</span>
+                          <span class="text-[var(--text-3)]">${escapeHtml(ev.ts)}</span>
+                        </div>
+                        <p class="text-xs font-mono-code text-white truncate m-0">${escapeHtml(ev.target)}</p>
+                      </div>`).join('')}
+                  </div>
+                  <button type="button" id="overviewOpenDrawer" class="btn-ghost w-full justify-center">Abrir Dossiê Completo</button>
+                ` : `
+                  <p class="text-xs text-[var(--text-2)] leading-relaxed m-0">
+                    Todas as análises executadas nesta sessão (arquivos, hashes, domínios, perfis OSINT e CNPJs) são registradas automaticamente aqui para exportação unificada com assinatura <strong>HMAC-SHA256</strong>.
+                  </p>
+                `}
+              </div>
+            </section>
+
+            <section class="panel overflow-hidden">
+              <div class="panel-header">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                  <span class="material-symbols-rounded text-base text-[#5AC8FA]">bolt</span> Fluxo Pericial Recomendado
+                </h3>
+              </div>
+              <div class="p-4 space-y-2.5 text-xs text-[var(--text-2)]">
+                <div class="flex gap-2.5"><span class="font-mono-code text-[#D9A74A] font-bold">01</span><span>Suba evidências em <strong>Custódia & Hex</strong> para fixar SHA-256, entropia e detectar extensão falsificada.</span></div>
+                <div class="flex gap-2.5"><span class="font-mono-code text-[#D9A74A] font-bold">02</span><span>Acione <strong>VirusTotal</strong> em 1 toque para reputação de malware e <strong>EXIF / ELA</strong> para fotos.</span></div>
+                <div class="flex gap-2.5"><span class="font-mono-code text-[#D9A74A] font-bold">03</span><span>Correlacione alvos via <strong>Sherlock OSINT</strong>, <strong>crt.sh</strong>, <strong>RDAP</strong> e <strong>CNPJ</strong>.</span></div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>`;
+
+    document.getElementById('overviewOpenDrawer')?.addEventListener('click', openCaseDrawer);
+  }
+
+  // =========================================================================
+  // 8. MÓDULOS FORENSES ESPECIALIZADOS (WORKBENCH 2 PAINÉIS)
   // =========================================================================
   function detectVtIndicator(raw) {
     const val = raw.trim();
@@ -1120,119 +1398,110 @@
     return null;
   }
 
-  function renderVirusTotalView(view) {
+  function renderVirusTotalView(ws, m) {
     const savedKey = localStorage.getItem('sherlock_vt_key') || '';
-    const history = getHistory('virustotal');
-    const histHtml = history.length ? `<div class="mt-4 pt-4 border-t border-white/10"><span class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold block mb-2">Recentes</span><div class="flex flex-wrap gap-2">${history.map(h => `<button type="button" class="chip-action py-1 px-3 font-mono-tech text-[11px]" data-fill-vt="${escapeHtml(h.query)}">${escapeHtml(h.query.length > 22 ? h.query.slice(0,22)+'…' : h.query)}</button>`).join('')}</div></div>` : '';
-
-    view.innerHTML = `
-      <div class="view-enter">
-        <button type="button" data-nav="" class="chip-action mb-5"><span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar</button>
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          <div class="lg:col-span-5 ios-m3-card p-6 lg:sticky lg:top-6">
-            <div class="flex items-center gap-3.5 mb-4">
-              <div class="squircle" style="background:linear-gradient(135deg,#0A84FF,#1D4ED8)"><span class="material-symbols-rounded">bug_report</span></div>
-              <div><h2 class="text-lg font-bold leading-tight">VirusTotal</h2><span class="tag-pill t-err mt-1">VT API v3 + AlienVault OTX</span></div>
-            </div>
-            <p class="text-xs text-[var(--text-secondary)] mb-4 leading-relaxed">Informe Hash, URL, Domínio, IP ou solte um arquivo para calcular o SHA-256 localmente e consultar ameaças.</p>
+    const hist = getHistory('virustotal');
+    ws.innerHTML = `
+      <div class="fade-in max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <div class="lg:col-span-4 panel overflow-hidden">
+          <div class="panel-header">
+            <span class="text-xs font-bold uppercase tracking-wider text-white">Aquisição de Indicador</span>
+            <span class="badge ${m.badgeClass}">${m.badge}</span>
+          </div>
+          <div class="p-5">
             <input type="file" id="vtFileInput" class="hidden">
             <div id="vtDropzone" class="dropzone mb-4">
               <span class="material-symbols-rounded text-2xl text-[#5AC8FA] mb-1">shield</span>
-              <p class="text-xs font-semibold text-white">Soltar arquivo (SHA-256 local)</p>
-              <p class="text-[10px] text-[var(--text-secondary)] mt-0.5">Nenhum upload de arquivo — apenas o hash é consultado</p>
+              <p class="text-xs font-semibold text-white m-0">Soltar arquivo (SHA-256 local)</p>
+              <p class="text-[11px] text-[var(--text-3)] mt-0.5 mb-0">Somente o hash é consultado</p>
             </div>
             <form id="vtForm">
-              <div class="m3-field"><input type="text" id="vtTarget" class="m3-input font-mono-tech text-xs" placeholder=" " maxlength="300" required autocomplete="off"><label for="vtTarget" class="m3-label">Hash, URL, Domínio ou IP</label></div>
+              <div class="field-wrap">
+                <label for="vtTarget" class="field-lbl">Hash, URL, Domínio ou IP</label>
+                <input type="text" id="vtTarget" class="m3-input font-mono-code text-xs" placeholder="Ex: SHA-256, 8.8.8.8 ou dominio.com" maxlength="300" required autocomplete="off">
+              </div>
               <details class="mb-4">
-                <summary class="cursor-pointer text-[11px] text-[#E0B354] font-semibold px-1 py-1">${RemoteProxy.isVtServerConfigured() ? 'VT_API_KEY ativa na Vercel (opcional substituir)' : 'Configurar VT API Key gratuita (opcional)'}</summary>
-                <div class="mt-2"><div class="m3-field mb-1"><input type="password" id="vtApiKey" class="m3-input font-mono-tech text-xs" placeholder=" " value="${escapeHtml(savedKey)}" autocomplete="off"><label for="vtApiKey" class="m3-label">VirusTotal API Key</label></div><p class="text-[10px] text-[var(--text-tertiary)] px-1">Sem chave, usa fallback AlienVault OTX + link direto VT.</p></div>
+                <summary class="cursor-pointer text-[11px] text-[#D9A74A] font-semibold py-1">${RemoteProxy.isVtServerConfigured() ? 'VT_API_KEY ativa na Vercel (substituir)' : 'Inserir VT API Key (opcional)'}</summary>
+                <div class="mt-2">
+                  <input type="password" id="vtApiKey" class="m3-input font-mono-code text-xs" placeholder="Sua VirusTotal API Key" value="${escapeHtml(savedKey)}" autocomplete="off">
+                  <p class="text-[10px] text-[var(--text-3)] mt-1 mb-0">Sem chave, aciona fallback AlienVault OTX + link oficial VT.</p>
+                </div>
               </details>
-              <button type="submit" class="btn-primary"><span class="material-symbols-rounded text-lg">radar</span> Escanear Ameaça</button>
+              <button type="submit" class="btn-exec"><span class="material-symbols-rounded text-base">radar</span> Escanear Ameaça</button>
             </form>
-            ${histHtml}
+            ${hist.length ? `<div class="mt-4 pt-4 border-t border-white/10"><span class="field-lbl">Recentes</span><div class="flex flex-wrap gap-1.5">${hist.map(h => `<button type="button" class="btn-ghost py-1 px-2 text-[11px] font-mono-code" data-fill-vt="${escapeHtml(h.query)}">${escapeHtml(h.query.length > 20 ? h.query.slice(0,20)+'…' : h.query)}</button>`).join('')}</div></div>` : ''}
           </div>
-          <div class="lg:col-span-7">
-            <div id="vtResult" class="min-h-[340px] ios-m3-card p-6 flex flex-col justify-center items-center text-center">
-              <div class="w-16 h-16 rounded-2xl bg-[#0A84FF]/15 border border-[#0A84FF]/30 flex items-center justify-center mb-3"><span class="material-symbols-rounded text-3xl text-[#5AC8FA]">bug_report</span></div>
-              <p class="text-sm font-semibold text-white mb-1">Varredura pronta</p>
-              <p class="text-xs text-[var(--text-secondary)] max-w-sm">Classificação automática de indicador com contagem de motores antivírus e inteligência OTX.</p>
-            </div>
+        </div>
+        <div class="lg:col-span-8">
+          <div id="vtResult" class="panel min-h-[380px] p-6 flex flex-col justify-center items-center text-center">
+            <span class="material-symbols-rounded text-4xl text-white/15 mb-2">bug_report</span>
+            <p class="text-sm font-semibold text-white m-0">Painel de Análise Threat Intel</p>
+            <p class="text-xs text-[var(--text-2)] max-w-sm mt-1">Informe um indicador ou solte um arquivo ao lado para verificar reputação em 70+ motores antivírus.</p>
           </div>
         </div>
       </div>`;
 
-    const fileInput = document.getElementById('vtFileInput'), dropzone = document.getElementById('vtDropzone');
-    const targetInput = document.getElementById('vtTarget'), keyInput = document.getElementById('vtApiKey'), form = document.getElementById('vtForm');
+    const fi = document.getElementById('vtFileInput'), dz = document.getElementById('vtDropzone');
+    const ti = document.getElementById('vtTarget'), ki = document.getElementById('vtApiKey'), form = document.getElementById('vtForm');
+    const onFile = async (f) => { ti.value = 'Calculando SHA-256...'; ti.value = await digestHex('SHA-256', await f.arrayBuffer()); form.requestSubmit(); };
 
-    const onFile = async (file) => {
-      targetInput.value = 'Calculando SHA-256...';
-      targetInput.value = await digestHex('SHA-256', await file.arrayBuffer());
-      form.requestSubmit();
-    };
-    dropzone.addEventListener('click', () => fileInput.click());
-    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
-    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
-    dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.classList.remove('drag-over'); if (e.dataTransfer?.files?.[0]) onFile(e.dataTransfer.files[0]); });
-    fileInput.addEventListener('change', () => { if (fileInput.files?.[0]) onFile(fileInput.files[0]); });
+    dz.addEventListener('click', () => fi.click());
+    dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', (e) => { e.preventDefault(); dz.classList.remove('drag-over'); if (e.dataTransfer?.files?.[0]) onFile(e.dataTransfer.files[0]); });
+    fi.addEventListener('change', () => { if (fi.files?.[0]) onFile(fi.files[0]); });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const userKey = keyInput.value.trim();
+      const userKey = ki.value.trim();
       if (userKey) localStorage.setItem('sherlock_vt_key', userKey); else localStorage.removeItem('sherlock_vt_key');
-      const parsed = detectVtIndicator(targetInput.value);
-      const resDiv = document.getElementById('vtResult'), btn = form.querySelector('button[type="submit"]');
+      const parsed = detectVtIndicator(ti.value), resDiv = document.getElementById('vtResult'), btn = form.querySelector('button[type="submit"]');
       if (!parsed) {
-        resDiv.className = 'min-h-[340px] ios-m3-card p-6 flex flex-col justify-center items-center text-center';
-        resDiv.innerHTML = `<span class="material-symbols-rounded text-5xl mb-2 text-[#FF453A]">error</span><h3 class="font-bold text-base mb-1">Indicador inválido</h3><p class="text-xs text-[var(--text-secondary)]">Use MD5/SHA-1/SHA-256, IPv4, Domínio ou URL completa.</p>`;
+        resDiv.className = 'panel min-h-[380px] p-6 flex flex-col justify-center items-center text-center';
+        resDiv.innerHTML = `<span class="material-symbols-rounded text-4xl text-[#FF453A] mb-2">error</span><p class="text-sm font-bold text-white">Indicador inválido</p><p class="text-xs text-[var(--text-2)]">Informe MD5/SHA-1/SHA-256, IPv4, Domínio ou URL.</p>`;
         return;
       }
 
-      btn.disabled = true; btn.innerHTML = '<span class="material-symbols-rounded spinner text-lg">refresh</span> Escaneando...';
-      resDiv.className = 'min-h-[340px] ios-m3-card p-6 flex flex-col justify-center items-center text-center';
-      resDiv.innerHTML = `<span class="material-symbols-rounded spinner text-4xl mb-3 text-[#5AC8FA]">refresh</span><p class="text-sm font-semibold text-white">Consultando VirusTotal (${escapeHtml(parsed.label)})...</p>`;
+      btn.disabled = true; btn.innerHTML = '<span class="material-symbols-rounded spinner text-base">refresh</span> Escaneando...';
+      resDiv.className = 'panel min-h-[380px] p-6 flex flex-col justify-center items-center text-center';
+      resDiv.innerHTML = `<span class="material-symbols-rounded spinner text-3xl text-[#D9A74A] mb-3">refresh</span><p class="text-sm font-semibold text-white">Consultando VirusTotal v3 (${escapeHtml(parsed.label)})...</p>`;
       await saveHistory('virustotal', parsed.clean);
-      lastModuleId = `virustotal-${parsed.type}`;
 
       let vtError = null;
       try {
         const vt = await RemoteProxy.queryVirusTotal(parsed.type, parsed.clean, userKey);
         if (vt.notFound) {
-          lastResultData = { fonte: 'VirusTotal v3', tipo: parsed.label, alvo: parsed.clean, status: 'Não indexado' };
-          resDiv.className = 'min-h-[340px] ios-m3-card p-6 text-left';
-          resDiv.innerHTML = `<div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10"><div><h3 class="font-bold text-lg">Sem registro no VirusTotal</h3><span class="text-[11px] text-[#E0B354] font-semibold">${escapeHtml(parsed.label)}</span></div><a href="${escapeHtml(parsed.guiUrl)}" target="_blank" rel="noopener noreferrer" class="chip-action"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">open_in_new</span> VT Oficial</a></div><div class="p-4 rounded-2xl bg-[#FF9F0A]/12 border border-[#FF9F0A]/30 text-xs text-[var(--text-secondary)]">Indicador ainda não enviado anteriormente à base do VirusTotal.</div>`;
-          btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded text-lg">radar</span> Escanear Ameaça';
+          recordEvidence('virustotal', parsed.clean, { fonte: 'VirusTotal v3', alvo: parsed.clean, status: 'Não indexado' });
+          resDiv.className = 'panel min-h-[380px] overflow-hidden text-left';
+          resDiv.innerHTML = `<div class="panel-header"><span class="text-sm font-bold text-white">Sem registro no VirusTotal</span><a href="${escapeHtml(parsed.guiUrl)}" target="_blank" rel="noopener noreferrer" class="btn-ghost"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">open_in_new</span> VT Oficial</a></div><div class="p-5"><div class="p-4 rounded-xl bg-[#FF9F0A]/10 border border-[#FF9F0A]/30 text-xs text-[var(--text-2)]">Este indicador não consta na base pública do VirusTotal.</div></div>`;
+          btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded text-base">radar</span> Escanear Ameaça';
           return;
         }
-
         const attr = vt?.data?.attributes || {}, st = attr.last_analysis_stats || {};
         const mal = st.malicious || 0, susp = st.suspicious || 0, harm = st.harmless || 0, undet = st.undetected || 0, total = mal + susp + harm + undet;
         const flagged = Object.entries(attr.last_analysis_results || {}).filter(([, r]) => r.category === 'malicious' || r.category === 'suspicious').map(([eng, r]) => `${eng}: ${r.result || r.category}`);
-        const resumo = {
-          alvo: parsed.clean, tipo: parsed.label,
-          veredito: mal > 0 ? `AMEAÇA (${mal}/${total} motores)` : (susp > 0 ? `SUSPEITO (${susp}/${total})` : `LIMPO (0/${total})`),
-          reputacao: attr.reputation ?? 0, nome_arquivo: attr.meaningful_name || attr.names?.[0] || '-',
-          tipo_arquivo: attr.type_description || '-', classificacao: attr.popular_threat_classification?.suggested_threat_label || '-',
-          ultima_analise: attr.last_analysis_date ? new Date(attr.last_analysis_date * 1000).toLocaleString('pt-BR') : '-'
-        };
-        lastResultData = { fonte: 'VirusTotal v3', stats: st, resumo, motores: flagged, raw: vt };
-        const vc = mal > 0 ? 'bg-[#FF453A]/15 border-[#FF453A]/45 text-[#FF453A]' : (susp > 0 ? 'bg-[#FF9F0A]/15 border-[#FF9F0A]/40 text-[#FF9F0A]' : 'bg-[#30D158]/14 border-[#30D158]/35 text-[#30D158]');
+        const resumo = { alvo: parsed.clean, tipo: parsed.label, veredito: mal > 0 ? `AMEAÇA (${mal}/${total} motores)` : (susp > 0 ? `SUSPEITO (${susp}/${total})` : `LIMPO (0/${total})`), reputacao: attr.reputation ?? 0, nome_arquivo: attr.meaningful_name || attr.names?.[0] || '-', tipo_arquivo: attr.type_description || '-', classificacao: attr.popular_threat_classification?.suggested_threat_label || '-', ultima_analise: attr.last_analysis_date ? new Date(attr.last_analysis_date * 1000).toLocaleString('pt-BR') : '-' };
+        recordEvidence('virustotal', parsed.clean, { fonte: 'VirusTotal v3', stats: st, resumo, motores: flagged });
+        const vc = mal > 0 ? 'bg-[#FF453A]/15 border-[#FF453A]/40 text-[#FF453A]' : (susp > 0 ? 'bg-[#FF9F0A]/15 border-[#FF9F0A]/40 text-[#FF9F0A]' : 'bg-[#30D158]/14 border-[#30D158]/35 text-[#30D158]');
 
-        resDiv.className = 'min-h-[340px] ios-m3-card p-6 text-left';
+        resDiv.className = 'panel min-h-[380px] overflow-hidden text-left';
         resDiv.innerHTML = `
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
-            <div><div class="flex items-center gap-2"><span class="material-symbols-rounded ${mal > 0 ? 'text-[#FF453A]' : 'text-[#30D158]'} text-2xl">${mal > 0 ? 'gpp_bad' : 'verified_user'}</span><h3 class="font-bold text-lg">Laudo VirusTotal</h3></div><span class="text-[11px] text-[#E0B354] font-semibold">API v3 via Proxy Remoto</span></div>
-            <div class="flex flex-wrap gap-2"><a href="${escapeHtml(parsed.guiUrl)}" target="_blank" rel="noopener noreferrer" class="chip-action"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">open_in_new</span> VT Oficial</a><button type="button" class="chip-action" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button><button type="button" class="chip-action" data-export="download"><span class="material-symbols-rounded text-sm text-[#E0B354]">verified</span> Dossiê</button></div>
+          <div class="panel-header flex-wrap">
+            <div><h3 class="text-sm font-bold text-white flex items-center gap-2"><span class="material-symbols-rounded ${mal > 0 ? 'text-[#FF453A]' : 'text-[#30D158]'}">${mal > 0 ? 'gpp_bad' : 'verified_user'}</span> Laudo VirusTotal v3</h3></div>
+            <div class="flex flex-wrap gap-1.5"><a href="${escapeHtml(parsed.guiUrl)}" target="_blank" rel="noopener noreferrer" class="btn-ghost"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">open_in_new</span> VT</a><button type="button" class="btn-ghost" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button><button type="button" class="btn-ghost" data-export="download"><span class="material-symbols-rounded text-sm text-[#D9A74A]">verified</span> JSON</button></div>
           </div>
-          <div class="mb-4 p-3.5 rounded-2xl border ${vc}"><span class="text-xs uppercase tracking-wider font-bold">${escapeHtml(resumo.veredito)}</span></div>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-5">
-            <div class="kpi-box"><span class="block text-xl font-bold text-[#FF453A] font-mono-tech">${mal}</span><span class="text-[10px] uppercase text-[var(--text-secondary)]">Maliciosos</span></div>
-            <div class="kpi-box"><span class="block text-xl font-bold text-[#FF9F0A] font-mono-tech">${susp}</span><span class="text-[10px] uppercase text-[var(--text-secondary)]">Suspeitos</span></div>
-            <div class="kpi-box"><span class="block text-xl font-bold text-[#30D158] font-mono-tech">${harm}</span><span class="text-[10px] uppercase text-[var(--text-secondary)]">Inofensivos</span></div>
-            <div class="kpi-box"><span class="block text-xl font-bold text-white/80 font-mono-tech">${undet}</span><span class="text-[10px] uppercase text-[var(--text-secondary)]">Não Detect.</span></div>
-          </div>
-          ${renderIosList(resumo)}
-          ${flagged.length ? `<h4 class="text-xs uppercase tracking-wider text-[#FF453A] font-semibold mt-5 mb-2 px-1">Detecções (${flagged.length})</h4><div class="flex flex-wrap gap-2 max-h-52 overflow-y-auto">${flagged.map(f => `<span class="text-xs font-mono-tech px-3 py-1.5 rounded-full bg-[#FF453A]/15 border border-[#FF453A]/35 text-[#FF9088]">${escapeHtml(f)}</span>`).join('')}</div>` : ''}`;
-        btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded text-lg">radar</span> Escanear Ameaça';
+          <div class="p-5">
+            <div class="mb-4 p-3.5 rounded-xl border ${vc} text-xs font-bold uppercase tracking-wider">${escapeHtml(resumo.veredito)}</div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-5">
+              <div class="kpi-tile text-center"><span class="text-xl font-bold text-[#FF453A] font-mono-code">${mal}</span><span class="text-[10px] uppercase text-[var(--text-3)]">Maliciosos</span></div>
+              <div class="kpi-tile text-center"><span class="text-xl font-bold text-[#FF9F0A] font-mono-code">${susp}</span><span class="text-[10px] uppercase text-[var(--text-3)]">Suspeitos</span></div>
+              <div class="kpi-tile text-center"><span class="text-xl font-bold text-[#30D158] font-mono-code">${harm}</span><span class="text-[10px] uppercase text-[var(--text-3)]">Inofensivos</span></div>
+              <div class="kpi-tile text-center"><span class="text-xl font-bold text-white/80 font-mono-code">${undet}</span><span class="text-[10px] uppercase text-[var(--text-3)]">Não Detect.</span></div>
+            </div>
+            ${renderKvTable(resumo)}
+            ${flagged.length ? `<h4 class="text-[11px] uppercase tracking-wider text-[#FF453A] font-bold mt-5 mb-2">Detecções (${flagged.length})</h4><div class="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto">${flagged.map(f => `<span class="text-[11px] font-mono-code px-2.5 py-1 rounded-lg bg-[#FF453A]/15 border border-[#FF453A]/30 text-[#FF9A94]">${escapeHtml(f)}</span>`).join('')}</div>` : ''}
+          </div>`;
+        btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded text-base">radar</span> Escanear Ameaça';
         return;
       } catch (err) { vtError = err.message; }
 
@@ -1241,75 +1510,71 @@
         const otx = await RemoteProxy.fetchJson(otxMap[parsed.type], {}, 11000);
         const pc = otx?.pulse_info?.count ?? 0;
         const pulses = (otx?.pulse_info?.pulses || []).slice(0, 15).map(p => `${p.name} (${(p.tags || []).slice(0, 3).join(', ') || 'Threat'})`);
-        const resumo = { alvo: parsed.clean, tipo: parsed.label, pulsos_otx: pc, status: pc > 0 ? `ALERTA: ${pc} relatório(s) de ameaça` : 'Sem registros no AlienVault OTX', pais: otx.country_name || '-', asn: otx.asn || '-' };
-        lastResultData = { fonte: 'AlienVault OTX', resumo, pulses, virustotal_gui: parsed.guiUrl, raw: otx };
-
-        resDiv.className = 'min-h-[340px] ios-m3-card p-6 text-left';
+        const resumo = { alvo: parsed.clean, tipo: parsed.label, pulsos_otx: pc, status: pc > 0 ? `ALERTA: ${pc} relatório(s) de ameaça` : 'Sem registros maliciosos no OTX', pais: otx.country_name || '-', asn: otx.asn || '-' };
+        recordEvidence('virustotal', parsed.clean, { fonte: 'AlienVault OTX', resumo, pulses, virustotal_gui: parsed.guiUrl });
+        resDiv.className = 'panel min-h-[380px] overflow-hidden text-left';
         resDiv.innerHTML = `
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
-            <div><div class="flex items-center gap-2"><span class="material-symbols-rounded ${pc > 0 ? 'text-[#FF453A]' : 'text-[#30D158]'} text-2xl">${pc > 0 ? 'gpp_maybe' : 'verified_user'}</span><h3 class="font-bold text-lg">Threat Intel (OTX)</h3></div><span class="text-[11px] text-[#E0B354] font-semibold">Fallback automático • Proxy Remoto</span></div>
-            <div class="flex flex-wrap gap-2"><a href="${escapeHtml(parsed.guiUrl)}" target="_blank" rel="noopener noreferrer" class="chip-action"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">open_in_new</span> Abrir VT</a><button type="button" class="chip-action" data-export="download"><span class="material-symbols-rounded text-sm text-[#E0B354]">verified</span> Dossiê</button></div>
+          <div class="panel-header flex-wrap">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2"><span class="material-symbols-rounded ${pc > 0 ? 'text-[#FF453A]' : 'text-[#30D158]'}">${pc > 0 ? 'gpp_maybe' : 'verified_user'}</span> Threat Intel (AlienVault OTX)</h3>
+            <div class="flex flex-wrap gap-1.5"><a href="${escapeHtml(parsed.guiUrl)}" target="_blank" rel="noopener noreferrer" class="btn-ghost"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">open_in_new</span> Abrir VT</a><button type="button" class="btn-ghost" data-export="download"><span class="material-symbols-rounded text-sm text-[#D9A74A]">verified</span> JSON</button></div>
           </div>
-          <div class="mb-4 p-3.5 rounded-2xl bg-[#FF9F0A]/12 border border-[#FF9F0A]/30 text-xs text-[var(--text-secondary)]"><strong class="text-[#FF9F0A]">VT API v3:</strong> ${escapeHtml(vtError)}</div>
-          ${renderIosList(resumo)}
-          ${pulses.length ? `<h4 class="text-xs uppercase tracking-wider text-[#FF9F0A] font-semibold mt-5 mb-2 px-1">Pulses (${pulses.length})</h4><div class="flex flex-wrap gap-2 max-h-52 overflow-y-auto">${pulses.map(p => `<span class="text-xs font-mono-tech px-3 py-1.5 rounded-full bg-[#FF9F0A]/12 border border-[#FF9F0A]/30 text-white">${escapeHtml(p)}</span>`).join('')}</div>` : ''}`;
+          <div class="p-5">
+            <div class="mb-4 p-3 rounded-xl bg-[#FF9F0A]/10 border border-[#FF9F0A]/30 text-xs text-[var(--text-2)]"><strong class="text-[#FF9F0A]">VirusTotal v3:</strong> ${escapeHtml(vtError)}</div>
+            ${renderKvTable(resumo)}
+            ${pulses.length ? `<h4 class="text-[11px] uppercase tracking-wider text-[#FF9F0A] font-bold mt-5 mb-2">Pulses OTX (${pulses.length})</h4><div class="flex flex-wrap gap-1.5 max-h-48 overflow-y-auto">${pulses.map(p => `<span class="text-[11px] font-mono-code px-2.5 py-1 rounded-lg bg-[#FF9F0A]/12 border border-[#FF9F0A]/30 text-white">${escapeHtml(p)}</span>`).join('')}</div>` : ''}
+          </div>`;
       } catch (err2) {
-        resDiv.className = 'min-h-[340px] ios-m3-card p-6 flex flex-col justify-center items-center text-center';
-        resDiv.innerHTML = `<span class="material-symbols-rounded text-5xl mb-2 text-[#FF9F0A]">warning</span><h3 class="font-bold text-base mb-1">API indisponível</h3><p class="text-xs text-[var(--text-secondary)] max-w-md mb-4">${escapeHtml(vtError || err2.message)}</p><a href="${escapeHtml(parsed.guiUrl)}" target="_blank" rel="noopener noreferrer" class="chip-action"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">open_in_new</span> Abrir no VirusTotal</a>`;
+        resDiv.className = 'panel min-h-[380px] p-6 flex flex-col justify-center items-center text-center';
+        resDiv.innerHTML = `<span class="material-symbols-rounded text-4xl text-[#FF9F0A] mb-2">warning</span><p class="text-sm font-bold text-white">API indisponível</p><p class="text-xs text-[var(--text-2)] max-w-md mb-4">${escapeHtml(vtError || err2.message)}</p><a href="${escapeHtml(parsed.guiUrl)}" target="_blank" rel="noopener noreferrer" class="btn-ghost"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">open_in_new</span> Abrir no VirusTotal</a>`;
       } finally {
-        btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded text-lg">radar</span> Escanear Ameaça';
+        btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded text-base">radar</span> Escanear Ameaça';
       }
     });
 
-    if (pendingVtQuery) { targetInput.value = pendingVtQuery; pendingVtQuery = ''; setTimeout(() => form.requestSubmit(), 120); }
+    if (pendingVtQuery) { ti.value = pendingVtQuery; pendingVtQuery = ''; setTimeout(() => form.requestSubmit(), 100); }
   }
 
-  function renderMetadataView(view) {
-    view.innerHTML = `
-      <div class="view-enter">
-        <button type="button" data-nav="" class="chip-action mb-5"><span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar</button>
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          <div class="lg:col-span-5 ios-m3-card p-6 lg:sticky lg:top-6">
-            <div class="flex items-center gap-3.5 mb-4">
-              <div class="squircle" style="background:linear-gradient(135deg,#E0B354,#9E6E1F)"><span class="material-symbols-rounded">photo_camera</span></div>
-              <div><h2 class="text-lg font-bold leading-tight">Metadados EXIF</h2><span class="tag-pill t-gold mt-1">EXIF • GPS • Mapa</span></div>
-            </div>
-            <p class="text-xs text-[var(--text-secondary)] mb-5 leading-relaxed">Envie a foto original (JPG, HEIC, PNG, TIFF ou WebP). Extrai aparelho, lente, data, hash SHA-256, GPS e localização no mapa.</p>
+  function renderMetadataView(ws, m) {
+    ws.innerHTML = `
+      <div class="fade-in max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <div class="lg:col-span-4 panel overflow-hidden">
+          <div class="panel-header"><span class="text-xs font-bold uppercase tracking-wider text-white">Aquisição de Imagem</span><span class="badge ${m.badgeClass}">${m.badge}</span></div>
+          <div class="p-5">
             <input type="file" id="metaFileInput" accept="image/*,.heic,.heif,.tif,.tiff" class="hidden">
             <div id="metaDropzone" class="dropzone">
-              <div class="w-12 h-12 mx-auto rounded-2xl bg-[#E0B354]/20 border border-[#E0B354]/40 flex items-center justify-center mb-2.5"><span class="material-symbols-rounded text-2xl text-[#E0B354]">add_photo_alternate</span></div>
-              <p class="text-sm font-semibold text-white mb-0.5">Toque ou arraste a foto</p>
-              <p class="text-[11px] text-[var(--text-secondary)]">Processamento 100% local</p>
+              <span class="material-symbols-rounded text-3xl text-[#D9A74A] mb-1">add_photo_alternate</span>
+              <p class="text-xs font-semibold text-white m-0">Selecionar ou arrastar fotografia</p>
+              <p class="text-[11px] text-[var(--text-3)] mt-1 mb-0">JPG, HEIC, PNG, TIFF, WebP (100% local)</p>
             </div>
-            <div id="metaPreviewBox" class="hidden mt-4 p-3 rounded-2xl bg-white/5 border border-white/10">
-              <img id="metaPreviewImg" src="" alt="Prévia" class="w-full max-h-52 object-contain rounded-xl mb-2">
-              <p id="metaPreviewName" class="text-xs text-[var(--text-secondary)] text-center truncate"></p>
-            </div>
-          </div>
-          <div class="lg:col-span-7">
-            <div id="metaResult" class="min-h-[340px] ios-m3-card p-6 flex flex-col justify-center items-center text-center">
-              <div class="w-16 h-16 rounded-2xl bg-[#E0B354]/10 border border-[#E0B354]/25 flex items-center justify-center mb-3"><span class="material-symbols-rounded text-3xl text-[#E0B354]/75">pin_drop</span></div>
-              <p class="text-sm font-semibold text-white mb-1">Aguardando imagem</p>
-              <p class="text-xs text-[var(--text-secondary)] max-w-sm">Fotos originais preservam EXIF e GPS; redes sociais e mensageiros costumam remover essas tags.</p>
+            <div id="metaPreviewBox" class="hidden mt-4 p-2.5 rounded-xl bg-black/40 border border-white/10">
+              <img id="metaPreviewImg" src="" alt="Prévia" class="w-full max-h-52 object-contain rounded-lg mb-2">
+              <p id="metaPreviewName" class="text-[11px] font-mono-code text-[var(--text-2)] text-center truncate m-0"></p>
             </div>
           </div>
         </div>
+        <div class="lg:col-span-8">
+          <div id="metaResult" class="panel min-h-[380px] p-6 flex flex-col justify-center items-center text-center">
+            <span class="material-symbols-rounded text-4xl text-white/15 mb-2">pin_drop</span>
+            <p class="text-sm font-semibold text-white m-0">Laudo Forense EXIF / GPS</p>
+            <p class="text-xs text-[var(--text-2)] max-w-sm mt-1">Carregue uma foto original ao lado para extrair câmera, data, hash SHA-256 e plotar coordenadas no mapa.</p>
+          </div>
+        </div>
       </div>`;
-    const fileInput = document.getElementById('metaFileInput'), dropzone = document.getElementById('metaDropzone');
-    dropzone.addEventListener('click', () => fileInput.click());
-    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
-    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
-    dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.classList.remove('drag-over'); if (e.dataTransfer?.files?.[0]) analyzePhotoMetadata(e.dataTransfer.files[0]); });
-    fileInput.addEventListener('change', () => { if (fileInput.files?.[0]) analyzePhotoMetadata(fileInput.files[0]); });
+    const fi = document.getElementById('metaFileInput'), dz = document.getElementById('metaDropzone');
+    dz.addEventListener('click', () => fi.click());
+    dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag-over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', (e) => { e.preventDefault(); dz.classList.remove('drag-over'); if (e.dataTransfer?.files?.[0]) analyzePhoto(e.dataTransfer.files[0]); });
+    fi.addEventListener('change', () => { if (fi.files?.[0]) analyzePhoto(fi.files[0]); });
   }
 
-  async function analyzePhotoMetadata(file) {
+  async function analyzePhoto(file) {
     const resDiv = document.getElementById('metaResult'), url = URL.createObjectURL(file);
     document.getElementById('metaPreviewBox').classList.remove('hidden');
     document.getElementById('metaPreviewImg').src = url;
     document.getElementById('metaPreviewName').textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
-    resDiv.className = 'min-h-[340px] ios-m3-card p-6 flex flex-col justify-center items-center text-center';
-    resDiv.innerHTML = `<span class="material-symbols-rounded spinner text-4xl mb-3 text-[#E0B354]">refresh</span><p class="text-sm font-semibold text-white">Extraindo EXIF, GPS e SHA-256...</p>`;
+    resDiv.className = 'panel min-h-[380px] p-6 flex flex-col justify-center items-center text-center';
+    resDiv.innerHTML = `<span class="material-symbols-rounded spinner text-3xl text-[#D9A74A] mb-3">refresh</span><p class="text-sm font-semibold text-white">Extraindo EXIF, GPS e SHA-256...</p>`;
     try {
       const [buffer, dim] = await Promise.all([file.arrayBuffer(), new Promise(r => { const i = new Image(); i.onload = () => r({ w: i.naturalWidth, h: i.naturalHeight }); i.onerror = () => r({ w: null, h: null }); i.src = url; })]);
       const sha256 = await digestHex('SHA-256', buffer);
@@ -1329,64 +1594,59 @@
       const rawTags = {};
       if (exif && typeof exif === 'object') for (const [k, v] of Object.entries(exif)) if (v != null && v !== '' && !(v instanceof Uint8Array)) rawTags[k] = v instanceof Date ? v.toISOString() : (typeof v === 'object' ? JSON.stringify(v) : String(v));
 
-      lastModuleId = 'laudo-exif'; lastResultData = { arquivo: arquivoInfo, camera: cameraInfo, gps: gpsInfo, exif_bruto: rawTags };
+      recordEvidence('metadata', file.name, { arquivo: arquivoInfo, camera: cameraInfo, gps: gpsInfo, exif_bruto: rawTags });
       const banner = hasGps
-        ? `<div class="mb-4 p-4 rounded-2xl bg-[#30D158]/12 border border-[#30D158]/35"><span class="text-xs uppercase tracking-wider text-[#30D158] font-bold block mb-1">GPS Localizado</span><p class="text-sm font-semibold text-white">${escapeHtml(address)}</p></div>`
-        : `<div class="mb-4 p-4 rounded-2xl bg-[#FF9F0A]/12 border border-[#FF9F0A]/30 text-xs text-[var(--text-secondary)]"><strong class="text-[#FF9F0A]">Sem GPS embutido:</strong> Imagem sem coordenadas geográficas.</div>`;
+        ? `<div class="mb-4 p-3.5 rounded-xl bg-[#30D158]/12 border border-[#30D158]/35"><span class="text-[11px] uppercase tracking-wider text-[#30D158] font-bold block mb-0.5">Coordenadas GPS Localizadas</span><p class="text-xs font-semibold text-white m-0">${escapeHtml(address)}</p></div>`
+        : `<div class="mb-4 p-3.5 rounded-xl bg-[#FF9F0A]/10 border border-[#FF9F0A]/30 text-xs text-[var(--text-2)]"><strong class="text-[#FF9F0A]">Sem GPS embutido:</strong> Imagem sem tags geográficas.</div>`;
 
-      resDiv.className = 'min-h-[340px] ios-m3-card p-6 text-left';
+      resDiv.className = 'panel min-h-[380px] overflow-hidden text-left';
       resDiv.innerHTML = `
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
-          <div><div class="flex items-center gap-2"><span class="material-symbols-rounded text-[#30D158] text-2xl">check_circle</span><h3 class="font-bold text-lg">Laudo EXIF</h3></div><span class="text-[11px] text-[#E0B354] font-semibold">Aparelho: ${escapeHtml(aparelho)}</span></div>
-          <div class="flex flex-wrap gap-2"><button type="button" class="chip-action" data-vt-hash="${escapeHtml(sha256)}"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">bug_report</span> VirusTotal</button><button type="button" class="chip-action" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button><button type="button" class="chip-action" data-export="download"><span class="material-symbols-rounded text-sm text-[#E0B354]">verified</span> Dossiê</button></div>
+        <div class="panel-header flex-wrap">
+          <div><h3 class="text-sm font-bold text-white flex items-center gap-2"><span class="material-symbols-rounded text-[#30D158]">check_circle</span> Laudo EXIF — ${escapeHtml(aparelho)}</h3></div>
+          <div class="flex flex-wrap gap-1.5"><button type="button" class="btn-ghost" data-vt-hash="${escapeHtml(sha256)}"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">bug_report</span> VirusTotal</button><button type="button" class="btn-ghost" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button><button type="button" class="btn-ghost" data-export="download"><span class="material-symbols-rounded text-sm text-[#D9A74A]">verified</span> JSON</button></div>
         </div>
-        ${banner}${hasGps ? renderIosList(gpsInfo) + renderMapBlock(lat, lon, 'Local da Captura') : ''}
-        <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mt-5 mb-2 px-1">Câmera & Dispositivo</h4>${renderIosList(cameraInfo)}
-        <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mt-5 mb-2 px-1">Arquivo & Integridade</h4>${renderIosList(arquivoInfo)}
-        ${Object.keys(rawTags).length ? `<details class="mt-4"><summary class="cursor-pointer text-xs uppercase tracking-wider text-[#E0B354] font-semibold px-1 py-2">Tags brutas EXIF/XMP (${Object.keys(rawTags).length})</summary><div class="mt-2">${renderIosList(rawTags)}</div></details>` : ''}`;
+        <div class="p-5">
+          ${banner}${hasGps ? renderKvTable(gpsInfo) + renderMapBlock(lat, lon, 'Local da Captura') : ''}
+          <h4 class="text-[11px] uppercase tracking-wider text-[var(--text-3)] font-bold mt-5 mb-2">Dispositivo & Câmera</h4>${renderKvTable(cameraInfo)}
+          <h4 class="text-[11px] uppercase tracking-wider text-[var(--text-3)] font-bold mt-5 mb-2">Integridade do Arquivo</h4>${renderKvTable(arquivoInfo)}
+          ${Object.keys(rawTags).length ? `<details class="mt-4"><summary class="cursor-pointer text-xs text-[#D9A74A] font-semibold py-1">Ver tags EXIF/XMP brutas (${Object.keys(rawTags).length})</summary><div class="mt-2">${renderKvTable(rawTags)}</div></details>` : ''}
+        </div>`;
     } catch (err) {
-      resDiv.className = 'min-h-[340px] ios-m3-card p-6 flex flex-col justify-center items-center text-center';
-      resDiv.innerHTML = `<span class="material-symbols-rounded text-5xl mb-2 text-[#FF453A]">error</span><h3 class="font-bold text-base mb-1">Erro na perícia</h3><p class="text-xs text-[var(--text-secondary)]">${escapeHtml(err.message)}</p>`;
+      resDiv.className = 'panel min-h-[380px] p-6 flex flex-col justify-center items-center text-center';
+      resDiv.innerHTML = `<span class="material-symbols-rounded text-4xl text-[#FF453A] mb-2">error</span><p class="text-sm font-bold text-white">Erro na análise</p><p class="text-xs text-[var(--text-2)]">${escapeHtml(err.message)}</p>`;
     }
   }
 
-  function renderElaView(view) {
-    view.innerHTML = `
-      <div class="view-enter">
-        <button type="button" data-nav="" class="chip-action mb-5"><span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar</button>
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          <div class="lg:col-span-4 ios-m3-card p-6 lg:sticky lg:top-6">
-            <div class="flex items-center gap-3.5 mb-4">
-              <div class="squircle" style="background:linear-gradient(135deg,#FF453A,#9B1C26)"><span class="material-symbols-rounded">compare</span></div>
-              <div><h2 class="text-lg font-bold leading-tight">Análise ELA</h2><span class="tag-pill t-gold mt-1">Adulteração Visual</span></div>
-            </div>
-            <p class="text-xs text-[var(--text-secondary)] mb-5 leading-relaxed">Amplifica diferenças de compressão JPEG para destacar áreas recortadas ou editadas.</p>
+  function renderElaView(ws, m) {
+    ws.innerHTML = `
+      <div class="fade-in max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <div class="lg:col-span-4 panel overflow-hidden">
+          <div class="panel-header"><span class="text-xs font-bold uppercase tracking-wider text-white">Parâmetros ELA</span><span class="badge ${m.badgeClass}">${m.badge}</span></div>
+          <div class="p-5">
             <input type="file" id="elaFileInput" accept="image/*" class="hidden">
             <div id="elaDropzone" class="dropzone mb-5">
-              <span class="material-symbols-rounded text-2xl text-[#FF453A] mb-1">image_search</span>
-              <p class="text-sm font-semibold text-white">Enviar imagem</p>
-              <p class="text-[11px] text-[var(--text-secondary)]">JPG, PNG ou WebP</p>
+              <span class="material-symbols-rounded text-3xl text-[#FF453A] mb-1">image_search</span>
+              <p class="text-xs font-semibold text-white m-0">Enviar imagem para perícia</p>
+              <p class="text-[11px] text-[var(--text-3)] mt-0.5 mb-0">JPG, PNG ou WebP</p>
             </div>
             <div class="space-y-4">
-              <div><div class="flex justify-between text-xs mb-1"><span class="text-[var(--text-secondary)] font-semibold">Ganho (α)</span><span id="elaScaleVal" class="font-mono-tech text-[#E0B354]">18x</span></div><input type="range" id="elaScale" class="gold-range" min="5" max="45" value="18"></div>
-              <div><div class="flex justify-between text-xs mb-1"><span class="text-[var(--text-secondary)] font-semibold">Qualidade JPEG</span><span id="elaQualVal" class="font-mono-tech text-[#E0B354]">90%</span></div><input type="range" id="elaQuality" class="gold-range" min="70" max="98" value="90"></div>
-            </div>
-          </div>
-          <div class="lg:col-span-8">
-            <div id="elaResult" class="min-h-[340px] ios-m3-card p-6 flex flex-col justify-center items-center text-center">
-              <div class="w-16 h-16 rounded-2xl bg-[#FF453A]/10 border border-[#FF453A]/25 flex items-center justify-center mb-3"><span class="material-symbols-rounded text-3xl text-[#FF453A]/75">compare</span></div>
-              <p class="text-sm font-semibold text-white mb-1">Laboratório ELA pronto</p>
-              <p class="text-xs text-[var(--text-secondary)] max-w-sm">Carregue uma foto para gerar o mapa de erro de compressão.</p>
+              <div><div class="flex justify-between text-xs mb-1"><span class="text-[var(--text-2)]">Ganho (α)</span><span id="elaScaleVal" class="font-mono-code text-[#D9A74A]">18x</span></div><input type="range" id="elaScale" class="gold-range" min="5" max="45" value="18"></div>
+              <div><div class="flex justify-between text-xs mb-1"><span class="text-[var(--text-2)]">Qualidade Base JPEG</span><span id="elaQualVal" class="font-mono-code text-[#D9A74A]">90%</span></div><input type="range" id="elaQuality" class="gold-range" min="70" max="98" value="90"></div>
             </div>
           </div>
         </div>
+        <div class="lg:col-span-8">
+          <div id="elaResult" class="panel min-h-[380px] p-6 flex flex-col justify-center items-center text-center">
+            <span class="material-symbols-rounded text-4xl text-white/15 mb-2">compare</span>
+            <p class="text-sm font-semibold text-white m-0">Laboratório ELA</p>
+            <p class="text-xs text-[var(--text-2)] max-w-sm mt-1">Carregue uma foto para gerar o mapa de variação de compressão.</p>
+          </div>
+        </div>
       </div>`;
-
     let origImg = null, meta = null;
     const fi = document.getElementById('elaFileInput'), dz = document.getElementById('elaDropzone');
     const sc = document.getElementById('elaScale'), ql = document.getElementById('elaQuality');
     const load = (f) => { const i = new Image(); i.onload = () => { origImg = i; meta = { name: f.name, w: i.naturalWidth, h: i.naturalHeight }; runEla(); }; i.src = URL.createObjectURL(f); };
-
     const runEla = () => {
       if (!origImg) return;
       const scale = Number(sc.value), quality = Number(ql.value) / 100, resDiv = document.getElementById('elaResult');
@@ -1402,22 +1662,24 @@
         const d2 = ctx2.getImageData(0, 0, w, h).data, outImg = ctx1.createImageData(w, h), out = outImg.data;
         let sum = 0, maxD = 0, hot = 0;
         for (let i = 0; i < d1.length; i += 4) {
-          const dr = Math.abs(d1[i] - d2[i]), dg = Math.abs(d1[i + 1] - d2[i + 1]), db = Math.abs(d1[i + 2] - d2[i + 2]);
+          const dr = Math.abs(d1[i] - d2[i]), dg = Math.abs(d1[i+1] - d2[i+1]), db = Math.abs(d1[i+2] - d2[i+2]);
           const avg = (dr + dg + db) / 3; sum += avg; if (avg > maxD) maxD = avg;
           const er = Math.min(255, dr * scale), eg = Math.min(255, dg * scale), eb = Math.min(255, db * scale);
           if ((er + eg + eb) / 3 > 110) hot++;
-          out[i] = er; out[i + 1] = eg; out[i + 2] = eb; out[i + 3] = 255;
+          out[i] = er; out[i+1] = eg; out[i+2] = eb; out[i+3] = 255;
         }
         const metrics = { arquivo: meta.name, resolucao: `${meta.w} × ${meta.h} px`, ganho: `${scale}x (JPEG ${Math.round(quality * 100)}%)`, erro_medio: `${(sum / (w * h)).toFixed(2)} / 255`, pico_erro: `${Math.round(maxD)} / 255`, alta_variacao: `${((hot / (w * h)) * 100).toFixed(2)}%` };
-        lastModuleId = 'pericia-ela'; lastResultData = metrics;
-        resDiv.className = 'min-h-[340px] ios-m3-card p-6 text-left';
+        recordEvidence('ela', meta.name, metrics);
+        resDiv.className = 'panel min-h-[380px] overflow-hidden text-left';
         resDiv.innerHTML = `
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
-            <div><h3 class="font-bold text-lg flex items-center gap-2"><span class="material-symbols-rounded text-[#E0B354]">analytics</span> Mapa ELA</h3></div>
-            <div class="flex flex-wrap gap-2"><button type="button" id="elaTog" class="chip-action"><span class="material-symbols-rounded text-sm">visibility</span> Original</button><button type="button" id="elaPng" class="chip-action"><span class="material-symbols-rounded text-sm text-[#30D158]">download</span> PNG</button><button type="button" class="chip-action" data-export="download"><span class="material-symbols-rounded text-sm text-[#E0B354]">verified</span> Dossiê</button></div>
+          <div class="panel-header flex-wrap">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2"><span class="material-symbols-rounded text-[#D9A74A]">analytics</span> Mapa Forense ELA</h3>
+            <div class="flex flex-wrap gap-1.5"><button type="button" id="elaTog" class="btn-ghost"><span class="material-symbols-rounded text-sm">visibility</span> Original</button><button type="button" id="elaPng" class="btn-ghost"><span class="material-symbols-rounded text-sm text-[#30D158]">download</span> PNG</button><button type="button" class="btn-ghost" data-export="download"><span class="material-symbols-rounded text-sm text-[#D9A74A]">verified</span> JSON</button></div>
           </div>
-          <div class="ela-stage mb-4"><canvas id="elaCanvas" width="${w}" height="${h}"></canvas><img id="elaOrig" src="${origImg.src}" alt="Original" class="hidden"></div>
-          ${renderIosList(metrics)}`;
+          <div class="p-5">
+            <div class="ela-box mb-4"><canvas id="elaCanvas" width="${w}" height="${h}"></canvas><img id="elaOrig" src="${origImg.src}" alt="Original" class="hidden"></div>
+            ${renderKvTable(metrics)}
+          </div>`;
         const cv = document.getElementById('elaCanvas'); cv.getContext('2d').putImageData(outImg, 0, 0);
         let orig = false;
         document.getElementById('elaTog').addEventListener('click', (ev) => { orig = !orig; cv.classList.toggle('hidden', orig); document.getElementById('elaOrig').classList.toggle('hidden', !orig); ev.currentTarget.innerHTML = orig ? '<span class="material-symbols-rounded text-sm">compare</span> Mapa ELA' : '<span class="material-symbols-rounded text-sm">visibility</span> Original'; });
@@ -1425,7 +1687,6 @@
       };
       i2.src = c1.toDataURL('image/jpeg', quality);
     };
-
     dz.addEventListener('click', () => fi.click());
     dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('drag-over'); });
     dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
@@ -1435,66 +1696,58 @@
     ql.addEventListener('input', () => { document.getElementById('elaQualVal').textContent = `${ql.value}%`; runEla(); });
   }
 
-  function renderCustodyView(view) {
-    view.innerHTML = `
-      <div class="view-enter">
-        <button type="button" data-nav="" class="chip-action mb-5"><span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar</button>
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          <div class="lg:col-span-5 ios-m3-card p-6 lg:sticky lg:top-6">
-            <div class="flex items-center gap-3.5 mb-4">
-              <div class="squircle" style="background:linear-gradient(135deg,#5AC8FA,#1E5BB8)"><span class="material-symbols-rounded">fingerprint</span></div>
-              <div><h2 class="text-lg font-bold leading-tight">Custódia & Hex</h2><span class="tag-pill t-gold mt-1">Hashes • Entropia • Magic Bytes</span></div>
-            </div>
-            <p class="text-xs text-[var(--text-secondary)] mb-5 leading-relaxed">Calcula SHA-256/512/1, entropia de Shannon, detecta extensão falsificada e checa o hash no VirusTotal em 1 toque.</p>
+  function renderCustodyView(ws, m) {
+    ws.innerHTML = `
+      <div class="fade-in max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <div class="lg:col-span-4 panel overflow-hidden">
+          <div class="panel-header"><span class="text-xs font-bold uppercase tracking-wider text-white">Evidência Digital</span><span class="badge ${m.badgeClass}">${m.badge}</span></div>
+          <div class="p-5">
             <input type="file" id="custFile" class="hidden">
             <div id="custDrop" class="dropzone mb-4">
-              <span class="material-symbols-rounded text-2xl text-[#5AC8FA] mb-1">upload_file</span>
-              <p class="text-sm font-semibold text-white">Selecionar evidência</p>
-              <p class="text-[11px] text-[var(--text-secondary)]">100% local no navegador</p>
+              <span class="material-symbols-rounded text-3xl text-[#5AC8FA] mb-1">upload_file</span>
+              <p class="text-xs font-semibold text-white m-0">Selecionar qualquer arquivo</p>
+              <p class="text-[11px] text-[var(--text-3)] mt-0.5 mb-0">Hashes + Entropia + Magic Bytes</p>
             </div>
-            <div class="m3-field mb-0"><input type="text" id="custHash" class="m3-input font-mono-tech text-xs" placeholder=" " autocomplete="off"><label for="custHash" class="m3-label">SHA-256 esperado (opcional)</label></div>
-          </div>
-          <div class="lg:col-span-7">
-            <div id="custRes" class="min-h-[340px] ios-m3-card p-6 flex flex-col justify-center items-center text-center">
-              <div class="w-16 h-16 rounded-2xl bg-[#5AC8FA]/10 border border-[#5AC8FA]/25 flex items-center justify-center mb-3"><span class="material-symbols-rounded text-3xl text-[#5AC8FA]/75">verified_user</span></div>
-              <p class="text-sm font-semibold text-white mb-1">Aguardando arquivo</p>
-              <p class="text-xs text-[var(--text-secondary)] max-w-sm">Lavre cadeia de custódia, verifique integridade e detecte spoofing de extensão.</p>
+            <div class="field-wrap mb-0">
+              <label for="custHash" class="field-lbl">SHA-256 Esperado (Opcional)</label>
+              <input type="text" id="custHash" class="m3-input font-mono-code text-xs" placeholder="Cole para validar integridade" autocomplete="off">
             </div>
           </div>
         </div>
+        <div class="lg:col-span-8">
+          <div id="custRes" class="panel min-h-[380px] p-6 flex flex-col justify-center items-center text-center">
+            <span class="material-symbols-rounded text-4xl text-white/15 mb-2">verified_user</span>
+            <p class="text-sm font-semibold text-white m-0">Certificado de Cadeia de Custódia</p>
+            <p class="text-xs text-[var(--text-2)] max-w-sm mt-1">Verifique assinatura binária (spoofing), entropia de Shannon e gere hashes criptográficos localmente.</p>
+          </div>
+        </div>
       </div>`;
-
     const fi = document.getElementById('custFile'), dz = document.getElementById('custDrop');
     const process = async (file) => {
       const resDiv = document.getElementById('custRes'), expected = document.getElementById('custHash').value.trim().toLowerCase();
-      resDiv.className = 'min-h-[340px] ios-m3-card p-6 flex flex-col justify-center items-center text-center';
-      resDiv.innerHTML = `<span class="material-symbols-rounded spinner text-4xl mb-3 text-[#E0B354]">refresh</span><p class="text-sm font-semibold text-white">Calculando hashes e entropia...</p>`;
+      resDiv.className = 'panel min-h-[380px] p-6 flex flex-col justify-center items-center text-center';
+      resDiv.innerHTML = `<span class="material-symbols-rounded spinner text-3xl text-[#D9A74A] mb-3">refresh</span><p class="text-sm font-semibold text-white">Calculando hashes e entropia...</p>`;
       try {
         const buf = await file.arrayBuffer();
         const [sha256, sha512, sha1] = await Promise.all([digestHex('SHA-256', buf), digestHex('SHA-512', buf), digestHex('SHA-1', buf)]);
         const magic = inspectMagicBytes(buf, file.name), ent = calcShannonEntropy(buf), str = extractAsciiStrings(buf);
         const resumo = { arquivo: file.name, tamanho: `${file.size.toLocaleString('pt-BR')} bytes`, extensao_declarada: magic.ext, tipo_real_magic: magic.detected, assinatura_hex: magic.hexSpaced, entropia_shannon: `${ent.bits} bits/byte — ${ent.classif}`, sha256, sha512, sha1 };
-        lastModuleId = 'cadeia-custodia'; lastResultData = { custodia: resumo, spoofing: magic.spoofAlert, strings: str.highlighted };
-
+        recordEvidence('custody', file.name, { custodia: resumo, spoofing: magic.spoofAlert, strings: str.highlighted });
         let banner = magic.spoofAlert
-          ? `<div class="mb-4 p-4 rounded-2xl bg-[#FF453A]/15 border border-[#FF453A]/45 text-xs text-white"><strong class="text-[#FF453A] block uppercase mb-1">Alerta de Spoofing</strong>${escapeHtml(magic.status)}</div>`
-          : `<div class="mb-4 p-4 rounded-2xl bg-[#30D158]/12 border border-[#30D158]/35 text-xs text-white"><strong class="text-[#30D158] block uppercase mb-1">Cabeçalho Verificado</strong>${escapeHtml(magic.status)}</div>`;
-        if (expected) {
-          banner += expected === sha256.toLowerCase()
-            ? `<div class="mb-4 p-3 rounded-2xl bg-[#30D158]/15 border border-[#30D158]/40 text-xs text-[#30D158] font-bold">INTEGRIDADE CONFIRMADA (SHA-256 idêntico)</div>`
-            : `<div class="mb-4 p-3 rounded-2xl bg-[#FF453A]/15 border border-[#FF453A]/40 text-xs text-[#FF453A] font-bold">DIVERGÊNCIA DETECTADA (SHA-256 diferente)</div>`;
-        }
-        resDiv.className = 'min-h-[340px] ios-m3-card p-6 text-left';
+          ? `<div class="mb-4 p-3.5 rounded-xl bg-[#FF453A]/15 border border-[#FF453A]/40 text-xs text-white"><strong class="text-[#FF453A] block uppercase mb-0.5">Alerta de Spoofing</strong>${escapeHtml(magic.status)}</div>`
+          : `<div class="mb-4 p-3.5 rounded-xl bg-[#30D158]/12 border border-[#30D158]/35 text-xs text-white"><strong class="text-[#30D158] block uppercase mb-0.5">Cabeçalho Verificado</strong>${escapeHtml(magic.status)}</div>`;
+        if (expected) banner += expected === sha256.toLowerCase() ? `<div class="mb-4 p-3 rounded-xl bg-[#30D158]/15 border border-[#30D158]/40 text-xs text-[#30D158] font-bold">INTEGRIDADE CONFIRMADA (SHA-256 idêntico)</div>` : `<div class="mb-4 p-3 rounded-xl bg-[#FF453A]/15 border border-[#FF453A]/40 text-xs text-[#FF453A] font-bold">DIVERGÊNCIA DETECTADA (SHA-256 diferente)</div>`;
+
+        resDiv.className = 'panel min-h-[380px] overflow-hidden text-left';
         resDiv.innerHTML = `
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
-            <div><h3 class="font-bold text-lg flex items-center gap-2"><span class="material-symbols-rounded text-[#E0B354]">verified</span> Certificado de Custódia</h3></div>
-            <div class="flex flex-wrap gap-2"><button type="button" class="chip-action" data-vt-hash="${escapeHtml(sha256)}"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">bug_report</span> VirusTotal</button><button type="button" class="chip-action" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button><button type="button" class="chip-action" data-export="download"><span class="material-symbols-rounded text-sm text-[#E0B354]">verified</span> Dossiê</button></div>
+          <div class="panel-header flex-wrap">
+            <h3 class="text-sm font-bold text-white flex items-center gap-2"><span class="material-symbols-rounded text-[#D9A74A]">verified</span> Certificado de Custódia</h3>
+            <div class="flex flex-wrap gap-1.5"><button type="button" class="btn-ghost" data-vt-hash="${escapeHtml(sha256)}"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">bug_report</span> VirusTotal</button><button type="button" class="btn-ghost" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button><button type="button" class="btn-ghost" data-export="download"><span class="material-symbols-rounded text-sm text-[#D9A74A]">verified</span> JSON</button></div>
           </div>
-          ${banner}${renderIosList(resumo)}
-          ${str.highlighted.length ? `<h4 class="text-xs uppercase tracking-wider text-[#E0B354] font-semibold mt-5 mb-2 px-1">Strings de Interesse (${str.highlighted.length})</h4><div class="code-box">${escapeHtml(str.highlighted.join('\n'))}</div>` : ''}`;
+          <div class="p-5">${banner}${renderKvTable(resumo)}${str.highlighted.length ? `<h4 class="text-[11px] uppercase tracking-wider text-[#D9A74A] font-bold mt-5 mb-2">Strings de Interesse (${str.highlighted.length})</h4><div class="code-viewer">${escapeHtml(str.highlighted.join('\n'))}</div>` : ''}</div>`;
       } catch (err) {
-        resDiv.className = 'min-h-[340px] ios-m3-card p-6 flex flex-col justify-center items-center text-center';
-        resDiv.innerHTML = `<span class="material-symbols-rounded text-5xl mb-2 text-[#FF453A]">error</span><p class="text-xs text-[var(--text-secondary)]">${escapeHtml(err.message)}</p>`;
+        resDiv.className = 'panel min-h-[380px] p-6 flex flex-col justify-center items-center text-center';
+        resDiv.innerHTML = `<span class="material-symbols-rounded text-4xl text-[#FF453A] mb-2">error</span><p class="text-xs text-[var(--text-2)]">${escapeHtml(err.message)}</p>`;
       }
     };
     dz.addEventListener('click', () => fi.click());
@@ -1510,74 +1763,63 @@
     return new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0)));
   }
 
-  function renderDecoderView(view) {
-    view.innerHTML = `
-      <div class="view-enter">
-        <button type="button" data-nav="" class="chip-action mb-5"><span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar</button>
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          <div class="lg:col-span-5 ios-m3-card p-6 lg:sticky lg:top-6">
-            <div class="flex items-center gap-3.5 mb-4">
-              <div class="squircle" style="background:linear-gradient(135deg,#BF5AF2,#6B21A8)"><span class="material-symbols-rounded">terminal</span></div>
-              <div><h2 class="text-lg font-bold leading-tight">Decodificador</h2><span class="tag-pill t-gold mt-1">JWT • Base64 • Hex • Unix</span></div>
-            </div>
-            <p class="text-xs text-[var(--text-secondary)] mb-4 leading-relaxed">Detecção automática de tokens JWT, Base64, Hex, URL e Unix Timestamp com hash SHA-256.</p>
+  function renderDecoderView(ws, m) {
+    ws.innerHTML = `
+      <div class="fade-in max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <div class="lg:col-span-4 panel overflow-hidden">
+          <div class="panel-header"><span class="text-xs font-bold uppercase tracking-wider text-white">Entrada de Artefato</span><span class="badge ${m.badgeClass}">${m.badge}</span></div>
+          <div class="p-5">
             <form id="decForm">
-              <textarea id="decIn" class="m3-textarea font-mono-tech mb-4" placeholder="Cole JWT, Base64, Hexadecimal, URL ou Timestamp Unix..." required></textarea>
-              <button type="submit" class="btn-primary"><span class="material-symbols-rounded text-lg">auto_fix_high</span> Decodificar</button>
+              <div class="field-wrap">
+                <label for="decIn" class="field-lbl">JWT, Base64, Hex, URL ou Unix</label>
+                <textarea id="decIn" class="m3-textarea font-mono-code" placeholder="Cole o conteúdo codificado aqui..." required></textarea>
+              </div>
+              <button type="submit" class="btn-exec"><span class="material-symbols-rounded text-base">auto_fix_high</span> Decodificar</button>
             </form>
           </div>
-          <div class="lg:col-span-7">
-            <div id="decRes" class="min-h-[320px] ios-m3-card p-6 flex flex-col justify-center items-center text-center">
-              <div class="w-16 h-16 rounded-2xl bg-[#BF5AF2]/10 border border-[#BF5AF2]/25 flex items-center justify-center mb-3"><span class="material-symbols-rounded text-3xl text-[#BF5AF2]/75">terminal</span></div>
-              <p class="text-sm font-semibold text-white mb-1">Aguardando artefato</p>
-              <p class="text-xs text-[var(--text-secondary)] max-w-sm">Cole o conteúdo à esquerda para decodificação imediata.</p>
-            </div>
+        </div>
+        <div class="lg:col-span-8">
+          <div id="decRes" class="panel min-h-[380px] p-6 flex flex-col justify-center items-center text-center">
+            <span class="material-symbols-rounded text-4xl text-white/15 mb-2">terminal</span>
+            <p class="text-sm font-semibold text-white m-0">Decodificador Forense</p>
+            <p class="text-xs text-[var(--text-2)] max-w-sm mt-1">Inspeção automática de cabeçalhos JWT, validade temporal, Base64, Hexadecimal e SHA-256.</p>
           </div>
         </div>
       </div>`;
-
     document.getElementById('decForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const raw = document.getElementById('decIn').value.trim(), resDiv = document.getElementById('decRes');
       const findings = [], bytes = new TextEncoder().encode(raw), sha = await digestHex('SHA-256', bytes);
-
       if (/^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]*$/.test(raw)) {
         try {
           const [h, p] = raw.split('.'), header = JSON.parse(decodeB64(h)), payload = JSON.parse(decodeB64(p));
           const exp = payload.exp ? (Date.now() / 1000 > payload.exp ? `Expirado (${new Date(payload.exp * 1000).toLocaleString('pt-BR')})` : `Válido até ${new Date(payload.exp * 1000).toLocaleString('pt-BR')}`) : 'Sem exp';
-          findings.push({ tipo: 'JWT', cls: 't-gold', extra: exp, body: JSON.stringify({ header, payload }, null, 2) });
+          findings.push({ tipo: 'Token JWT', cls: 'b-gold', extra: exp, body: JSON.stringify({ header, payload }, null, 2) });
         } catch {}
       }
       if (/^\d{10}$|^\d{13}$/.test(raw)) {
         const dt = new Date(raw.length === 10 ? Number(raw) * 1000 : Number(raw));
-        if (!isNaN(dt)) findings.push({ tipo: 'Unix Timestamp', cls: 't-ok', body: `Local: ${dt.toLocaleString('pt-BR')}\nUTC: ${dt.toISOString()}` });
+        if (!isNaN(dt)) findings.push({ tipo: 'Unix Timestamp', cls: 'b-ok', body: `Local: ${dt.toLocaleString('pt-BR')}\nUTC: ${dt.toISOString()}` });
       }
-      if (/%[0-9A-Fa-f]{2}/.test(raw)) {
-        try { const d = decodeURIComponent(raw); if (d !== raw) findings.push({ tipo: 'URL Decodificada', cls: 't-blue', body: d }); } catch {}
-      }
+      if (/%[0-9A-Fa-f]{2}/.test(raw)) { try { const d = decodeURIComponent(raw); if (d !== raw) findings.push({ tipo: 'URL Decodificada', cls: 'b-blue', body: d }); } catch {} }
       const hex = raw.replace(/^0x/i, '').replace(/[\s:,-]/g, '');
       if (hex.length >= 4 && hex.length % 2 === 0 && /^[0-9a-fA-F]+$/.test(hex)) {
-        try { const d = new TextDecoder().decode(new Uint8Array(hex.match(/.{2}/g).map(b => parseInt(b, 16)))); if (/[\x20-\x7E]/.test(d)) findings.push({ tipo: 'Hex → UTF-8', cls: 't-blue', body: d }); } catch {}
+        try { const d = new TextDecoder().decode(new Uint8Array(hex.match(/.{2}/g).map(b => parseInt(b, 16)))); if (/[\x20-\x7E]/.test(d)) findings.push({ tipo: 'Hex → UTF-8', cls: 'b-blue', body: d }); } catch {}
       }
-      if (/^[A-Za-z0-9+/=_\-\s]{4,}$/.test(raw) && !findings.some(f => f.tipo === 'JWT')) {
-        try { const d = decodeB64(raw); if (d && !/[\x00-\x08\x0E-\x1F]/.test(d)) findings.push({ tipo: 'Base64 → UTF-8', cls: 't-ok', body: d }); } catch {}
+      if (/^[A-Za-z0-9+/=_\-\s]{4,}$/.test(raw) && !findings.some(f => f.tipo === 'Token JWT')) {
+        try { const d = decodeB64(raw); if (d && !/[\x00-\x08\x0E-\x1F]/.test(d)) findings.push({ tipo: 'Base64 → UTF-8', cls: 'b-ok', body: d }); } catch {}
       }
-
       const summary = { tamanho: `${raw.length} chars (${bytes.length} bytes)`, hash_sha256: sha, em_base64: btoa(String.fromCharCode(...bytes)).slice(0, 120) };
-      lastModuleId = 'decodificador'; lastResultData = { entrada: raw, achados: findings, resumo: summary };
-      resDiv.className = 'min-h-[320px] ios-m3-card p-6 text-left';
+      recordEvidence('decoder', raw.slice(0, 40), { entrada: raw, achados: findings, resumo: summary });
+      resDiv.className = 'panel min-h-[380px] overflow-hidden text-left';
       resDiv.innerHTML = `
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
-          <div><h3 class="font-bold text-lg flex items-center gap-2"><span class="material-symbols-rounded text-[#30D158]">check_circle</span> Resultado</h3><span class="text-[11px] text-[#E0B354] font-semibold">${findings.length} formato(s)</span></div>
-          <div class="flex gap-2"><button type="button" class="chip-action" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button><button type="button" class="chip-action" data-export="download"><span class="material-symbols-rounded text-sm text-[#E0B354]">verified</span> Dossiê</button></div>
-        </div>
-        ${findings.map(f => `<div class="mb-4"><div class="flex items-center justify-between mb-1.5 px-1"><span class="tag-pill ${f.cls}">${escapeHtml(f.tipo)}</span>${f.extra ? `<span class="text-[11px] text-[#E0B354] font-semibold">${escapeHtml(f.extra)}</span>` : ''}</div><pre class="code-box">${escapeHtml(f.body)}</pre></div>`).join('')}
-        ${renderIosList(summary)}`;
+        <div class="panel-header flex-wrap"><h3 class="text-sm font-bold text-white flex items-center gap-2"><span class="material-symbols-rounded text-[#30D158]">check_circle</span> Artefato Decodificado (${findings.length})</h3><div class="flex gap-1.5"><button type="button" class="btn-ghost" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button><button type="button" class="btn-ghost" data-export="download"><span class="material-symbols-rounded text-sm text-[#D9A74A]">verified</span> JSON</button></div></div>
+        <div class="p-5">${findings.map(f => `<div class="mb-4"><div class="flex items-center justify-between mb-1.5"><span class="badge ${f.cls}">${escapeHtml(f.tipo)}</span>${f.extra ? `<span class="text-[11px] text-[#D9A74A] font-semibold">${escapeHtml(f.extra)}</span>` : ''}</div><pre class="code-viewer">${escapeHtml(f.body)}</pre></div>`).join('')}${renderKvTable(summary)}</div>`;
     });
   }
 
   // =========================================================================
-  // 7. SHERLOCK OSINT (11 APIS) & DORKS FORENSES
+  // 9. SHERLOCK OSINT & DORKS FORENSES
   // =========================================================================
   function getOsintApis(alvo) {
     const enc = encodeURIComponent(alvo);
@@ -1607,159 +1849,103 @@
   }
 
   async function runOsint(alvo, resDiv, btn) {
-    await saveHistory('osint', alvo); lastModuleId = 'sherlock-osint';
+    await saveHistory('osint', alvo);
     const apis = getOsintApis(alvo), report = { alvo, resultados: [] };
     let found = 0, notFound = 0;
-    resDiv.className = 'min-h-[300px] ios-m3-card p-6 text-left';
+    resDiv.className = 'panel min-h-[380px] overflow-hidden text-left';
     resDiv.innerHTML = `
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-white/10">
-        <div><h3 class="font-bold text-lg">Alvo: <span class="text-[#E0B354]">${escapeHtml(alvo)}</span></h3><p id="osintCnt" class="text-xs text-[var(--text-secondary)] mt-0.5">Consultando ${apis.length} APIs...</p></div>
-        <div class="flex gap-2"><button type="button" class="chip-action" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button><button type="button" class="chip-action" data-export="download"><span class="material-symbols-rounded text-sm text-[#E0B354]">verified</span> Dossiê</button></div>
+      <div class="panel-header flex-wrap">
+        <div><h3 class="text-sm font-bold text-white">Alvo: <span class="text-[#D9A74A] font-mono-code">${escapeHtml(alvo)}</span></h3><span id="osintCnt" class="text-[11px] text-[var(--text-3)]">Consultando ${apis.length} APIs...</span></div>
+        <div class="flex gap-1.5"><button type="button" class="btn-ghost" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button><button type="button" class="btn-ghost" data-export="download"><span class="material-symbols-rounded text-sm text-[#D9A74A]">verified</span> JSON</button></div>
       </div>
-      <div class="ios-group">${apis.map(i => `<a href="${escapeHtml(i.url)}" target="_blank" rel="noopener noreferrer" class="ios-row"><div class="flex flex-col min-w-0"><span class="font-semibold text-sm text-white truncate">${escapeHtml(i.nome)}</span><span id="info-${i.id}" class="text-[11px] text-[var(--text-secondary)] truncate">Checando...</span></div><span id="st-${i.id}" class="tag-pill t-blue"><span class="material-symbols-rounded text-xs spinner">refresh</span></span></a>`).join('')}</div>`;
+      <div class="p-5"><div class="kv-table">${apis.map(i => `<a href="${escapeHtml(i.url)}" target="_blank" rel="noopener noreferrer" class="kv-row no-underline text-inherit"><div class="min-w-0"><span class="block text-sm font-semibold text-white">${escapeHtml(i.nome)}</span><span id="info-${i.id}" class="text-[11px] text-[var(--text-3)]">Checando...</span></div><span id="st-${i.id}" class="badge b-blue"><span class="material-symbols-rounded text-xs spinner">refresh</span></span></a>`).join('')}</div></div>`;
     await Promise.allSettled(apis.map(i => i.check().then(r => ({ i, r })).catch(() => ({ i, r: { status: 'err' } })).then(({ i, r }) => {
       const st = document.getElementById(`st-${i.id}`), inf = document.getElementById(`info-${i.id}`);
       if (!st) return;
-      if (r.status === 'found') { found++; st.className = 'tag-pill t-ok'; st.innerHTML = '<span class="material-symbols-rounded text-xs">check_circle</span> Encontrado'; inf.textContent = r.info || 'Ativo'; }
-      else if (r.status === 'notfound') { notFound++; st.className = 'tag-pill t-err'; st.innerHTML = '<span class="material-symbols-rounded text-xs">cancel</span> Não encontrado'; inf.textContent = 'Sem conta'; }
-      else { st.className = 'tag-pill t-warn'; st.innerHTML = '<span class="material-symbols-rounded text-xs">warning</span> Fora'; inf.textContent = 'Indisponível'; }
+      if (r.status === 'found') { found++; st.className = 'badge b-ok'; st.innerHTML = '<span class="material-symbols-rounded text-xs">check_circle</span> Encontrado'; inf.textContent = r.info || 'Ativo'; }
+      else if (r.status === 'notfound') { notFound++; st.className = 'badge b-err'; st.innerHTML = '<span class="material-symbols-rounded text-xs">cancel</span> Não encontrado'; inf.textContent = 'Sem conta'; }
+      else { st.className = 'badge b-warn'; st.innerHTML = '<span class="material-symbols-rounded text-xs">warning</span> Fora'; inf.textContent = 'Indisponível'; }
       report.resultados.push({ site: i.nome, url: i.url, status: r.status, info: r.info || '' });
-      lastResultData = report;
       const c = document.getElementById('osintCnt'); if (c) c.textContent = `${found} encontrado(s) • ${notFound} não encontrado(s)`;
     })));
-    btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Investigar';
+    recordEvidence('osint', alvo, report);
+    btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded text-base">search</span> Investigar';
   }
 
   async function runDorks(alvo, resDiv, btn) {
-    await saveHistory('dork', alvo); lastModuleId = 'dorks';
-    const dorks = getDorks(alvo); lastResultData = { alvo, dorks };
-    resDiv.className = 'min-h-[300px] ios-m3-card p-6 text-left';
+    await saveHistory('dork', alvo);
+    const dorks = getDorks(alvo);
+    recordEvidence('dork', alvo, { alvo, dorks });
+    resDiv.className = 'panel min-h-[380px] overflow-hidden text-left';
     resDiv.innerHTML = `
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-white/10">
-        <div><h3 class="font-bold text-lg">Dorks: <span class="text-[#E0B354]">${escapeHtml(alvo)}</span></h3></div>
-        <button type="button" class="chip-action" data-export="download"><span class="material-symbols-rounded text-sm text-[#E0B354]">verified</span> Dossiê</button>
-      </div>
-      ${dorks.map(c => `<div class="mb-5"><div class="flex items-center justify-between gap-2 mb-2 px-1"><h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold flex items-center gap-1.5"><span class="material-symbols-rounded text-base text-[#E0B354]">${c.icone}</span> ${escapeHtml(c.titulo)}</h4><a href="${escapeHtml(c.geral)}" target="_blank" rel="noopener noreferrer" class="chip-action text-[11px] py-1 px-2.5">Dork Geral</a></div><div class="ios-group">${c.itens.map(i => `<a href="${escapeHtml(i.url)}" target="_blank" rel="noopener noreferrer" class="ios-row"><span class="font-semibold text-sm text-white">${escapeHtml(i.nome)}</span><span class="tag-pill t-gold"><span class="material-symbols-rounded text-xs">open_in_new</span> Abrir</span></a>`).join('')}</div></div>`).join('')}`;
-    btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Gerar Dorks';
+      <div class="panel-header flex-wrap"><h3 class="text-sm font-bold text-white">Dorks: <span class="text-[#D9A74A]">${escapeHtml(alvo)}</span></h3><button type="button" class="btn-ghost" data-export="download"><span class="material-symbols-rounded text-sm text-[#D9A74A]">verified</span> JSON</button></div>
+      <div class="p-5 space-y-5">${dorks.map(c => `<div><div class="flex items-center justify-between mb-2"><span class="text-xs font-bold uppercase tracking-wider text-[var(--text-2)] flex items-center gap-1.5"><span class="material-symbols-rounded text-base text-[#D9A74A]">${c.icone}</span> ${escapeHtml(c.titulo)}</span><a href="${escapeHtml(c.geral)}" target="_blank" rel="noopener noreferrer" class="btn-ghost py-1 px-2.5 text-[11px]">Dork Geral</a></div><div class="kv-table">${c.itens.map(i => `<a href="${escapeHtml(i.url)}" target="_blank" rel="noopener noreferrer" class="kv-row no-underline text-inherit"><span class="text-sm font-medium text-white">${escapeHtml(i.nome)}</span><span class="badge b-gold">Abrir</span></a>`).join('')}</div></div>`).join('')}</div>`;
+    btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded text-base">search</span> Gerar Dorks';
   }
 
   // =========================================================================
-  // 8. HOME SCREEN (RESUMIDA & DECLARADA) + ROTEADOR
+  // 10. ROTEADOR & WORKBENCH GENÉRICO
   // =========================================================================
-  const navigate = (id) => { window.location.hash = id ? '#' + id : ''; };
-  const updateDock = (hash) => document.querySelectorAll('[data-dock]').forEach(el => el.classList.toggle('active', el.getAttribute('data-dock') === hash));
+  function navigate(id) {
+    closeMobileNav();
+    closeCmdPalette();
+    window.location.hash = id ? '#' + id : '';
+  }
 
-  function renderHomeSectors() {
-    const box = document.getElementById('sectorsContainer');
-    if (!box) return;
-    const q = homeSearchQuery.trim().toLowerCase();
-    const secs = activeSectorFilter === 'all' ? SECTORS : SECTORS.filter(s => s.id === activeSectorFilter);
-    let count = 0;
-
-    const html = secs.map(sec => {
-      const items = MODULES.filter(m => m.sector === sec.id && (!q || `${m.name} ${m.summary} ${m.io} ${m.keywords}`.toLowerCase().includes(q)));
-      if (!items.length) return '';
-      count += items.length;
-      return `
-        <section class="mb-9">
-          <div class="sector-head">
-            <div class="flex items-center gap-3 min-w-0">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:${sec.accent}20; border:1px solid ${sec.accent}52;"><span class="material-symbols-rounded text-xl" style="color:${sec.accent}">${sec.icon}</span></div>
-              <div class="min-w-0"><h2 class="text-sm font-bold text-white leading-tight truncate">${escapeHtml(sec.title)}</h2><p class="text-[11px] text-[var(--text-secondary)] truncate mt-0.5">${escapeHtml(sec.subtitle)}</p></div>
-            </div>
-            <span class="tag-pill t-gold shrink-0">${items.length}</span>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            ${items.map(m => `
-              <div class="ios-m3-card module-tile p-5 flex flex-col justify-between" data-nav="${m.id}">
-                <div>
-                  <div class="flex items-start justify-between gap-3 mb-3.5">
-                    <div class="squircle" style="background:${m.gradient};"><span class="material-symbols-rounded">${m.icon}</span></div>
-                    <span class="tag-pill ${m.badgeClass}">${escapeHtml(m.badge)}</span>
-                  </div>
-                  <div class="flex items-center justify-between gap-2 mb-1">
-                    <h3 class="text-base font-bold text-white leading-snug">${escapeHtml(m.name)}</h3>
-                    <span class="material-symbols-rounded text-sm text-[var(--text-tertiary)]">arrow_forward_ios</span>
-                  </div>
-                  <p class="text-xs text-[var(--text-secondary)] leading-relaxed">${escapeHtml(m.summary)}</p>
-                </div>
-                <div class="io-meta font-mono-tech">
-                  <span class="material-symbols-rounded text-sm text-[#E0B354]">tune</span>
-                  <span class="truncate">${escapeHtml(m.io)}</span>
-                </div>
-              </div>`).join('')}
-          </div>
-        </section>`;
-    }).join('');
-
-    box.innerHTML = count ? html : `<div class="ios-m3-card p-10 text-center"><span class="material-symbols-rounded text-4xl text-white/20 mb-2">search_off</span><p class="text-sm text-[var(--text-secondary)]">Nenhum módulo encontrado para "<strong>${escapeHtml(homeSearchQuery)}</strong>".</p></div>`;
+  function renderKvTable(obj) {
+    const entries = Object.entries(obj).filter(([, v]) => v !== undefined && v !== null && v !== '');
+    if (!entries.length) return '<p class="text-xs text-[var(--text-3)]">Nenhum dado retornado.</p>';
+    return `<div class="kv-table">${entries.map(([k, v]) => {
+      const mono = /(hash|sha|hex|ip|latitude|longitude|cnpj|base64|alvo|entropia)/i.test(k);
+      return `<div class="kv-row"><div class="flex items-center gap-2.5 min-w-0"><span class="material-symbols-rounded text-[#D9A74A] text-lg shrink-0">${escapeHtml(getIcon(k))}</span><div class="min-w-0"><span class="block text-[10px] font-semibold uppercase tracking-wider text-[var(--text-3)]">${escapeHtml(k.replace(/_/g, ' '))}</span><span class="${mono ? 'font-mono-code text-xs' : 'text-sm'} font-medium text-white break-words">${escapeHtml(v)}</span></div></div><button type="button" class="btn-ghost px-2 py-1 shrink-0" data-copy-val="${escapeHtml(v)}" title="Copiar"><span class="material-symbols-rounded text-xs">content_copy</span></button></div>`;
+    }).join('')}</div>`;
   }
 
   function render() {
-    const view = document.getElementById('view'), hash = window.location.hash.replace('#', '');
-    updateDock(hash);
+    const ws = document.getElementById('workspace');
+    const hash = window.location.hash.replace('#', '');
+    renderSidebar(hash);
 
-    if (!hash) {
-      view.innerHTML = `
-        <div class="view-enter">
-          <div class="mb-7">
-            <div class="mb-5 px-1">
-              <span class="text-[11px] font-mono-tech uppercase tracking-[0.2em] text-[#E0B354] block mb-1">Baker Street 221B • iOS Material</span>
-              <h1 class="font-sherlock text-2xl sm:text-3xl font-bold text-white">Central Forense Sherlock</h1>
-              <p class="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">${MODULES.length} módulos declarados com roteamento via Proxy Remoto e perícia local.</p>
-            </div>
-            <div class="spotlight-bar mb-4">
-              <span class="material-symbols-rounded text-[#E0B354] text-xl">search</span>
-              <input type="text" id="spotIn" class="spotlight-input" placeholder="Buscar função (VirusTotal, EXIF, ELA, Custódia, JWT, CNPJ...)" value="${escapeHtml(homeSearchQuery)}" autocomplete="off">
-              ${homeSearchQuery ? '<button type="button" id="spotClr" class="text-[var(--text-secondary)] hover:text-white"><span class="material-symbols-rounded text-lg">close</span></button>' : ''}
-            </div>
-            <div class="m3-chips-row">
-              <button type="button" class="m3-filter-chip ${activeSectorFilter === 'all' ? 'active' : ''}" data-sector="all"><span class="material-symbols-rounded text-sm">apps</span> Todos (${MODULES.length})</button>
-              ${SECTORS.map(s => `<button type="button" class="m3-filter-chip ${activeSectorFilter === s.id ? 'active' : ''}" data-sector="${s.id}"><span class="material-symbols-rounded text-sm">${s.icon}</span> ${escapeHtml(s.short)}</button>`).join('')}
-            </div>
-          </div>
-          <div id="sectorsContainer"></div>
-        </div>`;
-      renderHomeSectors();
-      document.getElementById('spotIn').addEventListener('input', (e) => { homeSearchQuery = e.target.value; renderHomeSectors(); });
-      document.getElementById('spotClr')?.addEventListener('click', () => { homeSearchQuery = ''; render(); });
-      return;
-    }
+    if (!hash) { renderOverview(ws); return; }
 
     const m = MODULES.find(x => x.id === hash);
     if (!m) return navigate('');
-    if (m.customView === 'virustotal') return renderVirusTotalView(view);
-    if (m.customView === 'metadata') return renderMetadataView(view);
-    if (m.customView === 'ela') return renderElaView(view);
-    if (m.customView === 'custody') return renderCustodyView(view);
-    if (m.customView === 'decoder') return renderDecoderView(view);
+
+    const sec = SECTORS.find(s => s.id === m.sector);
+    updateTopbar(sec ? sec.title : 'Módulo', m.name, `${m.summary} (${m.io})`);
+
+    if (m.customView === 'virustotal') return renderVirusTotalView(ws, m);
+    if (m.customView === 'metadata') return renderMetadataView(ws, m);
+    if (m.customView === 'ela') return renderElaView(ws, m);
+    if (m.customView === 'custody') return renderCustodyView(ws, m);
+    if (m.customView === 'decoder') return renderDecoderView(ws, m);
 
     const hist = getHistory(m.id);
-    const histHtml = hist.length ? `<div class="mt-4 pt-4 border-t border-white/10"><span class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold block mb-2">Recentes</span><div class="flex flex-wrap gap-2">${hist.map(h => `<button type="button" class="chip-action py-1 px-3" data-fill="${escapeHtml(h.query)}">${escapeHtml(h.query)}</button>`).join('')}</div></div>` : '';
-
-    view.innerHTML = `
-      <div class="view-enter">
-        <button type="button" data-nav="" class="chip-action mb-5"><span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar</button>
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          <div class="lg:col-span-4 ios-m3-card p-6 lg:sticky lg:top-6">
-            <div class="flex items-center gap-3.5 mb-3">
-              <div class="squircle" style="background:${m.gradient};"><span class="material-symbols-rounded">${m.icon}</span></div>
-              <div><h2 class="text-lg font-bold leading-tight">${escapeHtml(m.name)}</h2><span class="tag-pill ${m.badgeClass} mt-1">${escapeHtml(m.badge)}</span></div>
-            </div>
-            <p class="text-xs text-[var(--text-secondary)] mb-2 leading-relaxed">${escapeHtml(m.summary)}</p>
-            <p class="text-[11px] font-mono-tech text-[#E0B354] mb-5">${escapeHtml(m.io)}</p>
-            <form id="searchForm">
-              <div class="m3-field"><input type="text" id="searchInput" class="m3-input" placeholder=" " maxlength="${m.max}" ${m.optional ? '' : 'required'} autocomplete="off"><label for="searchInput" class="m3-label">${escapeHtml(m.placeholder)}</label></div>
-              <button type="submit" class="btn-primary"><span class="material-symbols-rounded text-lg">search</span> ${m.customSearch === 'dork_only' ? 'Gerar Dorks' : 'Investigar'}</button>
-            </form>
-            ${histHtml}
+    ws.innerHTML = `
+      <div class="fade-in max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <div class="lg:col-span-4 panel overflow-hidden lg:sticky lg:top-0">
+          <div class="panel-header">
+            <span class="text-xs font-bold uppercase tracking-wider text-white">Parâmetros do Alvo</span>
+            <span class="badge ${m.badgeClass}">${m.badge}</span>
           </div>
-          <div class="lg:col-span-8">
-            <div id="result" class="min-h-[300px] ios-m3-card p-6 flex flex-col justify-center items-center text-center">
-              <div class="w-16 h-16 rounded-2xl bg-[#E0B354]/10 border border-[#E0B354]/25 flex items-center justify-center mb-3"><span class="material-symbols-rounded text-3xl text-[#E0B354]/75">${m.icon}</span></div>
-              <p class="text-sm font-semibold text-white mb-1">Aguardando alvo</p>
-              <p class="text-xs text-[var(--text-secondary)] max-w-xs">Consultas roteadas automaticamente via Proxy Remoto.</p>
-            </div>
+          <div class="p-5">
+            <p class="text-xs text-[var(--text-2)] leading-relaxed mb-3 mt-0">${escapeHtml(m.summary)}</p>
+            <p class="text-[11px] font-mono-code text-[#D9A74A] mb-4 mt-0">${escapeHtml(m.io)}</p>
+            <form id="searchForm">
+              <div class="field-wrap">
+                <label for="searchInput" class="field-lbl">${escapeHtml(m.placeholder)}</label>
+                <input type="text" id="searchInput" class="m3-input" placeholder="${escapeHtml(m.placeholder)}" maxlength="${m.max}" ${m.optional ? '' : 'required'} autocomplete="off">
+              </div>
+              <button type="submit" class="btn-exec"><span class="material-symbols-rounded text-base">search</span> ${m.customSearch === 'dork_only' ? 'Gerar Dorks' : 'Investigar'}</button>
+            </form>
+            ${hist.length ? `<div class="mt-4 pt-4 border-t border-white/10"><span class="field-lbl">Recentes</span><div class="flex flex-wrap gap-1.5">${hist.map(h => `<button type="button" class="btn-ghost py-1 px-2.5 text-[11px] font-mono-code" data-fill="${escapeHtml(h.query)}">${escapeHtml(h.query)}</button>`).join('')}</div></div>` : ''}
+          </div>
+        </div>
+        <div class="lg:col-span-8">
+          <div id="result" class="panel min-h-[380px] p-6 flex flex-col justify-center items-center text-center">
+            <span class="material-symbols-rounded text-4xl text-white/15 mb-2">${m.icon}</span>
+            <p class="text-sm font-semibold text-white m-0">Painel de Evidências</p>
+            <p class="text-xs text-[var(--text-2)] max-w-sm mt-1">Informe o alvo ao lado para iniciar a coleta via Proxy Remoto.</p>
           </div>
         </div>
       </div>`;
@@ -1773,53 +1959,69 @@
     e.preventDefault();
     const m = MODULES.find(x => x.id === id), val = document.getElementById('searchInput').value.trim();
     const btn = e.target.querySelector('button[type="submit"]'), resDiv = document.getElementById('result');
-    btn.disabled = true; btn.innerHTML = '<span class="material-symbols-rounded spinner text-lg">refresh</span> Investigando...';
+    btn.disabled = true; btn.innerHTML = '<span class="material-symbols-rounded spinner text-base">refresh</span> Investigando...';
     if (m.customSearch === 'osint_api') return runOsint(val, resDiv, btn);
     if (m.customSearch === 'dork_only') return runDorks(val, resDiv, btn);
 
-    resDiv.className = 'min-h-[300px] ios-m3-card p-6 flex flex-col justify-center items-center text-center';
-    resDiv.innerHTML = `<span class="material-symbols-rounded spinner text-4xl mb-3 text-[#E0B354]">refresh</span><p class="text-sm font-semibold text-white">Consultando via ${escapeHtml(RemoteProxy.getModeLabel())}...</p>`;
+    resDiv.className = 'panel min-h-[380px] p-6 flex flex-col justify-center items-center text-center';
+    resDiv.innerHTML = `<span class="material-symbols-rounded spinner text-3xl text-[#D9A74A] mb-3">refresh</span><p class="text-sm font-semibold text-white">Consultando via ${escapeHtml(RemoteProxy.getModeLabel())}...</p>`;
 
     try {
       const data = await m.fetchApi(val);
-      lastResultData = data.raw || data; lastModuleId = id;
       if (val) await saveHistory(id, val);
-      let html = '';
-      if (data.resumo) html += renderIosList(data.resumo);
-      if (data.coords) html += renderMapBlock(data.coords.lat, data.coords.lon, data.coords.label);
-      if (data.listas?.length) html += data.listas.map(l => `<div class="mt-5"><h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mb-2 px-1">${escapeHtml(l.titulo)} (${l.itens.length})</h4><div class="flex flex-wrap gap-2 max-h-64 overflow-y-auto">${l.itens.map(i => `<span class="text-xs font-mono-tech px-3 py-1.5 rounded-full bg-white/8 border border-white/10 text-white">${escapeHtml(i)}</span>`).join('')}</div></div>`).join('');
+      recordEvidence(id, val || 'Proxy IP', data.raw || data);
 
-      resDiv.className = 'min-h-[300px] ios-m3-card p-6 text-left';
+      let bodyHtml = '';
+      if (data.resumo) bodyHtml += renderKvTable(data.resumo);
+      if (data.coords) bodyHtml += renderMapBlock(data.coords.lat, data.coords.lon, data.coords.label);
+      if (data.listas?.length) bodyHtml += data.listas.map(l => `<div class="mt-5"><h4 class="text-[11px] uppercase tracking-wider text-[var(--text-3)] font-bold mb-2">${escapeHtml(l.titulo)} (${l.itens.length})</h4><div class="flex flex-wrap gap-1.5 max-h-60 overflow-y-auto">${l.itens.map(i => `<span class="text-[11px] font-mono-code px-2.5 py-1 rounded-lg bg-white/[0.06] border border-white/10 text-white">${escapeHtml(i)}</span>`).join('')}</div></div>`).join('');
+
+      resDiv.className = 'panel min-h-[380px] overflow-hidden text-left';
       resDiv.innerHTML = `
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
-          <div><h3 class="font-bold text-lg flex items-center gap-2"><span class="material-symbols-rounded text-[#30D158]">check_circle</span> Evidências</h3>${data.provider ? `<span class="text-[11px] text-[#E0B354] font-semibold">Fonte: ${escapeHtml(data.provider)}</span>` : ''}</div>
-          <div class="flex flex-wrap gap-2"><button type="button" class="chip-action" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button><button type="button" class="chip-action" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button><button type="button" class="chip-action" data-export="download"><span class="material-symbols-rounded text-sm text-[#E0B354]">verified</span> Dossiê</button></div>
-        </div>${html}`;
+        <div class="panel-header flex-wrap">
+          <div><h3 class="text-sm font-bold text-white flex items-center gap-2"><span class="material-symbols-rounded text-[#30D158]">check_circle</span> Evidências Coletadas</h3>${data.provider ? `<span class="text-[11px] text-[#D9A74A] font-semibold">Fonte: ${escapeHtml(data.provider)}</span>` : ''}</div>
+          <div class="flex flex-wrap gap-1.5"><button type="button" class="btn-ghost" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button><button type="button" class="btn-ghost" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button><button type="button" class="btn-ghost" data-export="download"><span class="material-symbols-rounded text-sm text-[#D9A74A]">verified</span> JSON</button></div>
+        </div>
+        <div class="p-5">${bodyHtml}</div>`;
     } catch (err) {
-      resDiv.className = 'min-h-[300px] ios-m3-card p-6 flex flex-col justify-center items-center text-center';
-      resDiv.innerHTML = `<span class="material-symbols-rounded text-5xl mb-2 text-[#FF453A]">error</span><h3 class="font-bold text-base mb-1">Falha na consulta</h3><p class="text-xs text-[var(--text-secondary)] max-w-md">${escapeHtml(err.message)}</p>`;
+      resDiv.className = 'panel min-h-[380px] p-6 flex flex-col justify-center items-center text-center';
+      resDiv.innerHTML = `<span class="material-symbols-rounded text-4xl text-[#FF453A] mb-2">error</span><p class="text-sm font-bold text-white">Falha na consulta</p><p class="text-xs text-[var(--text-2)] max-w-md">${escapeHtml(err.message)}</p>`;
     } finally {
-      btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Investigar';
+      btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded text-base">search</span> Investigar';
     }
   }
 
-  function renderIosList(obj) {
-    const entries = Object.entries(obj).filter(([, v]) => v !== undefined && v !== null && v !== '');
-    if (!entries.length) return '<p class="text-sm text-[var(--text-secondary)]">Nenhum dado retornado.</p>';
-    return `<div class="ios-group">${entries.map(([k, v]) => {
-      const mono = /(hash|sha|hex|ip|latitude|longitude|cnpj|base64|alvo|entropia)/i.test(k);
-      return `<div class="ios-row"><div class="flex items-center gap-3 min-w-0"><span class="material-symbols-rounded text-[#E0B354] text-xl shrink-0">${escapeHtml(getIcon(k))}</span><div class="flex flex-col min-w-0"><span class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold">${escapeHtml(k.replace(/_/g, ' '))}</span><span class="${mono ? 'font-mono-tech text-xs' : 'text-sm'} font-medium text-white break-words">${escapeHtml(v)}</span></div></div><button type="button" class="chip-action text-[11px] py-1 px-2.5 shrink-0" data-copy-val="${escapeHtml(v)}"><span class="material-symbols-rounded text-xs">content_copy</span></button></div>`;
-    }).join('')}</div>`;
-  }
+  // =========================================================================
+  // 11. EVENTOS GLOBAIS & BOOT
+  // =========================================================================
+  document.getElementById('openMobileSidebar').addEventListener('click', openMobileNav);
+  document.getElementById('closeMobileSidebar').addEventListener('click', closeMobileNav);
+  document.getElementById('mobileBackdrop').addEventListener('click', () => { closeMobileNav(); closeCaseDrawer(); });
+  document.getElementById('openCmdBtn').addEventListener('click', openCmdPalette);
+  document.getElementById('openCmdMobile').addEventListener('click', openCmdPalette);
+  document.getElementById('cmdClose').addEventListener('click', closeCmdPalette);
+  document.getElementById('cmdModal').addEventListener('click', (e) => { if (e.target.id === 'cmdModal') closeCmdPalette(); });
+  document.getElementById('cmdInput').addEventListener('input', (e) => renderCmdList(e.target.value));
+  document.getElementById('openDrawerBtn').addEventListener('click', openCaseDrawer);
+  document.getElementById('closeDrawerBtn').addEventListener('click', closeCaseDrawer);
 
-  // =========================================================================
-  // 9. EVENTOS & INICIALIZAÇÃO
-  // =========================================================================
+  document.getElementById('exportFullCaseBtn').addEventListener('click', async () => {
+    const signed = await P2PLayer.signJson({ total_evidences: sessionEvidences.length, timeline: sessionEvidences });
+    const url = URL.createObjectURL(new Blob([JSON.stringify(signed, null, 2)], { type: 'application/json' }));
+    const a = document.createElement('a'); a.href = url; a.download = `${CASE_ID.toLowerCase()}-dossie-completo.json`; a.click(); URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('clearCaseBtn').addEventListener('click', () => {
+    sessionEvidences = [];
+    updateEvidenceUI();
+    if (!window.location.hash.replace('#', '')) render();
+  });
+
   document.addEventListener('click', async (e) => {
     const nav = e.target.closest('[data-nav]'); if (nav) return navigate(nav.getAttribute('data-nav'));
+    const cnav = e.target.closest('[data-cmd-nav]'); if (cnav) return navigate(cnav.getAttribute('data-cmd-nav'));
     const vth = e.target.closest('[data-vt-hash]'); if (vth) { pendingVtQuery = vth.getAttribute('data-vt-hash'); return navigate('virustotal'); }
     const fvt = e.target.closest('[data-fill-vt]'); if (fvt) { const i = document.getElementById('vtTarget'); if (i) { i.value = fvt.getAttribute('data-fill-vt'); document.getElementById('vtForm')?.requestSubmit(); } return; }
-    const sec = e.target.closest('[data-sector]'); if (sec) { activeSectorFilter = sec.getAttribute('data-sector'); document.querySelectorAll('[data-sector]').forEach(b => b.classList.toggle('active', b === sec)); return renderHomeSectors(); }
     if (e.target.closest('[data-print]')) return window.print();
     const fl = e.target.closest('[data-fill]'); if (fl) { const i = document.getElementById('searchInput'); if (i) { i.value = fl.getAttribute('data-fill'); document.getElementById('searchForm')?.requestSubmit(); } return; }
     const cp = e.target.closest('[data-copy-val]'); if (cp) return copyText(cp.getAttribute('data-copy-val'), cp);
@@ -1833,7 +2035,7 @@
   });
 
   window.addEventListener('hashchange', render);
-  document.addEventListener('DOMContentLoaded', () => { render(); runBootSequence(); });
+  document.addEventListener('DOMContentLoaded', () => { render(); updateEvidenceUI(); runBootSequence(); });
 })();
 </script>
 </body>
