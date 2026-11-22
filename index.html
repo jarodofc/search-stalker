@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#040408">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="no-referrer">
-<title>GlassOSINT • Sherlock & Web Forensics</title>
+<title>GlassOSINT • Sherlock, Sites & CNPJ</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230A84FF'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js"></script>
@@ -377,13 +377,13 @@
       <span class="material-symbols-rounded">travel_explore</span>
       <span class="dock-lbl">OSINT</span>
     </button>
-    <button type="button" class="dock-item" data-nav="dork" data-dock="dork">
-      <span class="material-symbols-rounded">manage_search</span>
-      <span class="dock-lbl">Dorks</span>
-    </button>
     <button type="button" class="dock-item" data-nav="domain" data-dock="domain">
       <span class="material-symbols-rounded">language</span>
       <span class="dock-lbl">Sites</span>
+    </button>
+    <button type="button" class="dock-item" data-nav="cnpj" data-dock="cnpj">
+      <span class="material-symbols-rounded">domain</span>
+      <span class="dock-lbl">CNPJ</span>
     </button>
   </div>
 </nav>
@@ -440,7 +440,7 @@
         { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
       );
       const hmac = await crypto.subtle.importKey(
-        'raw', enc.encode(`${AUTHOR_SIGNATURE}::P2P::V10`),
+        'raw', enc.encode(`${AUTHOR_SIGNATURE}::P2P::V11`),
         { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
       );
       ctx = { aes, hmac };
@@ -644,10 +644,15 @@
   let activeSectorFilter = 'all';
   let homeSearchQuery = '';
   let historyCache = [];
-  try { historyCache = JSON.parse(localStorage.getItem('kiik_v10_history') || '[]'); } catch { historyCache = []; }
+  try { historyCache = JSON.parse(localStorage.getItem('kiik_v11_history') || '[]'); } catch { historyCache = []; }
 
   function escapeHtml(str) {
     return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function formatCnpj(digits) {
+    const d = String(digits || '').replace(/\D/g, '');
+    return d.length === 14 ? d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5') : d;
   }
 
   function copyText(text, btnEl) {
@@ -660,15 +665,18 @@
   }
 
   const ICON_MAP = {
-    email:'mail', emails:'mail', proprietario:'person_check', titular:'person_check', registro_titular:'badge',
-    registrador:'storefront', pais:'public', cidade:'location_city', endereco:'pin_drop', data:'calendar_today',
-    registro:'event', expiracao:'event_busy', status:'check_circle', ip:'router', isp:'dns', asn:'lan',
-    latitude:'location_on', longitude:'location_on', altitude:'terrain', bussola:'explore', regiao:'explore',
-    url:'link', links:'link', titulo:'title', descricao:'description', idioma:'translate', tecnologia:'memory',
-    imagens:'image', dominio:'language', aparelho:'smartphone', fabricante:'devices', modelo:'smartphone',
-    lente:'camera', software:'memory', iso:'iso', abertura:'camera', exposicao:'shutter_speed',
-    flash:'flash_on', resolucao:'aspect_ratio', arquivo:'image', tamanho:'data_usage', hash:'fingerprint',
-    servidor:'dns', vazamentos:'security'
+    cnpj:'badge', razao:'domain', fantasia:'storefront', situacao:'info', cnae:'category',
+    natureza:'gavel', porte:'business_center', capital:'payments', municipio:'location_city',
+    logradouro:'signpost', bairro:'holiday_village', cep:'markunread_mailbox', uf:'map',
+    telefone:'call', email:'mail', emails:'mail', proprietario:'person_check', titular:'person_check',
+    registro_titular:'badge', registrador:'storefront', pais:'public', cidade:'location_city',
+    endereco:'pin_drop', data:'calendar_today', abertura:'event', registro:'event', expiracao:'event_busy',
+    status:'check_circle', ip:'router', isp:'dns', asn:'lan', latitude:'location_on', longitude:'location_on',
+    altitude:'terrain', bussola:'explore', regiao:'explore', url:'link', links:'link', titulo:'title',
+    descricao:'description', idioma:'translate', tecnologia:'memory', imagens:'image', dominio:'language',
+    aparelho:'smartphone', fabricante:'devices', modelo:'smartphone', lente:'camera', software:'memory',
+    iso:'iso', abertura_lente:'camera', exposicao:'shutter_speed', flash:'flash_on', resolucao:'aspect_ratio',
+    arquivo:'image', tamanho:'data_usage', hash:'fingerprint', servidor:'dns', vazamentos:'security'
   };
 
   function getIcon(key) {
@@ -696,8 +704,8 @@
     historyCache.unshift({ moduleId, query, ts: Date.now() });
     historyCache = historyCache.slice(0, 20);
     try {
-      localStorage.setItem('kiik_v10_history', JSON.stringify(historyCache));
-      localStorage.setItem('kiik_v10_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
+      localStorage.setItem('kiik_v11_history', JSON.stringify(historyCache));
+      localStorage.setItem('kiik_v11_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
     } catch {}
   }
 
@@ -783,7 +791,7 @@
   }
 
   // ==========================================================
-  // 5. SETORES & MÓDULOS (FOCO EM SHERLOCK, SITES & FORENSE)
+  // 5. SETORES & MÓDULOS (SHERLOCK | SITES & REDE | EMPRESAS)
   // ==========================================================
   const SECTORS = [
     {
@@ -801,6 +809,14 @@
       short: 'Sites & Scraping',
       icon: 'language',
       accent: '#0A84FF'
+    },
+    {
+      id: 'empresas',
+      title: 'Área Empresas (CNPJ)',
+      subtitle: 'Consulta empresarial completa com situação cadastral, CNAE e sócios (QSA)',
+      short: 'CNPJ',
+      icon: 'domain',
+      accent: '#30D158'
     }
   ];
 
@@ -1028,6 +1044,76 @@
           raw: data
         };
       }
+    },
+
+    // ==================== ÁREA EMPRESAS (CNPJ) ====================
+    {
+      id: 'cnpj',
+      sector: 'empresas',
+      name: 'Consulta CNPJ',
+      desc: 'Razão social, situação cadastral, CNAE, endereço e sócios (QSA) com 3 APIs via proxy remoto.',
+      keywords: 'cnpj empresa razao social socios qsa receita cnae',
+      apisLabel: '3 APIs BR',
+      tagClass: 'tag-ok',
+      icon: 'domain',
+      gradient: 'linear-gradient(135deg, #30D158 0%, #1E9E3E 100%)',
+      placeholder: 'CNPJ (14 dígitos)',
+      max: 18,
+      digits: true,
+      fetchApi: async (v) => {
+        const clean = v.replace(/\D/g, '');
+        if (clean.length !== 14) throw new Error('Informe um CNPJ válido com 14 dígitos.');
+
+        const { data, provider } = await tryFallback([
+          { name: 'BrasilAPI via Proxy', run: () => RemoteProxy.fetchJson(`https://brasilapi.com.br/api/cnpj/v1/${clean}`) },
+          { name: 'MinhaReceita via Proxy', run: () => RemoteProxy.fetchJson(`https://minhareceita.org/${clean}`) },
+          { name: 'CNPJ.ws via Proxy', run: () => RemoteProxy.fetchJson(`https://publica.cnpj.ws/cnpj/${clean}`) }
+        ]);
+
+        const est = data.estabelecimento || {};
+        const socios = (data.qsa || data.socios || []).map(s => {
+          const nome = s.nome_socio || s.nome || 'Não informado';
+          const qual = s.qualificacao_socio || s.qualificacao?.descricao || '-';
+          return `${nome} — ${qual}`;
+        });
+        const cnaesSec = (data.cnaes_secundarios || est.atividades_secundarias || [])
+          .map(c => c.descricao || c.text)
+          .filter(Boolean)
+          .slice(0, 20);
+
+        const tel = data.ddd_telefone_1 || (est.ddd1 && est.telefone1 ? `(${est.ddd1}) ${est.telefone1}` : '-');
+        const logradouro = [
+          data.descricao_tipo_de_logradouro || est.tipo_logradouro || '',
+          data.logradouro || est.logradouro || '',
+          (data.numero || est.numero) ? `, ${data.numero || est.numero}` : ''
+        ].join(' ').replace(/\s+,/g, ',').trim() || '-';
+
+        return {
+          provider,
+          resumo: {
+            cnpj: formatCnpj(data.cnpj || clean),
+            razao_social: data.razao_social || '-',
+            nome_fantasia: data.nome_fantasia || est.nome_fantasia || '-',
+            situacao_cadastral: data.descricao_situacao_cadastral || est.situacao_cadastral || '-',
+            data_abertura: data.data_inicio_atividade || est.data_inicio_atividade || '-',
+            porte: data.porte || data.porte?.descricao || '-',
+            natureza_juridica: data.natureza_juridica?.descricao || data.natureza_juridica || '-',
+            cnae_principal: data.cnae_fiscal_descricao || est.atividade_principal?.descricao || '-',
+            capital_social: data.capital_social != null ? `R$ ${Number(data.capital_social).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-',
+            email: data.email || est.email || '-',
+            telefone: tel,
+            logradouro,
+            bairro: data.bairro || est.bairro || '-',
+            municipio_uf: `${data.municipio || est.cidade?.nome || '-'} / ${data.uf || est.estado?.sigla || '-'}`,
+            cep: data.cep || est.cep || '-'
+          },
+          listas: [
+            ...(socios.length ? [{ titulo: 'Quadro Societário (QSA)', itens: socios }] : []),
+            ...(cnaesSec.length ? [{ titulo: 'Atividades Secundárias (CNAE)', itens: cnaesSec }] : [])
+          ],
+          raw: data
+        };
+      }
     }
   ];
 
@@ -1182,7 +1268,7 @@
         software_so: exifAll?.Software || exifAll?.HostComputer || '-',
         lente: exifAll?.LensModel || exifAll?.LensInfo || '-',
         data_captura: formatDateExif(exifAll?.DateTimeOriginal || exifAll?.CreateDate),
-        abertura: exifAll?.FNumber ? `f/${exifAll.FNumber}` : '-',
+        abertura_lente: exifAll?.FNumber ? `f/${exifAll.FNumber}` : '-',
         exposicao: exifAll?.ExposureTime ? (exifAll.ExposureTime < 1 ? `1/${Math.round(1 / exifAll.ExposureTime)}s` : `${exifAll.ExposureTime}s`) : '-',
         iso: exifAll?.ISO || '-',
         distancia_focal: exifAll?.FocalLength ? `${exifAll.FocalLength} mm` : '-',
@@ -1518,15 +1604,15 @@
         <div class="view-enter">
           <div class="mb-7">
             <div class="mb-5 px-1">
-              <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">Central Sherlock & Web</h1>
+              <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">Central Sherlock, Web & CNPJ</h1>
               <p class="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
-                Metadados EXIF, OSINT, Dorks, Web Scraper, Proprietário de Sites e IP via Proxy Remoto.
+                Metadados EXIF, OSINT, Dorks, Web Scraper, Proprietário de Sites, IP e Consulta CNPJ via Proxy Remoto.
               </p>
             </div>
 
             <div class="spotlight-bar mb-4">
               <span class="material-symbols-rounded text-[var(--text-secondary)] text-xl">search</span>
-              <input type="text" id="spotlightInput" class="spotlight-input" placeholder="Buscar ferramenta (ex: metadados, foto, scraper, dork, site, IP...)" value="${escapeHtml(homeSearchQuery)}" autocomplete="off">
+              <input type="text" id="spotlightInput" class="spotlight-input" placeholder="Buscar ferramenta (ex: CNPJ, metadados, foto, scraper, dork, site, IP...)" value="${escapeHtml(homeSearchQuery)}" autocomplete="off">
               ${homeSearchQuery ? '<button type="button" id="clearSpotlight" class="text-[var(--text-secondary)] hover:text-white"><span class="material-symbols-rounded text-lg">close</span></button>' : ''}
             </div>
 
@@ -1612,6 +1698,10 @@
       </div>
     `;
 
+    const inputEl = document.getElementById('searchInput');
+    if (m.digits) {
+      inputEl.addEventListener('input', () => { inputEl.value = inputEl.value.replace(/\D/g, ''); });
+    }
     document.getElementById('searchForm').addEventListener('submit', (e) => handleSearch(e, m.id));
   }
 
