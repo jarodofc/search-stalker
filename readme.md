@@ -1,66 +1,64 @@
-# GlassOSINT — Painel de Investigação Digital & P2P (KIIK HACKING)
+# GlassOSINT • iOS Liquid Edition (Assinado por KIIK HACKING)
 
-[![Design System](https://img.shields.io/badge/Design-Liquid%20Glass%20%2F%20Material%20UX-blueviolet?style=for-the-badge&logo=apple)](#)
-[![Security](https://img.shields.io/badge/Security-P2P%20E2EE%20%7C%20KIIK%20HACKING-critical?style=for-the-badge&logo=shield)](#)
-[![Stack](https://img.shields.io/badge/Stack-HTML5%20%7C%20CSS3%20%7C%20Web%20Crypto%20API-important?style=for-the-badge&logo=javascript)](#)
+[![Design](https://img.shields.io/badge/UI-iOS%20Liquid%20Glass%20%7C%20Dynamic%20Island-0A84FF?style=for-the-badge&logo=apple)](#)
+[![Security](https://img.shields.io/badge/Security-P2P%20E2EE%20%7C%20KIIK%20HACKING-30D158?style=for-the-badge&logo=shield)](#)
+[![Stack](https://img.shields.io/badge/Stack-HTML5%20%7C%20CSS3%20%7C%20Web%20Crypto%20API-5E5CE6?style=for-the-badge&logo=javascript)](#)
 
-> Painel de investigação digital (OSINT), web scraping, central veicular e criptografia ponto-a-ponto (P2P) em arquivo HTML único, assinado criptograficamente por **KIIK HACKING**.
+> Painel de investigação digital (OSINT), web scraping e central veicular com interface inspirada no **iOS Liquid Glass** (Dynamic Island, ícones Squircle, listas agrupadas translúcidas e animações spring), protegido por criptografia P2P silenciosa e assinado por **KIIK HACKING**.
 
 ---
 
 ## 📑 Sumário
-1. [Camada de Segurança & Blindagem](#1-camada-de-segurança--blindagem)
-2. [Criptografia P2P (KIIK HACKING)](#2-criptografia-p2p-kiik-hacking)
-3. [Módulos Disponíveis](#3-módulos-disponíveis)
-4. [Arquitetura e Boas Práticas](#4-arquitetura-e-boas-práticas)
-5. [Como Usar](#5-como-usar)
+1. [Interface iOS Liquid Glass](#1-interface-ios-liquid-glass)
+2. [Criptografia P2P & Assinatura (KIIK HACKING)](#2-criptografia-p2p--assinatura-kiik-hacking)
+3. [Aplicativos Disponíveis](#3-aplicativos-disponíveis)
+4. [Segurança e Blindagem](#4-segurança-e-blindagem)
+5. [Como Publicar](#5-como-publicar)
 
 ---
 
-## 1. Camada de Segurança & Blindagem
+## 1. Interface iOS Liquid Glass
 
-- **Bloqueio de DevTools e Atalhos:** Intercepta `F12`, `Ctrl+Shift+I/J/C/K`, `Cmd+Option+I/J/C`, `Ctrl+U`, `Ctrl+S`, clique direito (`contextmenu`) e arraste (`dragstart`).
-- **Detecção Ativa de Painel de Desenvolvedor:** Monitora alterações de dimensão da janela (`outerWidth - innerWidth` / `outerHeight - innerHeight`) e aciona imediatamente uma tela de bloqueio (`#securityLock`) caso o DevTools seja aberto.
-- **Isolamento Total (IIFE + Strict Mode):** Todo o código JavaScript roda encapsulado em uma função anônima isolada (`(() => { 'use strict'; ... })()`), sem expor chaves, configurações ou funções no objeto global `window`.
-- **Proteção contra XSS:** Todos os dados vindos de APIs externas passam por `escapeHtml()` antes da renderização no DOM.
-
----
-
-## 2. Criptografia P2P (KIIK HACKING)
-
-Implementada nativamente via **Web Crypto API** (sem bibliotecas externas):
-
-- **Troca de Chaves P2P:** Geração de par de chaves **ECDH (Curva P-256)** para derivação de segredo compartilhado entre dois peers.
-- **Criptografia Autenticada:** **AES-256-GCM** com vetor de inicialização (`IV`) aleatório de 96 bits por mensagem.
-- **Assinatura Criptográfica (`KIIK HACKING`):** Todos os pacotes P2P e relatórios exportados em `.json` recebem assinatura **HMAC-SHA256** vinculada à autoridade `KIIK HACKING` e timestamp ISO, garantindo detecção imediata de adulteração.
+- **Home Screen com Ícones Squircle:** Grade responsiva estilo iPhone com ícones arredondados (`border-radius` proporcional), brilho especular interno e feedback tátil (`scale` spring).
+- **Dynamic Island:** Barra superior flutuante com status em tempo real e indicador de sessão criptografada.
+- **Inset Grouped Lists:** Resultados e formulários organizados em blocos translúcidos (`backdrop-filter: blur(36px) saturate(210%)`) com tipografia nativa Apple (`-apple-system` / `SF Pro`).
+- **100% Responsivo (Mobile & Desktop):** Otimizado para Safari no iOS (`viewport-fit=cover`, `apple-mobile-web-app-capable`) e navegadores desktop sem bloqueios falsos por zoom ou barra lateral.
 
 ---
 
-## 3. Módulos Disponíveis
+## 2. Criptografia P2P & Assinatura (KIIK HACKING)
 
-1. **Criptografia P2P (KIIK):** Gera chave pública ECDH P-256, criptografa/descriptografa pacotes P2P e valida a assinatura `KIIK HACKING`.
-2. **Central Veicular (MG / BH):** Organiza Placa, RENAVAM, CPF/CNPJ e Chassi/CRV com cópia em 1 clique, consulta automática do titular e atalhos para **DETRAN-MG (Situação e ATPV-e), SENATRAN (SERPRO) e Multas PBH**.
-3. **Varredura OSINT (Web):** Verificação progressiva em tempo real em **Redes Sociais, Sites Adultos, Sites de Namoro e Sites de Aposta** com status visual e Google Dorks.
-4. **Web Scraping (OSINT):** Extrai metadados, e-mails públicos, telefones, redes sociais, títulos (`H1/H2`) e links externos de URLs públicas.
-5. **CPF:** Integração com `CPFHub.io` + fallback local (validação matemática e Região Fiscal).
-6. **CNPJ:** `BrasilAPI` → `MinhaReceita` → `CNPJ.ws` (incluindo QSA).
-7. **Vazamentos (E-mail):** `XposedOrNot API`.
-8. **CEP / Endereço:** `BrasilAPI v2` → `ViaCEP`.
-9. **IP / Geolocalização:** `ipwho.is` → `ipapi.co`.
-10. **Domínio (DNS + RDAP):** `Google DNS-over-HTTPS` + `rdap.registro.br` / `rdap.org`.
-11. **DDD (Brasil):** `BrasilAPI (DDD v1)`.
+A criptografia P2P opera de forma transparente em segundo plano via **Web Crypto API** (sem botões ou telas extras na interface):
+
+- **Sessão E2EE (ECDH P-256 + AES-256-GCM):** Deriva chaves efêmeras para selar o armazenamento local (`localStorage`) da sessão.
+- **Assinatura Criptográfica (`KIIK HACKING`):** Todo relatório copiado ou exportado em `.json` recebe automaticamente o envelope assinado com `signed_by: "KIIK HACKING"`, timestamp ISO e assinatura **HMAC-SHA256**.
 
 ---
 
-## 4. Arquitetura e Boas Práticas
+## 3. Aplicativos Disponíveis
 
-- **Nota de Segurança Client-Side:** Proteções de navegador (bloqueio de `F12` e ofuscação no front-end) elevam a barreira contra inspeção casual, mas em aplicações hospedadas publicamente o ideal é mover chaves privadas para um backend ou Worker (Cloudflare Workers / Netlify Functions).
-- **Delegação de Eventos:** Nenhum handler inline (`onclick`) é usado no HTML, mantendo a superfície de ataque mínima.
+1. **Veículos MG:** Organização de Placa, RENAVAM, CPF/CNPJ e Chassi/CRV com cópia em 1 toque, consulta automática do titular (CPF/CNPJ) e acesso direto a **DETRAN-MG (Situação e ATPV-e), SENATRAN (SERPRO) e Multas PBH**.
+2. **OSINT Web:** Varredura progressiva em **Redes Sociais, Sites Adultos, Sites de Namoro e Sites de Aposta** com status em tempo real e Google Dorks.
+3. **Scraper:** Extração de metadados (`title`, `description`, `generator`), e-mails públicos, telefones BR, redes sociais, títulos (`H1/H2`) e links externos.
+4. **CPF:** Consulta via `CPFHub.io` com fallback local para validação matemática e Região Fiscal.
+5. **CNPJ:** Consulta cadastral e Quadro Societário (`BrasilAPI` → `MinhaReceita` → `CNPJ.ws`).
+6. **Vazamentos:** Checagem de exposição de e-mail via `XposedOrNot API`.
+7. **CEP:** Endereço completo e coordenadas (`BrasilAPI v2` → `ViaCEP`).
+8. **IP / Geo:** Geolocalização, operadora (ISP) e ASN (`ipwho.is` → `ipapi.co`).
+9. **Domínio:** Registros DNS (`A`, `MX`, `NS`, `TXT` via Google DoH) e dados RDAP (`Registro.br` / `RDAP.org`).
+10. **DDD Brasil:** Estado e lista de municípios atendidos (`BrasilAPI`).
 
 ---
 
-## 5. Como Usar
+## 4. Segurança e Blindagem
 
-1. Salve o arquivo como `index.html`.
-2. Abra em um navegador moderno via `https://` ou `localhost` (requerido pela **Web Crypto API** para criptografia P2P).
-3. Hospede em **Cloudflare Pages**, **Netlify** ou **GitHub Pages** para uso imediato.
+- **Bloqueio de Atalhos de Inspeção:** Intercepta `F12`, `Ctrl+Shift+I/J/C/K`, `Cmd+Option+I/J/C`, `Ctrl+U`, `Ctrl+S` e clique direito (`contextmenu`) sem disparar falsos positivos no iPhone ou em telas com barra lateral.
+- **Isolamento em IIFE:** Todo o código roda fechado em `(() => { 'use strict'; ... })()`, sem expor funções ou chaves no escopo global `window`.
+- **Sanitização XSS:** Todos os dados dinâmicos passam por `escapeHtml()` antes de entrar no DOM.
+
+---
+
+## 5. Como Publicar
+
+1. Substitua o arquivo `index.html` no seu repositório GitHub / Vercel.
+2. Aguarde o deploy concluir e abra o link no Safari ou navegador desktop.
