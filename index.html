@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GlassOSINT | Inteligência em Fontes Abertas</title>
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="referrer" content="no-referrer">
+<title>GlassOSINT | KIIK HACKING P2P</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230A84FF'%3E%3Cpath d='M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 3 12.01 3c-1.98 0-3.86.47-5.57 1.41-.24.13-.54.04-.68-.2-.13-.24-.04-.55.2-.68C7.82 2.52 9.86 2 12.01 2c2.13 0 3.99.47 6.03 1.52.25.13.34.43.21.67-.09.18-.26.28-.44.28zM3.5 9.72c-.1 0-.2-.03-.29-.09-.23-.16-.28-.47-.12-.7.99-1.4 2.25-2.5 3.75-3.27C9.98 4.04 14 4.03 17.15 5.65c1.5.77 2.76 1.86 3.75 3.25.16.22.11.54-.12.7-.23.16-.54.11-.7-.12-.9-1.26-2.04-2.25-3.39-2.94-2.87-1.47-6.54-1.47-9.4.01-1.36.7-2.5 1.7-3.4 2.96-.08.14-.23.21-.39.21zm6.25 12.07c-.13 0-.26-.05-.35-.15-.87-.87-1.34-1.43-2.01-2.64-.69-1.23-1.05-2.73-1.05-4.34 0-2.97 2.54-5.39 5.66-5.39s5.66 2.42 5.66 5.39c0 .28-.22.5-.5.5s-.5-.22-.5-.5c0-2.42-2.09-4.39-4.66-4.39-2.57 0-4.66 1.97-4.66 4.39 0 1.44.32 2.77.93 3.85.64 1.15 1.08 1.64 1.85 2.42.19.2.19.51 0 .71-.11.1-.24.15-.37.15z'/%3E%3C/svg%3E">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -22,7 +24,8 @@
     --warning: #FF9F0A;
     --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+  input, textarea { user-select: text; -webkit-user-select: text; }
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background-color: var(--bg-base);
@@ -174,912 +177,1353 @@
   .badge {
     display: inline-flex;
     align-items: center;
-    padding: 4px 10px;
+    gap: 6px;
+    padding: 5px 12px;
     border-radius: 999px;
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: 0.4px;
     background: rgba(10, 132, 255, 0.15);
     color: var(--accent);
-    border: 1px solid rgba(10, 132, 255, 0.3);
+    border: 1px solid rgba(10, 132, 255, 0.35);
   }
   .spinner { animation: spin 1s linear infinite; }
   @keyframes spin { 100% { transform: rotate(360deg); } }
+
+  #securityLock {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(5, 5, 8, 0.97);
+    backdrop-filter: blur(28px);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+  }
+  #securityLock.active { display: flex; }
 </style>
 </head>
 <body class="p-4 md:p-8">
+
+<div id="securityLock">
+  <div class="w-20 h-20 rounded-3xl bg-[var(--danger)]/15 border border-[var(--danger)]/40 flex items-center justify-center mb-5">
+    <span class="material-symbols-rounded text-5xl text-[var(--danger)]">shield_lock</span>
+  </div>
+  <h2 class="text-2xl font-bold mb-2">Acesso Bloqueado — Proteção Ativa</h2>
+  <p class="text-sm text-[var(--text-muted)] max-w-md mb-4">
+    Tentativa de inspeção ou abertura de DevTools detectada. Feche o painel de desenvolvedor para restaurar a sessão.
+  </p>
+  <span class="badge">ASSINATURA: KIIK HACKING • P2P E2EE</span>
+</div>
+
 <div class="max-w-6xl mx-auto">
   <header class="liquid-glass p-4 flex items-center justify-between mb-8 sticky top-4 z-50">
-    <div class="flex items-center gap-3 cursor-pointer" onclick="navigate('')">
+    <div class="flex items-center gap-3 cursor-pointer" data-nav="">
       <div class="w-11 h-11 rounded-2xl bg-[var(--accent-glow)] flex items-center justify-center border border-[var(--accent)]/30">
         <span class="material-symbols-rounded text-2xl text-[var(--accent)]">fingerprint</span>
       </div>
       <div>
         <span class="font-bold text-xl tracking-tight block leading-none">Glass<span class="text-[var(--accent)]">OSINT</span></span>
-        <span class="text-[11px] text-[var(--text-muted)] font-medium tracking-wider uppercase">Pegada Digital</span>
+        <span class="text-[11px] text-[var(--text-muted)] font-medium tracking-wider uppercase">KIIK HACKING • P2P</span>
       </div>
     </div>
-    <span class="badge hidden sm:inline-flex">OSINT + DETRAN-MG</span>
+    <span class="badge hidden sm:inline-flex">
+      <span class="material-symbols-rounded text-sm">verified_user</span> KIIK HACKING P2P
+    </span>
   </header>
 
   <main id="view" class="w-full"></main>
+
+  <footer class="mt-10 text-center text-[11px] text-[var(--text-muted)] opacity-75">
+    Assinado criptograficamente por <strong>KIIK HACKING</strong> • Camada P2P ECDH P-256 + AES-256-GCM + HMAC-SHA256
+  </footer>
 </div>
 
 <script>
-const CONFIG = {
-  cpfKey: '778433e124468b1aa60f2681919cd918f852afe1761056985813881cb72a550f',
-  detranAtpvUrl: 'https://detran.mg.gov.br/veiculos/transferencias/emitir-a-autorizacao-para-transferencia-de-propriedade-do-veiculo-atpv-e'
-};
+(() => {
+  'use strict';
 
-let lastResultData = null;
+  // ==========================================
+  // 1. BLINDAGEM ANTI-DEVTOOLS & ANTI-INSPEÇÃO
+  // ==========================================
+  const SIGNATURE_BRAND = 'KIIK HACKING';
+  const lockOverlay = document.getElementById('securityLock');
 
-function escapeHtml(str) {
-  return String(str ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
+  const triggerLock = () => {
+    lockOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  };
+  const releaseLock = () => {
+    lockOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+  };
 
-function copyText(text, btnEl) {
-  navigator.clipboard.writeText(text);
-  if (btnEl) {
-    const old = btnEl.innerHTML;
-    btnEl.innerHTML = '<span class="material-symbols-rounded text-sm text-[var(--success)]">check</span> Copiado';
-    setTimeout(() => { btnEl.innerHTML = old; }, 1400);
+  document.addEventListener('contextmenu', (e) => e.preventDefault());
+  document.addEventListener('dragstart', (e) => e.preventDefault());
+  document.addEventListener('keydown', (e) => {
+    const key = (e.key || '').toUpperCase();
+    const blocked =
+      key === 'F12' ||
+      (e.ctrlKey && e.shiftKey && ['I', 'J', 'C', 'K'].includes(key)) ||
+      (e.metaKey && e.altKey && ['I', 'J', 'C'].includes(key)) ||
+      (e.ctrlKey && ['U', 'S'].includes(key));
+    if (blocked) {
+      e.preventDefault();
+      e.stopPropagation();
+      triggerLock();
+      return false;
+    }
+  }, true);
+
+  setInterval(() => {
+    const threshold = 160;
+    const widthDiff = Math.abs(window.outerWidth - window.innerWidth) > threshold;
+    const heightDiff = Math.abs(window.outerHeight - window.innerHeight) > threshold;
+    if (widthDiff || heightDiff) triggerLock();
+    else releaseLock();
+  }, 800);
+
+  // ==========================================
+  // 2. MOTOR CRIPTOGRÁFICO P2P (KIIK HACKING)
+  // ==========================================
+  const P2P = (() => {
+    const enc = new TextEncoder();
+    const dec = new TextDecoder();
+    let localPair = null;
+
+    const b64 = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf)));
+    const unb64 = (str) => Uint8Array.from(atob(str), c => c.charCodeAt(0));
+
+    async function generateIdentity() {
+      localPair = await crypto.subtle.generateKey(
+        { name: 'ECDH', namedCurve: 'P-256' },
+        true,
+        ['deriveKey']
+      );
+      const pubJwk = await crypto.subtle.exportKey('jwk', localPair.publicKey);
+      return btoa(JSON.stringify(pubJwk));
+    }
+
+    async function deriveAesKey(remotePubB64) {
+      if (!localPair) await generateIdentity();
+      const remoteJwk = JSON.parse(atob(remotePubB64.trim()));
+      const remoteKey = await crypto.subtle.importKey(
+        'jwk',
+        remoteJwk,
+        { name: 'ECDH', namedCurve: 'P-256' },
+        false,
+        []
+      );
+      return crypto.subtle.deriveKey(
+        { name: 'ECDH', public: remoteKey },
+        localPair.privateKey,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['encrypt', 'decrypt']
+      );
+    }
+
+    async function signKiik(payloadStr) {
+      const key = await crypto.subtle.importKey(
+        'raw',
+        enc.encode(`${SIGNATURE_BRAND}::P2P::INTEGRITY::V2`),
+        { name: 'HMAC', hash: 'SHA-256' },
+        false,
+        ['sign']
+      );
+      const sig = await crypto.subtle.sign('HMAC', key, enc.encode(payloadStr));
+      return b64(sig);
+    }
+
+    async function encryptPacket(plainText, remotePubB64) {
+      const aesKey = await deriveAesKey(remotePubB64);
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const cipher = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, aesKey, enc.encode(plainText));
+      const body = {
+        v: '2.0',
+        alg: 'ECDH-P256+AES-256-GCM',
+        signer: SIGNATURE_BRAND,
+        ts: new Date().toISOString(),
+        iv: b64(iv),
+        ct: b64(cipher)
+      };
+      body.sig = await signKiik(`${body.ts}|${body.iv}|${body.ct}|${SIGNATURE_BRAND}`);
+      return btoa(JSON.stringify(body));
+    }
+
+    async function decryptPacket(packetB64, remotePubB64) {
+      const body = JSON.parse(atob(packetB64.trim()));
+      const expected = await signKiik(`${body.ts}|${body.iv}|${body.ct}|${SIGNATURE_BRAND}`);
+      if (body.signer !== SIGNATURE_BRAND || body.sig !== expected) {
+        throw new Error('Assinatura KIIK HACKING inválida ou pacote adulterado.');
+      }
+      const aesKey = await deriveAesKey(remotePubB64);
+      const plain = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv: unb64(body.iv) },
+        aesKey,
+        unb64(body.ct)
+      );
+      return { text: dec.decode(plain), meta: body };
+    }
+
+    async function wrapSignedJson(data) {
+      const rawStr = JSON.stringify(data);
+      const ts = new Date().toISOString();
+      const sig = await signKiik(`${ts}|${rawStr}|${SIGNATURE_BRAND}`);
+      return {
+        signature_authority: SIGNATURE_BRAND,
+        protocol: 'P2P-HMAC-SHA256',
+        timestamp: ts,
+        signature: sig,
+        payload: data
+      };
+    }
+
+    return { generateIdentity, encryptPacket, decryptPacket, wrapSignedJson };
+  })();
+
+  // ==========================================
+  // 3. CONFIGURAÇÃO ENCAPSULADA (SEM EXPOSIÇÃO GLOBAL)
+  // ==========================================
+  const _k = ['Nzc4NDMzZTEyNDQ2OGIxYWE2MGYyNjgxOTE5Y2Q5MThmODUyYWZlMTc2MTA1Njk4NTgxMzg4MWNiNzJhNTUwZg=='];
+  const getCpfKey = () => atob(_k[0]);
+
+  const PORTAIS_VEICULARES = [
+    {
+      nome: 'Situação do Veículo (DETRAN-MG)',
+      desc: 'Restrições, débitos e situação cadastral',
+      icone: 'fact_check',
+      url: 'https://detran.mg.gov.br/veiculos/situacao-do-veiculo/consulta-de-situacao-do-veiculo'
+    },
+    {
+      nome: 'ATPV-e (DETRAN-MG)',
+      desc: 'Consultar / emitir autorização de transferência',
+      icone: 'description',
+      url: 'https://detran.mg.gov.br/veiculos/transferencias/emitir-a-autorizacao-para-transferencia-de-propriedade-do-veiculo-atpv-e'
+    },
+    {
+      nome: 'Portal SENATRAN (SERPRO)',
+      desc: 'Consulta nacional de veículos e infrações',
+      icone: 'public',
+      url: 'https://portalservicos.senatran.serpro.gov.br/#/veiculos/consultar'
+    },
+    {
+      nome: 'Multas PBH (Belo Horizonte)',
+      desc: 'Consulta de infrações municipais de BH',
+      icone: 'local_police',
+      url: 'https://multas.pbh.gov.br/'
+    }
+  ];
+
+  let lastResultData = null;
+  let lastModuleId = 'osint';
+
+  function escapeHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
-}
 
-const ICON_MAP = {
-  cnpj: 'badge', cpf: 'fingerprint', email: 'mail', nome: 'person', name: 'person',
-  razao: 'domain', fantasia: 'storefront', uf: 'map', estado: 'map', pais: 'public',
-  country: 'public', municipio: 'location_city', cidade: 'location_city', city: 'location_city',
-  cep: 'markunread_mailbox', logradouro: 'signpost', bairro: 'holiday_village',
-  data: 'calendar_today', nascimento: 'cake', birth: 'cake', genero: 'wc', gender: 'wc',
-  abertura: 'event', situacao: 'info', status: 'check_circle', cnae: 'category',
-  natureza: 'gavel', capital: 'payments', ip: 'router', isp: 'dns', org: 'hub',
-  asn: 'lan', latitude: 'location_on', longitude: 'location_on', ddd: 'call',
-  telefone: 'call', regiao: 'explore', platform: 'apps', url: 'link', alvo: 'target',
-  placa: 'directions_car', renavam: 'pin', valor: 'payments'
-};
-
-function getIcon(key) {
-  const k = String(key || '').toLowerCase();
-  for (const [term, icon] of Object.entries(ICON_MAP)) {
-    if (k.includes(term)) return icon;
-  }
-  return 'data_object';
-}
-
-async function fetchJson(url, options = {}, timeoutMs = 9000) {
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), timeoutMs);
-  try {
-    const r = await fetch(url, { ...options, signal: ctrl.signal });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return await r.json();
-  } finally {
-    clearTimeout(timer);
-  }
-}
-
-async function tryFallback(sources) {
-  let lastErr;
-  for (const fn of sources) {
-    try {
-      const res = await fn();
-      if (res) return res;
-    } catch (e) {
-      lastErr = e;
+  function copyText(text, btnEl) {
+    navigator.clipboard.writeText(text);
+    if (btnEl) {
+      const old = btnEl.innerHTML;
+      btnEl.innerHTML = '<span class="material-symbols-rounded text-sm text-[var(--success)]">check</span> Copiado';
+      setTimeout(() => { btnEl.innerHTML = old; }, 1400);
     }
   }
-  throw new Error(lastErr?.message || 'Nenhuma fonte respondeu.');
-}
 
-function saveHistory(moduleId, query) {
-  try {
-    const key = 'glassosint_history';
-    const list = JSON.parse(localStorage.getItem(key) || '[]');
-    const filtered = list.filter(i => !(i.moduleId === moduleId && i.query === query));
-    filtered.unshift({ moduleId, query, ts: Date.now() });
-    localStorage.setItem(key, JSON.stringify(filtered.slice(0, 8)));
-  } catch (e) {}
-}
+  const ICON_MAP = {
+    cnpj: 'badge', cpf: 'fingerprint', email: 'mail', emails: 'mail', nome: 'person', name: 'person',
+    razao: 'domain', fantasia: 'storefront', uf: 'map', estado: 'map', pais: 'public',
+    country: 'public', municipio: 'location_city', cidade: 'location_city', city: 'location_city',
+    cep: 'markunread_mailbox', logradouro: 'signpost', bairro: 'holiday_village',
+    data: 'calendar_today', nascimento: 'cake', birth: 'cake', genero: 'wc', gender: 'wc',
+    abertura: 'event', situacao: 'info', status: 'check_circle', cnae: 'category',
+    natureza: 'gavel', capital: 'payments', ip: 'router', isp: 'dns', org: 'hub',
+    asn: 'lan', latitude: 'location_on', longitude: 'location_on', ddd: 'call',
+    telefone: 'call', regiao: 'explore', platform: 'apps', url: 'link', links: 'link',
+    alvo: 'target', placa: 'directions_car', renavam: 'pin', valor: 'payments',
+    titulo: 'title', descricao: 'description', idioma: 'translate', tecnologia: 'memory', imagens: 'image'
+  };
 
-function getHistory(moduleId) {
-  try {
-    const list = JSON.parse(localStorage.getItem('glassosint_history') || '[]');
-    return list.filter(i => i.moduleId === moduleId).slice(0, 5);
-  } catch (e) {
-    return [];
+  function getIcon(key) {
+    const k = String(key || '').toLowerCase();
+    for (const [term, icon] of Object.entries(ICON_MAP)) {
+      if (k.includes(term)) return icon;
+    }
+    return 'data_object';
   }
-}
 
-async function checkViaProxy(url, notFoundPatterns = []) {
-  try {
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
-    const res = await fetchJson(proxyUrl, {}, 8000);
-    const code = res?.status?.http_code;
-    const html = (res?.contents || '').toLowerCase();
+  async function fetchJson(url, options = {}, timeoutMs = 10000) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const r = await fetch(url, { ...options, signal: ctrl.signal });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return await r.json();
+    } finally {
+      clearTimeout(timer);
+    }
+  }
 
-    if (code === 404 || code === 410) return { status: 'notfound', label: 'Não encontrado' };
-    if (code === 403 || code === 429 || !code || html.includes('cf-browser-verification') || html.includes('just a moment')) {
+  async function tryFallback(sources) {
+    let lastErr;
+    for (const fn of sources) {
+      try {
+        const res = await fn();
+        if (res) return res;
+      } catch (e) {
+        lastErr = e;
+      }
+    }
+    throw new Error(lastErr?.message || 'Nenhuma fonte respondeu.');
+  }
+
+  function saveHistory(moduleId, query) {
+    try {
+      const key = 'kiik_glassosint_history';
+      const list = JSON.parse(localStorage.getItem(key) || '[]');
+      const filtered = list.filter(i => !(i.moduleId === moduleId && i.query === query));
+      filtered.unshift({ moduleId, query, ts: Date.now() });
+      localStorage.setItem(key, JSON.stringify(filtered.slice(0, 12)));
+    } catch {}
+  }
+
+  function getHistory(moduleId) {
+    try {
+      const list = JSON.parse(localStorage.getItem('kiik_glassosint_history') || '[]');
+      return list.filter(i => i.moduleId === moduleId).slice(0, 5);
+    } catch {
+      return [];
+    }
+  }
+
+  async function checkViaProxy(url, notFoundPatterns = []) {
+    try {
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+      const res = await fetchJson(proxyUrl, {}, 8000);
+      const code = res?.status?.http_code;
+      const html = (res?.contents || '').toLowerCase();
+
+      if (code === 404 || code === 410) return { status: 'notfound', label: 'Não encontrado' };
+      if (code === 403 || code === 429 || !code || html.includes('cf-browser-verification') || html.includes('just a moment')) {
+        return { status: 'manual', label: 'Protegido (Verificar)' };
+      }
+      if (notFoundPatterns.some(p => html.includes(p.toLowerCase()))) {
+        return { status: 'notfound', label: 'Não encontrado' };
+      }
+      if (code >= 200 && code < 400) return { status: 'found', label: 'Encontrado' };
+      return { status: 'manual', label: 'Verificar manual' };
+    } catch {
       return { status: 'manual', label: 'Protegido (Verificar)' };
     }
-    if (notFoundPatterns.some(p => html.includes(p.toLowerCase()))) {
-      return { status: 'notfound', label: 'Não encontrado' };
-    }
-    if (code >= 200 && code < 400) return { status: 'found', label: 'Encontrado' };
-    return { status: 'manual', label: 'Verificar manual' };
-  } catch (e) {
-    return { status: 'manual', label: 'Protegido (Verificar)' };
   }
-}
 
-function buildOsintTargets(alvo) {
-  const enc = encodeURIComponent(alvo);
-  const q = (dork) => `https://www.google.com/search?q=${encodeURIComponent(dork)}`;
+  function buildOsintTargets(alvo) {
+    const enc = encodeURIComponent(alvo);
+    const q = (dork) => `https://www.google.com/search?q=${encodeURIComponent(dork)}`;
 
-  return [
-    {
-      titulo: 'Redes Sociais',
-      icone: 'groups',
-      dorkGeral: q(`"${alvo}" (site:instagram.com OR site:tiktok.com OR site:x.com OR site:facebook.com OR site:linkedin.com OR site:threads.net OR site:reddit.com)`),
-      itens: [
-        {
-          id: 'github', nome: 'GitHub', url: `https://github.com/${enc}`,
-          check: async () => {
-            try {
-              const r = await fetch(`https://api.github.com/users/${enc}`);
-              if (r.status === 404) return { status: 'notfound', label: 'Não encontrado' };
-              if (r.ok) { const d = await r.json(); return { status: 'found', label: 'Encontrado', info: `${d.public_repos} repos` }; }
-            } catch (e) {}
-            return { status: 'manual', label: 'Verificar' };
-          }
-        },
-        {
-          id: 'gitlab', nome: 'GitLab', url: `https://gitlab.com/${enc}`,
-          check: async () => {
-            try {
-              const arr = await fetchJson(`https://gitlab.com/api/v4/users?username=${enc}`);
-              return arr.length ? { status: 'found', label: 'Encontrado' } : { status: 'notfound', label: 'Não encontrado' };
-            } catch (e) { return { status: 'manual', label: 'Verificar' }; }
-          }
-        },
-        {
-          id: 'devto', nome: 'Dev.to', url: `https://dev.to/${enc}`,
-          check: async () => {
-            try {
-              const r = await fetch(`https://dev.to/api/users/by_username?url=${enc}`);
-              if (r.status === 404) return { status: 'notfound', label: 'Não encontrado' };
-              if (r.ok) return { status: 'found', label: 'Encontrado' };
-            } catch (e) {}
-            return { status: 'manual', label: 'Verificar' };
-          }
-        },
-        {
-          id: 'reddit', nome: 'Reddit', url: `https://www.reddit.com/user/${enc}`,
-          check: async () => {
-            try {
-              const r = await fetch(`https://www.reddit.com/user/${enc}/about.json`);
-              if (r.status === 404) return { status: 'notfound', label: 'Não encontrado' };
-              if (r.ok) return { status: 'found', label: 'Encontrado' };
-            } catch (e) {}
-            return await checkViaProxy(`https://www.reddit.com/user/${enc}`, ['page not found', 'nobody on reddit goes by that name']);
-          }
-        },
-        { id: 'instagram', nome: 'Instagram', url: `https://www.instagram.com/${enc}/`, check: () => checkViaProxy(`https://www.instagram.com/${enc}/`, ["page isn't available", 'página não está disponível']) },
-        { id: 'tiktok', nome: 'TikTok', url: `https://www.tiktok.com/@${enc}`, check: () => checkViaProxy(`https://www.tiktok.com/@${enc}`, ["couldn't find this account", 'não foi possível encontrar']) },
-        { id: 'x', nome: 'X (Twitter)', url: `https://x.com/${enc}`, check: () => checkViaProxy(`https://x.com/${enc}`, ['this account doesn’t exist', 'esta conta não existe']) },
-        { id: 'twitch', nome: 'Twitch', url: `https://www.twitch.tv/${enc}`, check: () => checkViaProxy(`https://www.twitch.tv/${enc}`, ['unless you’ve got a time machine']) },
-        { id: 'youtube', nome: 'YouTube', url: `https://www.youtube.com/@${enc}`, check: () => checkViaProxy(`https://www.youtube.com/@${enc}`, ["this page isn't available"]) },
-        { id: 'facebook', nome: 'Facebook', url: q(`site:facebook.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Busca Google' }) }
-      ]
-    },
-    {
-      titulo: 'Sites Adultos',
-      icone: 'visibility_off',
-      dorkGeral: q(`"${alvo}" (site:onlyfans.com OR site:privacy.com.br OR site:fansly.com OR site:pornhub.com OR site:xvideos.com OR site:chaturbate.com OR site:fatalmodel.com)`),
-      itens: [
-        { id: 'onlyfans', nome: 'OnlyFans', url: `https://onlyfans.com/${enc}`, check: () => checkViaProxy(`https://onlyfans.com/${enc}`, ['sorry this page is not available']) },
-        { id: 'privacy', nome: 'Privacy', url: `https://privacy.com.br/profile/${enc}`, check: () => checkViaProxy(`https://privacy.com.br/profile/${enc}`, ['não encontrado', '404']) },
-        { id: 'fansly', nome: 'Fansly', url: `https://fansly.com/${enc}`, check: () => checkViaProxy(`https://fansly.com/${enc}`, ['page not found']) },
-        { id: 'chaturbate', nome: 'Chaturbate', url: `https://chaturbate.com/${enc}/`, check: () => checkViaProxy(`https://chaturbate.com/${enc}/`, ['page not found']) },
-        { id: 'pornhub', nome: 'Pornhub', url: `https://www.pornhub.com/users/${enc}`, check: () => checkViaProxy(`https://www.pornhub.com/users/${enc}`, ['error 404', 'page not found']) },
-        { id: 'xvideos', nome: 'XVideos', url: `https://www.xvideos.com/profiles/${enc}`, check: () => checkViaProxy(`https://www.xvideos.com/profiles/${enc}`, ['404', 'not found']) },
-        { id: 'fatalmodel', nome: 'Fatal Model', url: q(`site:fatalmodel.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Busca Google' }) }
-      ]
-    },
-    {
-      titulo: 'Sites de Namoro',
-      icone: 'favorite',
-      dorkGeral: q(`"${alvo}" (site:tinder.com OR site:bumble.com OR site:badoo.com OR site:happn.com OR site:okcupid.com OR site:pof.com OR site:grindr.com)`),
-      itens: [
-        { id: 'tinder', nome: 'Tinder', url: q(`site:tinder.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) },
-        { id: 'badoo', nome: 'Badoo', url: q(`site:badoo.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) },
-        { id: 'bumble', nome: 'Bumble', url: q(`site:bumble.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) },
-        { id: 'happn', nome: 'Happn', url: q(`site:happn.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) },
-        { id: 'okcupid', nome: 'OkCupid', url: q(`site:okcupid.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) },
-        { id: 'grindr', nome: 'Grindr', url: q(`site:grindr.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) }
-      ]
-    },
-    {
-      titulo: 'Sites de Aposta',
-      icone: 'casino',
-      dorkGeral: q(`"${alvo}" (site:betano.com OR site:bet365.com OR site:blaze.com OR site:stake.com OR site:pixbet.com OR site:estrelabet.com OR site:superbet.com OR site:sportingbet.com)`),
-      itens: [
-        { id: 'betano', nome: 'Betano', url: q(`site:betano.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) },
-        { id: 'bet365', nome: 'Bet365', url: q(`site:bet365.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) },
-        { id: 'blaze', nome: 'Blaze', url: q(`site:blaze.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) },
-        { id: 'stake', nome: 'Stake', url: q(`site:stake.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) },
-        { id: 'pixbet', nome: 'Pixbet', url: q(`site:pixbet.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) },
-        { id: 'superbet', nome: 'Superbet', url: q(`site:superbet.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) }
-      ]
-    }
-  ];
-}
-
-const MODULES = [
-  {
-    id: 'atpv',
-    name: 'Puxar ATPV-e (DETRAN-MG)',
-    desc: 'Consulta e 2ª via de ATPV-e existente',
-    icon: 'directions_car',
-    customView: 'atpv'
-  },
-  {
-    id: 'username',
-    name: 'Varredura OSINT (Web)',
-    desc: 'Redes Sociais, Adultos, Namoro e Apostas',
-    icon: 'travel_explore',
-    placeholder: 'Ex: torvalds ou nome',
-    max: 60,
-    digits: false,
-    progressive: true
-  },
-  {
-    id: 'cpf',
-    name: 'CPF',
-    desc: 'CPFHub.io + Validação Local',
-    icon: 'fingerprint',
-    placeholder: 'Apenas números (11 dígitos)',
-    max: 14,
-    digits: true,
-    fetchApi: async (v) => {
-      const cpf = v.replace(/\D/g, '');
-      if (cpf.length !== 11) throw new Error('Informe um CPF com 11 dígitos.');
-
-      return await tryFallback([
-        async () => {
-          const raw = await fetchJson(`https://api.cpfhub.io/cpf/${cpf}`, {
-            headers: { 'x-api-key': CONFIG.cpfKey, 'Accept': 'application/json' }
-          });
-          const info = raw.data || raw.result || raw;
-          if (!info || typeof info !== 'object') throw new Error('Resposta inválida da CPFHub.io');
-          const resumo = {};
-          for (const [k, val] of Object.entries(info)) {
-            if (val !== null && val !== '' && typeof val !== 'object') {
-              resumo[k] = val === true ? 'Sim' : val === false ? 'Não' : val;
+    return [
+      {
+        titulo: 'Redes Sociais',
+        icone: 'groups',
+        dorkGeral: q(`"${alvo}" (site:instagram.com OR site:tiktok.com OR site:x.com OR site:facebook.com OR site:linkedin.com OR site:threads.net OR site:reddit.com)`),
+        itens: [
+          {
+            id: 'github', nome: 'GitHub', url: `https://github.com/${enc}`,
+            check: async () => {
+              try {
+                const r = await fetch(`https://api.github.com/users/${enc}`);
+                if (r.status === 404) return { status: 'notfound', label: 'Não encontrado' };
+                if (r.ok) { const d = await r.json(); return { status: 'found', label: 'Encontrado', info: `${d.public_repos} repos` }; }
+              } catch {}
+              return { status: 'manual', label: 'Verificar' };
             }
-          }
-          return { resumo, raw };
-        },
-        async () => {
-          const isRepeated = /^(\d)\1{10}$/.test(cpf);
-          const calcDigit = (slice) => {
-            let sum = 0;
-            for (let i = 0; i < slice.length; i++) sum += Number(slice[i]) * (slice.length + 1 - i);
-            const mod = (sum * 10) % 11;
-            return mod === 10 ? 0 : mod;
-          };
-          const isValid = !isRepeated && calcDigit(cpf.slice(0, 9)) === Number(cpf[9]) && calcDigit(cpf.slice(0, 10)) === Number(cpf[10]);
-          const regioes = {
-            '0': 'RS', '1': 'DF, GO, MS, MT, TO', '2': 'AC, AM, AP, PA, RO, RR',
-            '3': 'CE, MA, PI', '4': 'AL, PB, PE, RN', '5': 'BA, SE',
-            '6': 'MG', '7': 'ES, RJ', '8': 'SP', '9': 'PR, SC'
-          };
-          return {
-            resumo: {
-              cpf: cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'),
-              status_api: 'CPFHub.io indisponível (fallback local)',
-              valido: isValid ? 'Sim (Dígitos válidos)' : 'Não (Dígitos inválidos)',
-              regiao_fiscal: isValid ? regioes[cpf[8]] : '-'
-            },
-            raw: { cpf, valid: isValid, regiao_fiscal: regioes[cpf[8]] }
-          };
-        }
-      ]);
-    }
-  },
-  {
-    id: 'cnpj',
-    name: 'CNPJ',
-    desc: 'BrasilAPI / MinhaReceita / CNPJ.ws',
-    icon: 'domain',
-    placeholder: 'Ex: 00000000000191',
-    max: 18,
-    digits: true,
-    fetchApi: async (v) => {
-      const clean = v.replace(/\D/g, '');
-      if (clean.length !== 14) throw new Error('Informe um CNPJ válido com 14 dígitos.');
-      const data = await tryFallback([
-        () => fetchJson(`https://brasilapi.com.br/api/cnpj/v1/${clean}`),
-        () => fetchJson(`https://minhareceita.org/${clean}`),
-        () => fetchJson(`https://publica.cnpj.ws/cnpj/${clean}`)
-      ]);
-      const socios = (data.qsa || data.socios || []).map(s => ({
-        nome: s.nome_socio || s.nome || 'Não informado',
-        qualificacao: s.qualificacao_socio || s.qualificacao?.descricao || '-'
-      }));
-      return {
-        resumo: {
-          cnpj: data.cnpj || clean,
-          razao_social: data.razao_social,
-          nome_fantasia: data.nome_fantasia || data.estabelecimento?.nome_fantasia || '-',
-          situacao: data.descricao_situacao_cadastral || data.estabelecimento?.situacao_cadastral || '-',
-          data_abertura: data.data_inicio_atividade || data.estabelecimento?.data_inicio_atividade || '-',
-          cnae_principal: data.cnae_fiscal_descricao || data.estabelecimento?.atividade_principal?.descricao || '-',
-          capital_social: data.capital_social != null ? `R$ ${Number(data.capital_social).toLocaleString('pt-BR')}` : '-',
-          municipio_uf: `${data.municipio || data.estabelecimento?.cidade?.nome || '-'} / ${data.uf || data.estabelecimento?.estado?.sigla || '-'}`,
-          logradouro: `${data.logradouro || data.estabelecimento?.logradouro || ''}, ${data.numero || data.estabelecimento?.numero || 'S/N'}`,
-          cep: data.cep || data.estabelecimento?.cep || '-'
-        },
-        listas: socios.length ? [{ titulo: 'Quadro Societário (QSA)', itens: socios.map(s => `${s.nome} — ${s.qualificacao}`) }] : [],
-        raw: data
-      };
-    }
-  },
-  {
-    id: 'breach',
-    name: 'Vazamentos (E-mail)',
-    desc: 'XposedOrNot API',
-    icon: 'security',
-    placeholder: 'Ex: teste@exemplo.com',
-    max: 80,
-    digits: false,
-    fetchApi: async (v) => {
-      const email = v.trim();
-      if (!email.includes('@')) throw new Error('Informe um e-mail válido.');
-      const r = await fetch(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
-      if (r.status === 404) {
-        return { resumo: { email, status: 'Nenhum vazamento encontrado', base: 'XposedOrNot' }, raw: { email, breaches: [] } };
+          },
+          {
+            id: 'gitlab', nome: 'GitLab', url: `https://gitlab.com/${enc}`,
+            check: async () => {
+              try {
+                const arr = await fetchJson(`https://gitlab.com/api/v4/users?username=${enc}`);
+                return arr.length ? { status: 'found', label: 'Encontrado' } : { status: 'notfound', label: 'Não encontrado' };
+              } catch { return { status: 'manual', label: 'Verificar' }; }
+            }
+          },
+          {
+            id: 'devto', nome: 'Dev.to', url: `https://dev.to/${enc}`,
+            check: async () => {
+              try {
+                const r = await fetch(`https://dev.to/api/users/by_username?url=${enc}`);
+                if (r.status === 404) return { status: 'notfound', label: 'Não encontrado' };
+                if (r.ok) return { status: 'found', label: 'Encontrado' };
+              } catch {}
+              return { status: 'manual', label: 'Verificar' };
+            }
+          },
+          {
+            id: 'reddit', nome: 'Reddit', url: `https://www.reddit.com/user/${enc}`,
+            check: async () => {
+              try {
+                const r = await fetch(`https://www.reddit.com/user/${enc}/about.json`);
+                if (r.status === 404) return { status: 'notfound', label: 'Não encontrado' };
+                if (r.ok) return { status: 'found', label: 'Encontrado' };
+              } catch {}
+              return await checkViaProxy(`https://www.reddit.com/user/${enc}`, ['page not found', 'nobody on reddit goes by that name']);
+            }
+          },
+          { id: 'instagram', nome: 'Instagram', url: `https://www.instagram.com/${enc}/`, check: () => checkViaProxy(`https://www.instagram.com/${enc}/`, ["page isn't available", 'página não está disponível']) },
+          { id: 'tiktok', nome: 'TikTok', url: `https://www.tiktok.com/@${enc}`, check: () => checkViaProxy(`https://www.tiktok.com/@${enc}`, ["couldn't find this account", 'não foi possível encontrar']) },
+          { id: 'x', nome: 'X (Twitter)', url: `https://x.com/${enc}`, check: () => checkViaProxy(`https://x.com/${enc}`, ['this account doesn’t exist', 'esta conta não existe']) },
+          { id: 'twitch', nome: 'Twitch', url: `https://www.twitch.tv/${enc}`, check: () => checkViaProxy(`https://www.twitch.tv/${enc}`, ['unless you’ve got a time machine']) },
+          { id: 'youtube', nome: 'YouTube', url: `https://www.youtube.com/@${enc}`, check: () => checkViaProxy(`https://www.youtube.com/@${enc}`, ["this page isn't available"]) },
+          { id: 'facebook', nome: 'Facebook', url: q(`site:facebook.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Busca Google' }) }
+        ]
+      },
+      {
+        titulo: 'Sites Adultos',
+        icone: 'visibility_off',
+        dorkGeral: q(`"${alvo}" (site:onlyfans.com OR site:privacy.com.br OR site:fansly.com OR site:pornhub.com OR site:xvideos.com OR site:chaturbate.com OR site:fatalmodel.com)`),
+        itens: [
+          { id: 'onlyfans', nome: 'OnlyFans', url: `https://onlyfans.com/${enc}`, check: () => checkViaProxy(`https://onlyfans.com/${enc}`, ['sorry this page is not available']) },
+          { id: 'privacy', nome: 'Privacy', url: `https://privacy.com.br/profile/${enc}`, check: () => checkViaProxy(`https://privacy.com.br/profile/${enc}`, ['não encontrado', '404']) },
+          { id: 'fansly', nome: 'Fansly', url: `https://fansly.com/${enc}`, check: () => checkViaProxy(`https://fansly.com/${enc}`, ['page not found']) },
+          { id: 'chaturbate', nome: 'Chaturbate', url: `https://chaturbate.com/${enc}/`, check: () => checkViaProxy(`https://chaturbate.com/${enc}/`, ['page not found']) },
+          { id: 'pornhub', nome: 'Pornhub', url: `https://www.pornhub.com/users/${enc}`, check: () => checkViaProxy(`https://www.pornhub.com/users/${enc}`, ['error 404', 'page not found']) },
+          { id: 'xvideos', nome: 'XVideos', url: `https://www.xvideos.com/profiles/${enc}`, check: () => checkViaProxy(`https://www.xvideos.com/profiles/${enc}`, ['404', 'not found']) },
+          { id: 'fatalmodel', nome: 'Fatal Model', url: q(`site:fatalmodel.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Busca Google' }) }
+        ]
+      },
+      {
+        titulo: 'Sites de Namoro',
+        icone: 'favorite',
+        dorkGeral: q(`"${alvo}" (site:tinder.com OR site:bumble.com OR site:badoo.com OR site:happn.com OR site:okcupid.com OR site:pof.com OR site:grindr.com)`),
+        itens: [
+          { id: 'tinder', nome: 'Tinder', url: q(`site:tinder.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) },
+          { id: 'badoo', nome: 'Badoo', url: q(`site:badoo.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) },
+          { id: 'bumble', nome: 'Bumble', url: q(`site:bumble.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) },
+          { id: 'happn', nome: 'Happn', url: q(`site:happn.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) },
+          { id: 'okcupid', nome: 'OkCupid', url: q(`site:okcupid.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) },
+          { id: 'grindr', nome: 'Grindr', url: q(`site:grindr.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) }
+        ]
+      },
+      {
+        titulo: 'Sites de Aposta',
+        icone: 'casino',
+        dorkGeral: q(`"${alvo}" (site:betano.com OR site:bet365.com OR site:blaze.com OR site:stake.com OR site:pixbet.com OR site:estrelabet.com OR site:superbet.com OR site:sportingbet.com)`),
+        itens: [
+          { id: 'betano', nome: 'Betano', url: q(`site:betano.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) },
+          { id: 'bet365', nome: 'Bet365', url: q(`site:bet365.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) },
+          { id: 'blaze', nome: 'Blaze', url: q(`site:blaze.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) },
+          { id: 'stake', nome: 'Stake', url: q(`site:stake.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) },
+          { id: 'pixbet', nome: 'Pixbet', url: q(`site:pixbet.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) },
+          { id: 'superbet', nome: 'Superbet', url: q(`site:superbet.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) }
+        ]
       }
-      if (!r.ok) throw new Error(`Erro na API XposedOrNot (HTTP ${r.status}).`);
-      const data = await r.json();
-      const breaches = Array.isArray(data.breaches?.[0]) ? data.breaches[0] : (data.breaches || []);
-      return {
-        resumo: { email, status: breaches.length ? 'Exposto em vazamentos' : 'Seguro', total_vazamentos: breaches.length },
-        listas: breaches.length ? [{ titulo: 'Bases onde o e-mail apareceu', itens: breaches }] : [],
-        raw: data
-      };
-    }
-  },
-  {
-    id: 'cep',
-    name: 'CEP / Endereço',
-    desc: 'BrasilAPI v2 / ViaCEP',
-    icon: 'markunread_mailbox',
-    placeholder: 'Ex: 30140071',
-    max: 9,
-    digits: true,
-    fetchApi: async (v) => {
-      const clean = v.replace(/\D/g, '');
-      if (clean.length !== 8) throw new Error('Informe um CEP com 8 dígitos.');
-      const data = await tryFallback([
-        () => fetchJson(`https://brasilapi.com.br/api/cep/v2/${clean}`),
-        async () => { const r = await fetchJson(`https://viacep.com.br/ws/${clean}/json/`); if (r.erro) throw new Error('CEP não encontrado.'); return r; }
-      ]);
-      return {
-        resumo: {
-          cep: data.cep || clean,
-          logradouro: data.street || data.logradouro || '-',
-          bairro: data.neighborhood || data.bairro || '-',
-          cidade: data.city || data.localidade || '-',
-          uf: data.state || data.uf || '-',
-          latitude: data.location?.coordinates?.latitude || '-',
-          longitude: data.location?.coordinates?.longitude || '-'
-        },
-        raw: data
-      };
-    }
-  },
-  {
-    id: 'ip',
-    name: 'IP / Geolocalização',
-    desc: 'ipwho.is / ipapi.co',
-    icon: 'router',
-    placeholder: 'Ex: 8.8.8.8 (ou vazio)',
-    max: 45,
-    digits: false,
-    optional: true,
-    fetchApi: async (v) => {
-      const target = v.trim();
-      const data = await tryFallback([
-        async () => { const r = await fetchJson(`https://ipwho.is/${encodeURIComponent(target)}`); if (r.success === false) throw new Error(r.message || 'IP inválido'); return r; },
-        () => fetchJson(target ? `https://ipapi.co/${encodeURIComponent(target)}/json/` : 'https://ipapi.co/json/')
-      ]);
-      return {
-        resumo: {
-          ip: data.ip, tipo: data.type || data.version || '-',
-          pais: `${data.country || data.country_name || '-'} (${data.country_code || '-'})`,
-          regiao: data.region || '-', cidade: data.city || '-',
-          isp: data.connection?.isp || data.org || '-', asn: data.connection?.asn || data.asn || '-',
-          latitude: data.latitude, longitude: data.longitude, fuso_horario: data.timezone?.id || data.timezone || '-'
-        },
-        raw: data
-      };
-    }
-  },
-  {
-    id: 'domain',
-    name: 'Domínio (DNS + RDAP)',
-    desc: 'Google DoH + Registro.br / RDAP',
-    icon: 'language',
-    placeholder: 'Ex: exemplo.com.br',
-    max: 80,
-    digits: false,
-    fetchApi: async (v) => {
-      const domain = v.trim().toLowerCase().replace(/^https?:\/\//, '').split('/')[0];
-      if (!domain || !domain.includes('.')) throw new Error('Informe um domínio válido (ex: site.com.br).');
-      const [dnsA, dnsMX, dnsNS, dnsTXT, rdap] = await Promise.all([
-        fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=A`).catch(() => null),
-        fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=MX`).catch(() => null),
-        fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=NS`).catch(() => null),
-        fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=TXT`).catch(() => null),
-        fetchJson(domain.endsWith('.br') ? `https://rdap.registro.br/domain/${encodeURIComponent(domain)}` : `https://rdap.org/domain/${encodeURIComponent(domain)}`).catch(() => null)
-      ]);
-      const extractDns = (res) => (res?.Answer || []).map(a => a.data);
-      const events = (rdap?.events || []).reduce((acc, ev) => { acc[ev.eventAction] = ev.eventDate?.split('T')[0]; return acc; }, {});
-      return {
-        resumo: {
-          dominio: domain,
-          status_rdap: (rdap?.status || []).join(', ') || 'Não retornado',
-          registro: events.registration || '-', expiracao: events.expiration || '-', ultima_alteracao: events['last changed'] || '-'
-        },
-        listas: [
-          { titulo: 'Registros A (IPv4)', itens: extractDns(dnsA) },
-          { titulo: 'Servidores de E-mail (MX)', itens: extractDns(dnsMX) },
-          { titulo: 'Nameservers (NS)', itens: extractDns(dnsNS) },
-          { titulo: 'Registros TXT', itens: extractDns(dnsTXT) }
-        ].filter(l => l.itens.length > 0),
-        raw: { dnsA, dnsMX, dnsNS, dnsTXT, rdap }
-      };
-    }
-  },
-  {
-    id: 'ddd',
-    name: 'DDD (Brasil)',
-    desc: 'BrasilAPI — Estado e Cidades',
-    icon: 'call',
-    placeholder: 'Ex: 31',
-    max: 2,
-    digits: true,
-    fetchApi: async (v) => {
-      const ddd = v.replace(/\D/g, '');
-      if (ddd.length !== 2) throw new Error('Informe um DDD com 2 dígitos.');
-      const data = await fetchJson(`https://brasilapi.com.br/api/ddd/v1/${ddd}`);
-      return {
-        resumo: { ddd, estado: data.state, total_cidades: data.cities?.length || 0 },
-        listas: [{ titulo: 'Municípios atendidos', itens: data.cities || [] }],
-        raw: data
-      };
-    }
+    ];
   }
-];
 
-function navigate(id) {
-  window.location.hash = id ? '#' + id : '';
-}
+  // ==========================================
+  // 4. MÓDULOS
+  // ==========================================
+  const MODULES = [
+    {
+      id: 'p2p',
+      name: 'Criptografia P2P (KIIK)',
+      desc: 'ECDH P-256 + AES-256-GCM + Assinatura',
+      icon: 'enhanced_encryption',
+      customView: 'p2p'
+    },
+    {
+      id: 'atpv',
+      name: 'Central Veicular (MG / BH)',
+      desc: 'DETRAN-MG, ATPV-e, SENATRAN e Multas PBH',
+      icon: 'directions_car',
+      customView: 'atpv'
+    },
+    {
+      id: 'username',
+      name: 'Varredura OSINT (Web)',
+      desc: 'Redes Sociais, Adultos, Namoro e Apostas',
+      icon: 'travel_explore',
+      placeholder: 'Ex: torvalds ou nome',
+      max: 60,
+      digits: false,
+      progressive: true
+    },
+    {
+      id: 'scraping',
+      name: 'Web Scraping (OSINT)',
+      desc: 'Extrai metadados, e-mails, telefones e links',
+      icon: 'code',
+      placeholder: 'Ex: https://exemplo.com.br',
+      max: 150,
+      digits: false,
+      fetchApi: async (v) => {
+        let target = v.trim();
+        if (!target) throw new Error('Informe uma URL pública.');
+        if (!/^https?:\/\//i.test(target)) target = 'https://' + target;
+        let parsedUrl;
+        try { parsedUrl = new URL(target); } catch { throw new Error('URL inválida.'); }
 
-function renderAtpvView(view) {
-  const history = getHistory('atpv');
-  const historyHtml = history.length ? `
-    <div class="mt-5 pt-4 border-t border-[var(--glass-border)]">
-      <span class="text-[11px] uppercase tracking-wider text-[var(--text-muted)] font-semibold block mb-2">Placas Recentes</span>
-      <div class="flex flex-wrap gap-2">
-        ${history.map(h => `
-          <button type="button" class="btn-ghost text-xs py-1 px-2.5" onclick="document.getElementById('atpvPlaca').value='${escapeHtml(h.query)}'">
-            ${escapeHtml(h.query)}
-          </button>
-        `).join('')}
-      </div>
-    </div>
-  ` : '';
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(parsedUrl.href)}`;
+        const res = await fetchJson(proxyUrl, {}, 12000);
+        const html = res?.contents;
+        if (!html) throw new Error('Não foi possível ler o HTML público.');
 
-  view.innerHTML = `
-    <button onclick="navigate('')" class="liquid-glass interactive inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6">
-      <span class="material-symbols-rounded text-lg">arrow_back</span> Voltar
-    </button>
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-      <div class="lg:col-span-5 liquid-glass p-6">
-        <div class="flex items-center gap-3 mb-5">
-          <div class="w-12 h-12 rounded-2xl bg-[var(--accent-glow)] flex items-center justify-center border border-[var(--accent)]/30">
-            <span class="material-symbols-rounded text-2xl text-[var(--accent)]">directions_car</span>
-          </div>
-          <div>
-            <h2 class="text-lg font-bold leading-tight">Puxar ATPV-e (DETRAN-MG)</h2>
-            <p class="text-xs text-[var(--text-muted)]">Dados rápidos para baixar ATPV-e já emitida</p>
-          </div>
-        </div>
-        <form id="atpvForm" onsubmit="handleAtpvPrepare(event)">
-          <div class="input-group">
-            <input type="text" id="atpvPlaca" class="input-glass uppercase" placeholder=" " maxlength="7" required autocomplete="off">
-            <label for="atpvPlaca" class="input-label">Placa (Ex: ABC1D23)</label>
-          </div>
-          <div class="input-group">
-            <input type="text" id="atpvRenavam" class="input-glass" placeholder=" " maxlength="11" required autocomplete="off">
-            <label for="atpvRenavam" class="input-label">RENAVAM (11 dígitos)</label>
-          </div>
-          <div class="input-group">
-            <input type="text" id="atpvDoc" class="input-glass" placeholder=" " maxlength="18" required autocomplete="off">
-            <label for="atpvDoc" class="input-label">CPF / CNPJ do Proprietário</label>
-          </div>
-          <div class="input-group">
-            <input type="text" id="atpvCrv" class="input-glass" placeholder=" " maxlength="20" autocomplete="off">
-            <label for="atpvCrv" class="input-label">Nº do CRV / Código Segurança (opcional)</label>
-          </div>
-          <button type="submit" class="btn-primary w-full">
-            <span class="material-symbols-rounded text-lg">content_paste_go</span> Preparar e Abrir DETRAN-MG
-          </button>
-        </form>
-        ${historyHtml}
-      </div>
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const textContent = doc.body?.innerText || doc.body?.textContent || '';
 
-      <div class="lg:col-span-7 space-y-4">
-        <div id="atpvResult" class="liquid-glass p-6">
-          <div class="flex items-center gap-2 mb-3">
-            <span class="material-symbols-rounded text-[var(--accent)]">description</span>
-            <h3 class="font-bold text-base">Consulta de ATPV-e Existente</h3>
-          </div>
-          <p class="text-sm text-[var(--text-muted)] mb-5">
-            Como o DETRAN-MG possui validação anti-robô (CAPTCHA/Gov.br), o painel organiza <strong>Placa, RENAVAM e CPF/CNPJ</strong> com cópia em 1 clique para você colar direto na tela oficial e baixar o PDF.
-          </p>
-          <a href="${CONFIG.detranAtpvUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary">
-            <span class="material-symbols-rounded text-lg">open_in_new</span> Ir Direto para o DETRAN-MG
-          </a>
-        </div>
-      </div>
-    </div>
-  `;
-}
+        const title = doc.querySelector('title')?.textContent?.trim() || '-';
+        const description =
+          doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim() ||
+          doc.querySelector('meta[property="og:description"]')?.getAttribute('content')?.trim() || '-';
+        const generator = doc.querySelector('meta[name="generator"]')?.getAttribute('content')?.trim() || '-';
+        const lang = doc.documentElement?.getAttribute('lang') || '-';
 
-function handleAtpvPrepare(e) {
-  e.preventDefault();
-  const placa = document.getElementById('atpvPlaca').value.trim().toUpperCase();
-  const renavam = document.getElementById('atpvRenavam').value.replace(/\D/g, '');
-  const doc = document.getElementById('atpvDoc').value.replace(/\D/g, '');
-  const crv = document.getElementById('atpvCrv').value.trim();
+        const emails = [...new Set(
+          (html.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || [])
+            .filter(e => !/\.(png|jpg|jpeg|gif|svg|webp|css|js)$/i.test(e))
+        )].slice(0, 30);
 
-  const dados = { placa, renavam, cpf_cnpj: doc, crv_codigo: crv || '-' };
-  lastResultData = dados;
-  saveHistory('atpv', placa);
+        const telefones = [...new Set(
+          (textContent.match(/(?:\+55\s?)?(?:\(?\d{2}\)?\s?)(?:9\d{4}|\d{4})-?\d{4}/g) || []).map(t => t.trim())
+        )].slice(0, 20);
 
-  const campos = [
-    { label: 'Placa', val: placa },
-    { label: 'RENAVAM', val: renavam },
-    { label: 'CPF / CNPJ', val: doc },
-    ...(crv ? [{ label: 'CRV / Cód. Segurança', val: crv }] : [])
+        const allLinks = [...doc.querySelectorAll('a[href]')]
+          .map(a => a.getAttribute('href')?.trim())
+          .filter(h => h && /^https?:\/\//i.test(h));
+
+        const uniqueLinks = [...new Set(allLinks)];
+        const socialRegex = /(instagram\.com|facebook\.com|linkedin\.com|x\.com|twitter\.com|youtube\.com|tiktok\.com|wa\.me|whatsapp\.com|t\.me|github\.com)/i;
+        const redesSociais = uniqueLinks.filter(l => socialRegex.test(l)).slice(0, 20);
+        const linksExternos = uniqueLinks.filter(l => !l.includes(parsedUrl.hostname) && !socialRegex.test(l)).slice(0, 25);
+        const headings = [...doc.querySelectorAll('h1, h2')].map(h => h.textContent.replace(/\s+/g, ' ').trim()).filter(Boolean).slice(0, 15);
+
+        return {
+          resumo: {
+            url: parsedUrl.href, titulo: title, descricao: description, idioma: lang,
+            tecnologia: generator, total_links: uniqueLinks.length,
+            total_imagens: doc.querySelectorAll('img').length, emails_encontrados: emails.length
+          },
+          listas: [
+            { titulo: 'E-mails Públicos', itens: emails },
+            { titulo: 'Telefones Encontrados', itens: telefones },
+            { titulo: 'Redes Sociais / Contato', itens: redesSociais },
+            { titulo: 'Títulos da Página (H1 / H2)', itens: headings },
+            { titulo: 'Links Externos', itens: linksExternos }
+          ].filter(l => l.itens.length > 0),
+          raw: { url: parsedUrl.href, title, description, emails, telefones, redesSociais, headings, linksExternos }
+        };
+      }
+    },
+    {
+      id: 'cpf',
+      name: 'CPF',
+      desc: 'CPFHub.io + Validação Local',
+      icon: 'fingerprint',
+      placeholder: 'Apenas números (11 dígitos)',
+      max: 14,
+      digits: true,
+      fetchApi: async (v) => {
+        const cpf = v.replace(/\D/g, '');
+        if (cpf.length !== 11) throw new Error('Informe um CPF com 11 dígitos.');
+        return await tryFallback([
+          async () => {
+            const raw = await fetchJson(`https://api.cpfhub.io/cpf/${cpf}`, {
+              headers: { 'x-api-key': getCpfKey(), 'Accept': 'application/json' }
+            });
+            const info = raw.data || raw.result || raw;
+            if (!info || typeof info !== 'object') throw new Error('Resposta inválida');
+            const resumo = {};
+            for (const [k, val] of Object.entries(info)) {
+              if (val !== null && val !== '' && typeof val !== 'object') {
+                resumo[k] = val === true ? 'Sim' : val === false ? 'Não' : val;
+              }
+            }
+            return { resumo, raw };
+          },
+          async () => {
+            const isRepeated = /^(\d)\1{10}$/.test(cpf);
+            const calcDigit = (slice) => {
+              let sum = 0;
+              for (let i = 0; i < slice.length; i++) sum += Number(slice[i]) * (slice.length + 1 - i);
+              const mod = (sum * 10) % 11;
+              return mod === 10 ? 0 : mod;
+            };
+            const isValid = !isRepeated && calcDigit(cpf.slice(0, 9)) === Number(cpf[9]) && calcDigit(cpf.slice(0, 10)) === Number(cpf[10]);
+            const regioes = {
+              '0': 'RS', '1': 'DF, GO, MS, MT, TO', '2': 'AC, AM, AP, PA, RO, RR',
+              '3': 'CE, MA, PI', '4': 'AL, PB, PE, RN', '5': 'BA, SE',
+              '6': 'MG', '7': 'ES, RJ', '8': 'SP', '9': 'PR, SC'
+            };
+            return {
+              resumo: {
+                cpf: cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'),
+                status_api: 'CPFHub.io indisponível (fallback local)',
+                valido: isValid ? 'Sim (Dígitos válidos)' : 'Não (Dígitos inválidos)',
+                regiao_fiscal: isValid ? regioes[cpf[8]] : '-'
+              },
+              raw: { cpf, valid: isValid, regiao_fiscal: regioes[cpf[8]] }
+            };
+          }
+        ]);
+      }
+    },
+    {
+      id: 'cnpj',
+      name: 'CNPJ',
+      desc: 'BrasilAPI / MinhaReceita / CNPJ.ws',
+      icon: 'domain',
+      placeholder: 'Ex: 00000000000191',
+      max: 18,
+      digits: true,
+      fetchApi: async (v) => {
+        const clean = v.replace(/\D/g, '');
+        if (clean.length !== 14) throw new Error('Informe um CNPJ válido com 14 dígitos.');
+        const data = await tryFallback([
+          () => fetchJson(`https://brasilapi.com.br/api/cnpj/v1/${clean}`),
+          () => fetchJson(`https://minhareceita.org/${clean}`),
+          () => fetchJson(`https://publica.cnpj.ws/cnpj/${clean}`)
+        ]);
+        const socios = (data.qsa || data.socios || []).map(s => ({
+          nome: s.nome_socio || s.nome || 'Não informado',
+          qualificacao: s.qualificacao_socio || s.qualificacao?.descricao || '-'
+        }));
+        return {
+          resumo: {
+            cnpj: data.cnpj || clean,
+            razao_social: data.razao_social,
+            nome_fantasia: data.nome_fantasia || data.estabelecimento?.nome_fantasia || '-',
+            situacao: data.descricao_situacao_cadastral || data.estabelecimento?.situacao_cadastral || '-',
+            data_abertura: data.data_inicio_atividade || data.estabelecimento?.data_inicio_atividade || '-',
+            cnae_principal: data.cnae_fiscal_descricao || data.estabelecimento?.atividade_principal?.descricao || '-',
+            capital_social: data.capital_social != null ? `R$ ${Number(data.capital_social).toLocaleString('pt-BR')}` : '-',
+            municipio_uf: `${data.municipio || data.estabelecimento?.cidade?.nome || '-'} / ${data.uf || data.estabelecimento?.estado?.sigla || '-'}`,
+            logradouro: `${data.logradouro || data.estabelecimento?.logradouro || ''}, ${data.numero || data.estabelecimento?.numero || 'S/N'}`,
+            cep: data.cep || data.estabelecimento?.cep || '-'
+          },
+          listas: socios.length ? [{ titulo: 'Quadro Societário (QSA)', itens: socios.map(s => `${s.nome} — ${s.qualificacao}`) }] : [],
+          raw: data
+        };
+      }
+    },
+    {
+      id: 'breach',
+      name: 'Vazamentos (E-mail)',
+      desc: 'XposedOrNot API',
+      icon: 'security',
+      placeholder: 'Ex: teste@exemplo.com',
+      max: 80,
+      digits: false,
+      fetchApi: async (v) => {
+        const email = v.trim();
+        if (!email.includes('@')) throw new Error('Informe um e-mail válido.');
+        const r = await fetch(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
+        if (r.status === 404) return { resumo: { email, status: 'Nenhum vazamento encontrado', base: 'XposedOrNot' }, raw: { email, breaches: [] } };
+        if (!r.ok) throw new Error(`Erro XposedOrNot (HTTP ${r.status}).`);
+        const data = await r.json();
+        const breaches = Array.isArray(data.breaches?.[0]) ? data.breaches[0] : (data.breaches || []);
+        return {
+          resumo: { email, status: breaches.length ? 'Exposto em vazamentos' : 'Seguro', total_vazamentos: breaches.length },
+          listas: breaches.length ? [{ titulo: 'Bases onde o e-mail apareceu', itens: breaches }] : [],
+          raw: data
+        };
+      }
+    },
+    {
+      id: 'cep',
+      name: 'CEP / Endereço',
+      desc: 'BrasilAPI v2 / ViaCEP',
+      icon: 'markunread_mailbox',
+      placeholder: 'Ex: 30140071',
+      max: 9,
+      digits: true,
+      fetchApi: async (v) => {
+        const clean = v.replace(/\D/g, '');
+        if (clean.length !== 8) throw new Error('Informe um CEP com 8 dígitos.');
+        const data = await tryFallback([
+          () => fetchJson(`https://brasilapi.com.br/api/cep/v2/${clean}`),
+          async () => { const r = await fetchJson(`https://viacep.com.br/ws/${clean}/json/`); if (r.erro) throw new Error('CEP não encontrado.'); return r; }
+        ]);
+        return {
+          resumo: {
+            cep: data.cep || clean, logradouro: data.street || data.logradouro || '-',
+            bairro: data.neighborhood || data.bairro || '-', cidade: data.city || data.localidade || '-',
+            uf: data.state || data.uf || '-',
+            latitude: data.location?.coordinates?.latitude || '-', longitude: data.location?.coordinates?.longitude || '-'
+          },
+          raw: data
+        };
+      }
+    },
+    {
+      id: 'ip',
+      name: 'IP / Geolocalização',
+      desc: 'ipwho.is / ipapi.co',
+      icon: 'router',
+      placeholder: 'Ex: 8.8.8.8 (ou vazio)',
+      max: 45,
+      digits: false,
+      optional: true,
+      fetchApi: async (v) => {
+        const target = v.trim();
+        const data = await tryFallback([
+          async () => { const r = await fetchJson(`https://ipwho.is/${encodeURIComponent(target)}`); if (r.success === false) throw new Error(r.message || 'IP inválido'); return r; },
+          () => fetchJson(target ? `https://ipapi.co/${encodeURIComponent(target)}/json/` : 'https://ipapi.co/json/')
+        ]);
+        return {
+          resumo: {
+            ip: data.ip, tipo: data.type || data.version || '-',
+            pais: `${data.country || data.country_name || '-'} (${data.country_code || '-'})`,
+            regiao: data.region || '-', cidade: data.city || '-',
+            isp: data.connection?.isp || data.org || '-', asn: data.connection?.asn || data.asn || '-',
+            latitude: data.latitude, longitude: data.longitude, fuso_horario: data.timezone?.id || data.timezone || '-'
+          },
+          raw: data
+        };
+      }
+    },
+    {
+      id: 'domain',
+      name: 'Domínio (DNS + RDAP)',
+      desc: 'Google DoH + Registro.br / RDAP',
+      icon: 'language',
+      placeholder: 'Ex: exemplo.com.br',
+      max: 80,
+      digits: false,
+      fetchApi: async (v) => {
+        const domain = v.trim().toLowerCase().replace(/^https?:\/\//, '').split('/')[0];
+        if (!domain || !domain.includes('.')) throw new Error('Informe um domínio válido.');
+        const [dnsA, dnsMX, dnsNS, dnsTXT, rdap] = await Promise.all([
+          fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=A`).catch(() => null),
+          fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=MX`).catch(() => null),
+          fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=NS`).catch(() => null),
+          fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=TXT`).catch(() => null),
+          fetchJson(domain.endsWith('.br') ? `https://rdap.registro.br/domain/${encodeURIComponent(domain)}` : `https://rdap.org/domain/${encodeURIComponent(domain)}`).catch(() => null)
+        ]);
+        const extractDns = (res) => (res?.Answer || []).map(a => a.data);
+        const events = (rdap?.events || []).reduce((acc, ev) => { acc[ev.eventAction] = ev.eventDate?.split('T')[0]; return acc; }, {});
+        return {
+          resumo: {
+            dominio: domain, status_rdap: (rdap?.status || []).join(', ') || 'Não retornado',
+            registro: events.registration || '-', expiracao: events.expiration || '-', ultima_alteracao: events['last changed'] || '-'
+          },
+          listas: [
+            { titulo: 'Registros A (IPv4)', itens: extractDns(dnsA) },
+            { titulo: 'Servidores de E-mail (MX)', itens: extractDns(dnsMX) },
+            { titulo: 'Nameservers (NS)', itens: extractDns(dnsNS) },
+            { titulo: 'Registros TXT', itens: extractDns(dnsTXT) }
+          ].filter(l => l.itens.length > 0),
+          raw: { dnsA, dnsMX, dnsNS, dnsTXT, rdap }
+        };
+      }
+    },
+    {
+      id: 'ddd',
+      name: 'DDD (Brasil)',
+      desc: 'BrasilAPI — Estado e Cidades',
+      icon: 'call',
+      placeholder: 'Ex: 31',
+      max: 2,
+      digits: true,
+      fetchApi: async (v) => {
+        const ddd = v.replace(/\D/g, '');
+        if (ddd.length !== 2) throw new Error('Informe um DDD com 2 dígitos.');
+        const data = await fetchJson(`https://brasilapi.com.br/api/ddd/v1/${ddd}`);
+        return {
+          resumo: { ddd, estado: data.state, total_cidades: data.cities?.length || 0 },
+          listas: [{ titulo: 'Municípios atendidos', itens: data.cities || [] }],
+          raw: data
+        };
+      }
+    }
   ];
 
-  const box = document.getElementById('atpvResult');
-  box.innerHTML = `
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-[var(--glass-border)]">
-      <div class="flex items-center gap-2">
-        <span class="material-symbols-rounded text-[var(--success)] text-2xl">check_circle</span>
-        <h3 class="font-bold text-lg">Pronto para Puxar ATPV-e (${escapeHtml(placa)})</h3>
-      </div>
-      <button type="button" class="btn-ghost" onclick="downloadJson('atpv-${escapeHtml(placa)}')">
-        <span class="material-symbols-rounded text-base">download</span> JSON
-      </button>
-    </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
-      ${campos.map(c => `
-        <div class="site-card">
-          <div class="flex flex-col min-w-0">
-            <span class="data-label">${escapeHtml(c.label)}</span>
-            <span class="data-value truncate">${escapeHtml(c.val)}</span>
-          </div>
-          <button type="button" class="btn-ghost text-xs py-1.5 px-2.5" onclick="copyText('${escapeHtml(c.val)}', this)">
-            <span class="material-symbols-rounded text-sm">content_copy</span> Copiar
-          </button>
-        </div>
-      `).join('')}
-    </div>
-    <a href="${CONFIG.detranAtpvUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary">
-      <span class="material-symbols-rounded text-lg">open_in_new</span> Abrir DETRAN-MG (Puxar ATPV-e)
-    </a>
-  `;
+  // ==========================================
+  // 5. VIEWS ESPECIAIS (P2P E CENTRAL VEICULAR)
+  // ==========================================
+  function navigate(id) {
+    window.location.hash = id ? '#' + id : '';
+  }
 
-  window.open(CONFIG.detranAtpvUrl, '_blank', 'noopener,noreferrer');
-}
-
-function render() {
-  const view = document.getElementById('view');
-  const hash = window.location.hash.replace('#', '');
-
-  if (!hash) {
-    const cards = MODULES.map(m => `
-      <div class="liquid-glass interactive p-6 text-center" onclick="navigate('${escapeHtml(m.id)}')">
-        <div class="w-14 h-14 mx-auto rounded-2xl bg-[var(--accent-glow)] flex items-center justify-center mb-4 border border-[var(--accent)]/30">
-          <span class="material-symbols-rounded text-3xl text-[var(--accent)]">${escapeHtml(m.icon)}</span>
-        </div>
-        <h3 class="text-lg font-bold mb-1">${escapeHtml(m.name)}</h3>
-        <p class="text-xs text-[var(--text-muted)]">${escapeHtml(m.desc)}</p>
-      </div>
-    `).join('');
-
+  async function renderP2pView(view) {
+    const myPub = await P2P.generateIdentity();
     view.innerHTML = `
-      <div class="text-center mb-10 mt-2">
-        <h1 class="text-3xl md:text-4xl font-bold mb-2">
-          Pegada <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent)] to-[#BF5AF2]">Digital</span>
-        </h1>
-        <p class="text-sm text-[var(--text-muted)]">Módulos OSINT com verificação em tempo real, CPFHub.io, APIs públicas e DETRAN-MG.</p>
+      <button data-nav="" class="liquid-glass interactive inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6">
+        <span class="material-symbols-rounded text-lg">arrow_back</span> Voltar
+      </button>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div class="lg:col-span-5 liquid-glass p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-12 h-12 rounded-2xl bg-[var(--accent-glow)] flex items-center justify-center border border-[var(--accent)]/30">
+              <span class="material-symbols-rounded text-2xl text-[var(--accent)]">enhanced_encryption</span>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold leading-tight">Criptografia P2P</h2>
+              <p class="text-xs text-[var(--text-muted)]">Assinatura: ${SIGNATURE_BRAND}</p>
+            </div>
+          </div>
+          <label class="data-label block">Sua Chave Pública P2P (ECDH P-256)</label>
+          <textarea id="myPubKey" rows="3" readonly class="input-glass text-xs font-mono mb-3 pt-3">${escapeHtml(myPub)}</textarea>
+          <button type="button" class="btn-ghost w-full justify-center mb-5" data-copy-el="myPubKey">
+            <span class="material-symbols-rounded text-sm">content_copy</span> Copiar Minha Chave Pública
+          </button>
+          <label class="data-label block">Chave Pública do Destinatário (Peer)</label>
+          <textarea id="peerPubKey" rows="3" class="input-glass text-xs font-mono pt-3" placeholder="Cole aqui a chave pública do outro peer (ou use a sua para teste local)"></textarea>
+        </div>
+
+        <div class="lg:col-span-7 liquid-glass p-6">
+          <h3 class="font-bold text-base mb-4 flex items-center gap-2">
+            <span class="material-symbols-rounded text-[var(--accent)]">vpn_key</span> Criptografar / Descriptografar Pacote
+          </h3>
+          <textarea id="p2pInput" rows="4" class="input-glass text-sm pt-3 mb-4" placeholder="Digite a mensagem/relatório ou cole um pacote criptografado..."></textarea>
+          <div class="flex flex-wrap gap-3 mb-5">
+            <button type="button" id="btnEncrypt" class="btn-primary">
+              <span class="material-symbols-rounded text-lg">lock</span> Criptografar + Assinar (${SIGNATURE_BRAND})
+            </button>
+            <button type="button" id="btnDecrypt" class="btn-ghost">
+              <span class="material-symbols-rounded text-base">lock_open</span> Descriptografar & Verificar
+            </button>
+          </div>
+          <label class="data-label block">Saída Criptográfica</label>
+          <textarea id="p2pOutput" rows="5" readonly class="input-glass text-xs font-mono pt-3 mb-3" placeholder="O resultado aparecerá aqui..."></textarea>
+          <div class="flex items-center justify-between gap-2">
+            <span id="p2pStatus" class="text-xs text-[var(--text-muted)]">Aguardando operação...</span>
+            <button type="button" class="btn-ghost text-xs" data-copy-el="p2pOutput">
+              <span class="material-symbols-rounded text-sm">content_copy</span> Copiar Saída
+            </button>
+          </div>
+        </div>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">${cards}</div>
     `;
-    return;
-  }
 
-  const m = MODULES.find(x => x.id === hash);
-  if (!m) return navigate('');
+    document.getElementById('btnEncrypt').addEventListener('click', async () => {
+      const status = document.getElementById('p2pStatus');
+      try {
+        const peer = document.getElementById('peerPubKey').value.trim() || myPub;
+        const msg = document.getElementById('p2pInput').value;
+        if (!msg) throw new Error('Digite um conteúdo para criptografar.');
+        const packet = await P2P.encryptPacket(msg, peer);
+        document.getElementById('p2pOutput').value = packet;
+        status.innerHTML = `<span class="text-[var(--success)] font-semibold">Criptografado (AES-256-GCM) e assinado por ${SIGNATURE_BRAND}.</span>`;
+      } catch (err) {
+        status.innerHTML = `<span class="text-[var(--danger)]">${escapeHtml(err.message)}</span>`;
+      }
+    });
 
-  if (m.customView === 'atpv') {
-    renderAtpvView(view);
-    return;
-  }
-
-  const history = getHistory(m.id);
-  const historyHtml = history.length ? `
-    <div class="mt-5 pt-4 border-t border-[var(--glass-border)]">
-      <span class="text-[11px] uppercase tracking-wider text-[var(--text-muted)] font-semibold block mb-2">Recentes</span>
-      <div class="flex flex-wrap gap-2">
-        ${history.map(h => `
-          <button type="button" class="btn-ghost text-xs py-1 px-2.5" onclick="fillAndSearch('${escapeHtml(h.query)}')">
-            ${escapeHtml(h.query)}
-          </button>
-        `).join('')}
-      </div>
-    </div>
-  ` : '';
-
-  view.innerHTML = `
-    <button onclick="navigate('')" class="liquid-glass interactive inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6">
-      <span class="material-symbols-rounded text-lg">arrow_back</span> Voltar
-    </button>
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-      <div class="lg:col-span-4 liquid-glass p-6">
-        <div class="text-center mb-6">
-          <div class="w-14 h-14 rounded-2xl bg-[var(--accent-glow)] flex items-center justify-center mx-auto mb-3 border border-[var(--accent)]/30">
-            <span class="material-symbols-rounded text-3xl text-[var(--accent)]">${escapeHtml(m.icon)}</span>
-          </div>
-          <h2 class="text-xl font-bold mb-1">${escapeHtml(m.name)}</h2>
-          <p class="text-xs text-[var(--text-muted)]">${escapeHtml(m.desc)}</p>
-        </div>
-        <form id="searchForm" onsubmit="handleSearch(event, '${escapeHtml(m.id)}')">
-          <div class="input-group">
-            <input type="text" id="searchInput" class="input-glass" placeholder=" " maxlength="${m.max}" ${m.optional ? '' : 'required'} autocomplete="off">
-            <label for="searchInput" class="input-label">${escapeHtml(m.placeholder)}</label>
-          </div>
-          <button type="submit" class="btn-primary w-full">
-            <span class="material-symbols-rounded text-lg">search</span> Consultar
-          </button>
-        </form>
-        ${historyHtml}
-      </div>
-      <div class="lg:col-span-8">
-        <div id="result" class="min-h-[320px] liquid-glass p-6 flex flex-col justify-center items-center text-center">
-          <span class="material-symbols-rounded text-5xl text-white/10 mb-3">travel_explore</span>
-          <p class="text-sm text-[var(--text-muted)]">Informe o alvo ao lado para iniciar a consulta.</p>
-        </div>
-      </div>
-    </div>
-  `;
-
-  if (m.digits) {
-    document.getElementById('searchInput').addEventListener('input', function () {
-      this.value = this.value.replace(/\D/g, '');
+    document.getElementById('btnDecrypt').addEventListener('click', async () => {
+      const status = document.getElementById('p2pStatus');
+      try {
+        const peer = document.getElementById('peerPubKey').value.trim() || myPub;
+        const packet = document.getElementById('p2pInput').value.trim();
+        if (!packet) throw new Error('Cole o pacote criptografado.');
+        const res = await P2P.decryptPacket(packet, peer);
+        document.getElementById('p2pOutput').value = res.text;
+        status.innerHTML = `<span class="text-[var(--success)] font-semibold">Assinatura ${escapeHtml(res.meta.signer)} verificada (${escapeHtml(res.meta.ts)}).</span>`;
+      } catch (err) {
+        status.innerHTML = `<span class="text-[var(--danger)]">${escapeHtml(err.message)}</span>`;
+      }
     });
   }
-}
 
-function fillAndSearch(val) {
-  const input = document.getElementById('searchInput');
-  if (!input) return;
-  input.value = val;
-  document.getElementById('searchForm').requestSubmit();
-}
-
-async function runProgressiveOsint(alvo, resDiv, btn) {
-  saveHistory('username', alvo);
-  const categorias = buildOsintTargets(alvo);
-  const report = { alvo, resultados: [] };
-  let foundCount = 0;
-  let notFoundCount = 0;
-
-  resDiv.className = 'min-h-[320px] liquid-glass p-6 text-left';
-  resDiv.innerHTML = `
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-[var(--glass-border)]">
-      <div>
-        <h3 class="font-bold text-lg">Varredura para: <span class="text-[var(--accent)]">${escapeHtml(alvo)}</span></h3>
-        <p id="osintCounter" class="text-xs text-[var(--text-muted)] mt-0.5">Verificando plataformas em tempo real...</p>
-      </div>
-      <div class="flex gap-2">
-        <button type="button" class="btn-ghost" onclick="copyJson()"><span class="material-symbols-rounded text-base">content_copy</span> JSON</button>
-        <button type="button" class="btn-ghost" onclick="downloadJson('osint')"><span class="material-symbols-rounded text-base">download</span> Exportar</button>
-      </div>
-    </div>
-    ${categorias.map(cat => `
-      <div class="mb-6 p-4 rounded-2xl bg-white/[0.02] border border-[var(--glass-border)]">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-          <h4 class="text-xs uppercase tracking-wider text-[var(--accent)] font-bold flex items-center gap-2">
-            <span class="material-symbols-rounded text-base">${escapeHtml(cat.icone)}</span>
-            ${escapeHtml(cat.titulo)}
-          </h4>
-          <a href="${escapeHtml(cat.dorkGeral)}" target="_blank" rel="noopener noreferrer" class="btn-ghost text-xs py-1 px-3">
-            <span class="material-symbols-rounded text-sm">manage_search</span> Dork Geral
-          </a>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          ${cat.itens.map(item => `
-            <a id="card-${escapeHtml(item.id)}" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="site-card">
-              <div class="flex flex-col min-w-0">
-                <span class="font-semibold text-sm truncate">${escapeHtml(item.nome)}</span>
-                <span id="info-${escapeHtml(item.id)}" class="text-[11px] text-[var(--text-muted)] truncate">Verificando...</span>
-              </div>
-              <span id="status-${escapeHtml(item.id)}" class="status-pill status-loading">
-                <span class="material-symbols-rounded text-xs spinner">refresh</span> Checando
-              </span>
-            </a>
+  function renderAtpvView(view) {
+    const history = getHistory('atpv');
+    const historyHtml = history.length ? `
+      <div class="mt-5 pt-4 border-t border-[var(--glass-border)]">
+        <span class="text-[11px] uppercase tracking-wider text-[var(--text-muted)] font-semibold block mb-2">Placas Recentes</span>
+        <div class="flex flex-wrap gap-2">
+          ${history.map(h => `
+            <button type="button" class="btn-ghost text-xs py-1 px-2.5" data-fill-atpv="${escapeHtml(h.query)}">
+              ${escapeHtml(h.query)}
+            </button>
           `).join('')}
         </div>
       </div>
-    `).join('')}
-  `;
+    ` : '';
 
-  const allTasks = [];
-  for (const cat of categorias) {
-    for (const item of cat.itens) {
-      allTasks.push(
-        item.check().then(res => {
-          const pill = document.getElementById(`status-${item.id}`);
-          const infoEl = document.getElementById(`info-${item.id}`);
-          if (!pill) return;
-
-          if (res.status === 'found') {
-            foundCount++;
-            pill.className = 'status-pill status-found';
-            pill.innerHTML = '<span class="material-symbols-rounded text-xs">check_circle</span> Encontrado';
-            infoEl.textContent = res.info || 'Conta localizada';
-          } else if (res.status === 'notfound') {
-            notFoundCount++;
-            pill.className = 'status-pill status-notfound';
-            pill.innerHTML = '<span class="material-symbols-rounded text-xs">cancel</span> Não encontrado';
-            infoEl.textContent = 'Sem conta pública';
-          } else {
-            pill.className = 'status-pill status-manual';
-            pill.innerHTML = `<span class="material-symbols-rounded text-xs">open_in_new</span> ${escapeHtml(res.label || 'Verificar')}`;
-            infoEl.textContent = 'Clique para abrir busca';
-          }
-
-          report.resultados.push({ categoria: cat.titulo, site: item.nome, url: item.url, status: res.status });
-          lastResultData = report;
-
-          const counter = document.getElementById('osintCounter');
-          if (counter) {
-            counter.textContent = `${foundCount} encontrado(s) • ${notFoundCount} não encontrado(s) • Demais em verificação manual`;
-          }
-        })
-      );
-    }
-  }
-
-  await Promise.allSettled(allTasks);
-  btn.disabled = false;
-  btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Consultar';
-}
-
-async function handleSearch(e, id) {
-  e.preventDefault();
-  const m = MODULES.find(x => x.id === id);
-  const val = document.getElementById('searchInput').value.trim();
-  const btn = e.target.querySelector('button[type="submit"]');
-  const resDiv = document.getElementById('result');
-
-  btn.disabled = true;
-  btn.innerHTML = '<span class="material-symbols-rounded spinner text-lg">refresh</span> Consultando...';
-
-  if (m.progressive) {
-    await runProgressiveOsint(val, resDiv, btn);
-    return;
-  }
-
-  resDiv.className = 'min-h-[320px] liquid-glass p-6 flex flex-col justify-center items-center text-center';
-  resDiv.innerHTML = `
-    <span class="material-symbols-rounded spinner text-4xl mb-3 text-[var(--accent)]">refresh</span>
-    <p class="text-sm font-medium text-[var(--accent)]">Consultando bases...</p>
-  `;
-
-  try {
-    const data = await m.fetchApi(val);
-    lastResultData = data.raw || data;
-    if (val) saveHistory(id, val);
-
-    let sectionsHtml = '';
-    if (data.resumo) sectionsHtml += renderDataGrid(data.resumo);
-    if (data.listas && data.listas.length) {
-      sectionsHtml += data.listas.map(lista => `
-        <div class="mt-6">
-          <h4 class="text-xs uppercase tracking-wider text-[var(--accent)] font-bold mb-3">${escapeHtml(lista.titulo)} (${lista.itens.length})</h4>
-          <div class="flex flex-wrap gap-2 max-h-60 overflow-y-auto pr-1">
-            ${lista.itens.map(item => `<span class="text-xs px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[var(--text-main)]">${escapeHtml(item)}</span>`).join('')}
+    const portaisHtml = PORTAIS_VEICULARES.map(p => `
+      <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="site-card">
+        <div class="flex items-center gap-3 min-w-0">
+          <span class="material-symbols-rounded text-[var(--accent)] text-2xl">${p.icone}</span>
+          <div class="flex flex-col min-w-0">
+            <span class="font-semibold text-sm truncate">${p.nome}</span>
+            <span class="text-[11px] text-[var(--text-muted)] truncate">${p.desc}</span>
           </div>
         </div>
-      `).join('');
+        <span class="material-symbols-rounded text-base text-[var(--text-muted)]">open_in_new</span>
+      </a>
+    `).join('');
+
+    view.innerHTML = `
+      <button data-nav="" class="liquid-glass interactive inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6">
+        <span class="material-symbols-rounded text-lg">arrow_back</span> Voltar
+      </button>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div class="lg:col-span-5 liquid-glass p-6">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-12 h-12 rounded-2xl bg-[var(--accent-glow)] flex items-center justify-center border border-[var(--accent)]/30">
+              <span class="material-symbols-rounded text-2xl text-[var(--accent)]">directions_car</span>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold leading-tight">Central Veicular</h2>
+              <p class="text-xs text-[var(--text-muted)]">DETRAN-MG • SENATRAN • Multas PBH</p>
+            </div>
+          </div>
+          <form id="atpvForm">
+            <div class="input-group">
+              <input type="text" id="atpvPlaca" class="input-glass uppercase" placeholder=" " maxlength="7" required autocomplete="off">
+              <label for="atpvPlaca" class="input-label">Placa (Ex: ABC1D23)</label>
+            </div>
+            <div class="input-group">
+              <input type="text" id="atpvRenavam" class="input-glass" placeholder=" " maxlength="11" autocomplete="off">
+              <label for="atpvRenavam" class="input-label">RENAVAM (11 dígitos)</label>
+            </div>
+            <div class="input-group">
+              <input type="text" id="atpvDoc" class="input-glass" placeholder=" " maxlength="18" autocomplete="off">
+              <label for="atpvDoc" class="input-label">CPF / CNPJ do Proprietário</label>
+            </div>
+            <div class="input-group">
+              <input type="text" id="atpvChassi" class="input-glass uppercase" placeholder=" " maxlength="20" autocomplete="off">
+              <label for="atpvChassi" class="input-label">Chassi ou Nº CRV (opcional)</label>
+            </div>
+            <button type="submit" class="btn-primary w-full">
+              <span class="material-symbols-rounded text-lg">fact_check</span> Preparar Dados + Consultar Doc
+            </button>
+          </form>
+          ${historyHtml}
+        </div>
+
+        <div class="lg:col-span-7 space-y-4">
+          <div id="atpvResult" class="liquid-glass p-6">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="material-symbols-rounded text-[var(--accent)]">hub</span>
+              <h3 class="font-bold text-base">Portais Oficiais Integrados</h3>
+            </div>
+            <div class="grid grid-cols-1 gap-2.5">${portaisHtml}</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('atpvForm').addEventListener('submit', handleAtpvPrepare);
+  }
+
+  async function handleAtpvPrepare(e) {
+    e.preventDefault();
+    const placa = document.getElementById('atpvPlaca').value.trim().toUpperCase();
+    const renavam = document.getElementById('atpvRenavam').value.replace(/\D/g, '');
+    const doc = document.getElementById('atpvDoc').value.replace(/\D/g, '');
+    const chassi = document.getElementById('atpvChassi').value.trim().toUpperCase();
+
+    lastResultData = { placa, renavam: renavam || '-', cpf_cnpj: doc || '-', chassi_crv: chassi || '-' };
+    lastModuleId = `veiculo-${placa}`;
+    saveHistory('atpv', placa);
+
+    const campos = [
+      { label: 'Placa', val: placa },
+      ...(renavam ? [{ label: 'RENAVAM', val: renavam }] : []),
+      ...(doc ? [{ label: 'CPF / CNPJ', val: doc }] : []),
+      ...(chassi ? [{ label: 'Chassi / CRV', val: chassi }] : [])
+    ];
+
+    let titularHtml = '';
+    if (doc.length === 14) {
+      try {
+        const res = await MODULES.find(m => m.id === 'cnpj').fetchApi(doc);
+        titularHtml = `
+          <div class="mb-5 p-4 rounded-2xl bg-white/[0.03] border border-[var(--glass-border)]">
+            <span class="text-[11px] uppercase tracking-wider text-[var(--accent)] font-bold block mb-2">Titular (CNPJ Consultado)</span>
+            <p class="text-sm font-semibold">${escapeHtml(res.resumo.razao_social || '-')}</p>
+            <p class="text-xs text-[var(--text-muted)]">${escapeHtml(res.resumo.situacao)} • ${escapeHtml(res.resumo.municipio_uf)}</p>
+          </div>
+        `;
+      } catch {}
+    } else if (doc.length === 11) {
+      try {
+        const res = await MODULES.find(m => m.id === 'cpf').fetchApi(doc);
+        const nome = res.resumo.nome || res.resumo.name || res.resumo.regiao_fiscal || 'CPF validado';
+        titularHtml = `
+          <div class="mb-5 p-4 rounded-2xl bg-white/[0.03] border border-[var(--glass-border)]">
+            <span class="text-[11px] uppercase tracking-wider text-[var(--accent)] font-bold block mb-2">Titular (CPF Consultado)</span>
+            <p class="text-sm font-semibold">${escapeHtml(nome)}</p>
+          </div>
+        `;
+      } catch {}
     }
+
+    const portaisHtml = PORTAIS_VEICULARES.map(p => `
+      <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="site-card">
+        <div class="flex items-center gap-3 min-w-0">
+          <span class="material-symbols-rounded text-[var(--accent)] text-xl">${p.icone}</span>
+          <div class="flex flex-col min-w-0">
+            <span class="font-semibold text-sm truncate">${p.nome}</span>
+            <span class="text-[11px] text-[var(--text-muted)] truncate">${p.desc}</span>
+          </div>
+        </div>
+        <span class="material-symbols-rounded text-base text-[var(--text-muted)]">open_in_new</span>
+      </a>
+    `).join('');
+
+    document.getElementById('atpvResult').innerHTML = `
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-[var(--glass-border)]">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-rounded text-[var(--success)] text-2xl">check_circle</span>
+          <h3 class="font-bold text-lg">Veículo ${escapeHtml(placa)}</h3>
+        </div>
+        <button type="button" class="btn-ghost" data-export="download">
+          <span class="material-symbols-rounded text-base">verified</span> Exportar Assinado
+        </button>
+      </div>
+      ${titularHtml}
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+        ${campos.map(c => `
+          <div class="site-card">
+            <div class="flex flex-col min-w-0">
+              <span class="data-label">${escapeHtml(c.label)}</span>
+              <span class="data-value truncate">${escapeHtml(c.val)}</span>
+            </div>
+            <button type="button" class="btn-ghost text-xs py-1.5 px-2.5" data-copy-val="${escapeHtml(c.val)}">
+              <span class="material-symbols-rounded text-sm">content_copy</span> Copiar
+            </button>
+          </div>
+        `).join('')}
+      </div>
+      <h4 class="text-xs uppercase tracking-wider text-[var(--accent)] font-bold mb-3">Abrir Portal Oficial</h4>
+      <div class="grid grid-cols-1 gap-2.5">${portaisHtml}</div>
+    `;
+  }
+
+  // ==========================================
+  // 6. RENDERIZAÇÃO PRINCIPAL
+  // ==========================================
+  function render() {
+    const view = document.getElementById('view');
+    const hash = window.location.hash.replace('#', '');
+
+    if (!hash) {
+      const cards = MODULES.map(m => `
+        <div class="liquid-glass interactive p-6 text-center" data-nav="${escapeHtml(m.id)}">
+          <div class="w-14 h-14 mx-auto rounded-2xl bg-[var(--accent-glow)] flex items-center justify-center mb-4 border border-[var(--accent)]/30">
+            <span class="material-symbols-rounded text-3xl text-[var(--accent)]">${escapeHtml(m.icon)}</span>
+          </div>
+          <h3 class="text-lg font-bold mb-1">${escapeHtml(m.name)}</h3>
+          <p class="text-xs text-[var(--text-muted)]">${escapeHtml(m.desc)}</p>
+        </div>
+      `).join('');
+
+      view.innerHTML = `
+        <div class="text-center mb-10 mt-2">
+          <h1 class="text-3xl md:text-4xl font-bold mb-2">
+            Pegada <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent)] to-[#BF5AF2]">Digital</span>
+          </h1>
+          <p class="text-sm text-[var(--text-muted)]">Ambiente protegido com criptografia P2P (${SIGNATURE_BRAND}), OSINT e Central Veicular.</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">${cards}</div>
+      `;
+      return;
+    }
+
+    const m = MODULES.find(x => x.id === hash);
+    if (!m) return navigate('');
+
+    if (m.customView === 'p2p') { renderP2pView(view); return; }
+    if (m.customView === 'atpv') { renderAtpvView(view); return; }
+
+    const history = getHistory(m.id);
+    const historyHtml = history.length ? `
+      <div class="mt-5 pt-4 border-t border-[var(--glass-border)]">
+        <span class="text-[11px] uppercase tracking-wider text-[var(--text-muted)] font-semibold block mb-2">Recentes</span>
+        <div class="flex flex-wrap gap-2">
+          ${history.map(h => `
+            <button type="button" class="btn-ghost text-xs py-1 px-2.5" data-fill="${escapeHtml(h.query)}">
+              ${escapeHtml(h.query)}
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    ` : '';
+
+    view.innerHTML = `
+      <button data-nav="" class="liquid-glass interactive inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6">
+        <span class="material-symbols-rounded text-lg">arrow_back</span> Voltar
+      </button>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div class="lg:col-span-4 liquid-glass p-6">
+          <div class="text-center mb-6">
+            <div class="w-14 h-14 rounded-2xl bg-[var(--accent-glow)] flex items-center justify-center mx-auto mb-3 border border-[var(--accent)]/30">
+              <span class="material-symbols-rounded text-3xl text-[var(--accent)]">${escapeHtml(m.icon)}</span>
+            </div>
+            <h2 class="text-xl font-bold mb-1">${escapeHtml(m.name)}</h2>
+            <p class="text-xs text-[var(--text-muted)]">${escapeHtml(m.desc)}</p>
+          </div>
+          <form id="searchForm">
+            <div class="input-group">
+              <input type="text" id="searchInput" class="input-glass" placeholder=" " maxlength="${m.max}" ${m.optional ? '' : 'required'} autocomplete="off">
+              <label for="searchInput" class="input-label">${escapeHtml(m.placeholder)}</label>
+            </div>
+            <button type="submit" class="btn-primary w-full">
+              <span class="material-symbols-rounded text-lg">search</span> Consultar
+            </button>
+          </form>
+          ${historyHtml}
+        </div>
+        <div class="lg:col-span-8">
+          <div id="result" class="min-h-[320px] liquid-glass p-6 flex flex-col justify-center items-center text-center">
+            <span class="material-symbols-rounded text-5xl text-white/10 mb-3">travel_explore</span>
+            <p class="text-sm text-[var(--text-muted)]">Informe o alvo ao lado para iniciar a consulta.</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const inputEl = document.getElementById('searchInput');
+    if (m.digits) {
+      inputEl.addEventListener('input', () => { inputEl.value = inputEl.value.replace(/\D/g, ''); });
+    }
+    document.getElementById('searchForm').addEventListener('submit', (e) => handleSearch(e, m.id));
+  }
+
+  async function runProgressiveOsint(alvo, resDiv, btn) {
+    saveHistory('username', alvo);
+    lastModuleId = 'osint';
+    const categorias = buildOsintTargets(alvo);
+    const report = { alvo, resultados: [] };
+    let foundCount = 0;
+    let notFoundCount = 0;
 
     resDiv.className = 'min-h-[320px] liquid-glass p-6 text-left';
     resDiv.innerHTML = `
       <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-[var(--glass-border)]">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-rounded text-[var(--success)] text-2xl">check_circle</span>
-          <h3 class="font-bold text-lg">Resultado da Consulta</h3>
+        <div>
+          <h3 class="font-bold text-lg">Varredura para: <span class="text-[var(--accent)]">${escapeHtml(alvo)}</span></h3>
+          <p id="osintCounter" class="text-xs text-[var(--text-muted)] mt-0.5">Verificando plataformas em tempo real...</p>
         </div>
         <div class="flex gap-2">
-          <button type="button" class="btn-ghost" onclick="copyJson()"><span class="material-symbols-rounded text-base">content_copy</span> Copiar JSON</button>
-          <button type="button" class="btn-ghost" onclick="downloadJson('${escapeHtml(id)}')"><span class="material-symbols-rounded text-base">download</span> Exportar</button>
+          <button type="button" class="btn-ghost" data-export="copy"><span class="material-symbols-rounded text-base">content_copy</span> JSON</button>
+          <button type="button" class="btn-ghost" data-export="download"><span class="material-symbols-rounded text-base">verified</span> Assinado</button>
         </div>
       </div>
-      ${sectionsHtml}
-    `;
-  } catch (err) {
-    resDiv.className = 'min-h-[320px] liquid-glass p-6 flex flex-col justify-center items-center text-center';
-    resDiv.innerHTML = `
-      <span class="material-symbols-rounded text-5xl mb-3 text-[var(--danger)]">error</span>
-      <h3 class="font-bold text-lg mb-1">Falha na consulta</h3>
-      <p class="text-sm text-[var(--text-muted)] max-w-md">${escapeHtml(err.message)}</p>
-    `;
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Consultar';
-  }
-}
-
-function renderDataGrid(obj) {
-  const entries = Object.entries(obj).filter(([, v]) => v !== undefined && v !== null && v !== '');
-  if (!entries.length) return '<p class="text-sm text-[var(--text-muted)]">Nenhum dado retornado.</p>';
-  return `
-    <div class="data-grid">
-      ${entries.map(([k, v]) => `
-        <div class="data-item">
-          <span class="material-symbols-rounded data-icon">${escapeHtml(getIcon(k))}</span>
-          <div class="flex flex-col">
-            <span class="data-label">${escapeHtml(k.replace(/_/g, ' '))}</span>
-            <span class="data-value">${escapeHtml(v)}</span>
+      ${categorias.map(cat => `
+        <div class="mb-6 p-4 rounded-2xl bg-white/[0.02] border border-[var(--glass-border)]">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <h4 class="text-xs uppercase tracking-wider text-[var(--accent)] font-bold flex items-center gap-2">
+              <span class="material-symbols-rounded text-base">${escapeHtml(cat.icone)}</span>
+              ${escapeHtml(cat.titulo)}
+            </h4>
+            <a href="${escapeHtml(cat.dorkGeral)}" target="_blank" rel="noopener noreferrer" class="btn-ghost text-xs py-1 px-3">
+              <span class="material-symbols-rounded text-sm">manage_search</span> Dork Geral
+            </a>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            ${cat.itens.map(item => `
+              <a id="card-${escapeHtml(item.id)}" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="site-card">
+                <div class="flex flex-col min-w-0">
+                  <span class="font-semibold text-sm truncate">${escapeHtml(item.nome)}</span>
+                  <span id="info-${escapeHtml(item.id)}" class="text-[11px] text-[var(--text-muted)] truncate">Verificando...</span>
+                </div>
+                <span id="status-${escapeHtml(item.id)}" class="status-pill status-loading">
+                  <span class="material-symbols-rounded text-xs spinner">refresh</span> Checando
+                </span>
+              </a>
+            `).join('')}
           </div>
         </div>
       `).join('')}
-    </div>
-  `;
-}
+    `;
 
-function copyJson() {
-  if (!lastResultData) return;
-  navigator.clipboard.writeText(JSON.stringify(lastResultData, null, 2));
-}
+    const allTasks = [];
+    for (const cat of categorias) {
+      for (const item of cat.itens) {
+        allTasks.push(
+          item.check().then(res => {
+            const pill = document.getElementById(`status-${item.id}`);
+            const infoEl = document.getElementById(`info-${item.id}`);
+            if (!pill) return;
 
-function downloadJson(prefix) {
-  if (!lastResultData) return;
-  const blob = new Blob([JSON.stringify(lastResultData, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `glassosint-${prefix}-${Date.now()}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
+            if (res.status === 'found') {
+              foundCount++;
+              pill.className = 'status-pill status-found';
+              pill.innerHTML = '<span class="material-symbols-rounded text-xs">check_circle</span> Encontrado';
+              infoEl.textContent = res.info || 'Conta localizada';
+            } else if (res.status === 'notfound') {
+              notFoundCount++;
+              pill.className = 'status-pill status-notfound';
+              pill.innerHTML = '<span class="material-symbols-rounded text-xs">cancel</span> Não encontrado';
+              infoEl.textContent = 'Sem conta pública';
+            } else {
+              pill.className = 'status-pill status-manual';
+              pill.innerHTML = `<span class="material-symbols-rounded text-xs">open_in_new</span> ${escapeHtml(res.label || 'Verificar')}`;
+              infoEl.textContent = 'Clique para abrir busca';
+            }
 
-window.addEventListener('hashchange', render);
-document.addEventListener('DOMContentLoaded', render);
+            report.resultados.push({ categoria: cat.titulo, site: item.nome, url: item.url, status: res.status });
+            lastResultData = report;
+
+            const counter = document.getElementById('osintCounter');
+            if (counter) counter.textContent = `${foundCount} encontrado(s) • ${notFoundCount} não encontrado(s) • Demais em verificação manual`;
+          })
+        );
+      }
+    }
+
+    await Promise.allSettled(allTasks);
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Consultar';
+  }
+
+  async function handleSearch(e, id) {
+    e.preventDefault();
+    const m = MODULES.find(x => x.id === id);
+    const val = document.getElementById('searchInput').value.trim();
+    const btn = e.target.querySelector('button[type="submit"]');
+    const resDiv = document.getElementById('result');
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-symbols-rounded spinner text-lg">refresh</span> Consultando...';
+
+    if (m.progressive) {
+      await runProgressiveOsint(val, resDiv, btn);
+      return;
+    }
+
+    resDiv.className = 'min-h-[320px] liquid-glass p-6 flex flex-col justify-center items-center text-center';
+    resDiv.innerHTML = `
+      <span class="material-symbols-rounded spinner text-4xl mb-3 text-[var(--accent)]">refresh</span>
+      <p class="text-sm font-medium text-[var(--accent)]">Consultando bases...</p>
+    `;
+
+    try {
+      const data = await m.fetchApi(val);
+      lastResultData = data.raw || data;
+      lastModuleId = id;
+      if (val) saveHistory(id, val);
+
+      let sectionsHtml = '';
+      if (data.resumo) sectionsHtml += renderDataGrid(data.resumo);
+      if (data.listas && data.listas.length) {
+        sectionsHtml += data.listas.map(lista => `
+          <div class="mt-6">
+            <h4 class="text-xs uppercase tracking-wider text-[var(--accent)] font-bold mb-3">${escapeHtml(lista.titulo)} (${lista.itens.length})</h4>
+            <div class="flex flex-wrap gap-2 max-h-60 overflow-y-auto pr-1">
+              ${lista.itens.map(item => `<span class="text-xs px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[var(--text-main)]">${escapeHtml(item)}</span>`).join('')}
+            </div>
+          </div>
+        `).join('');
+      }
+
+      resDiv.className = 'min-h-[320px] liquid-glass p-6 text-left';
+      resDiv.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-[var(--glass-border)]">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-rounded text-[var(--success)] text-2xl">check_circle</span>
+            <h3 class="font-bold text-lg">Resultado da Consulta</h3>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" class="btn-ghost" data-export="copy"><span class="material-symbols-rounded text-base">content_copy</span> Copiar JSON</button>
+            <button type="button" class="btn-ghost" data-export="download"><span class="material-symbols-rounded text-base">verified</span> Exportar Assinado</button>
+          </div>
+        </div>
+        ${sectionsHtml}
+      `;
+    } catch (err) {
+      resDiv.className = 'min-h-[320px] liquid-glass p-6 flex flex-col justify-center items-center text-center';
+      resDiv.innerHTML = `
+        <span class="material-symbols-rounded text-5xl mb-3 text-[var(--danger)]">error</span>
+        <h3 class="font-bold text-lg mb-1">Falha na consulta</h3>
+        <p class="text-sm text-[var(--text-muted)] max-w-md">${escapeHtml(err.message)}</p>
+      `;
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Consultar';
+    }
+  }
+
+  function renderDataGrid(obj) {
+    const entries = Object.entries(obj).filter(([, v]) => v !== undefined && v !== null && v !== '');
+    if (!entries.length) return '<p class="text-sm text-[var(--text-muted)]">Nenhum dado retornado.</p>';
+    return `
+      <div class="data-grid">
+        ${entries.map(([k, v]) => `
+          <div class="data-item">
+            <span class="material-symbols-rounded data-icon">${escapeHtml(getIcon(k))}</span>
+            <div class="flex flex-col">
+              <span class="data-label">${escapeHtml(k.replace(/_/g, ' '))}</span>
+              <span class="data-value">${escapeHtml(v)}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  // ==========================================
+  // 7. DELEGAÇÃO DE EVENTOS (ZERO FUNÇÕES GLOBAIS)
+  // ==========================================
+  document.addEventListener('click', async (e) => {
+    const navEl = e.target.closest('[data-nav]');
+    if (navEl) {
+      navigate(navEl.getAttribute('data-nav'));
+      return;
+    }
+
+    const fillEl = e.target.closest('[data-fill]');
+    if (fillEl) {
+      const input = document.getElementById('searchInput');
+      if (input) {
+        input.value = fillEl.getAttribute('data-fill');
+        document.getElementById('searchForm')?.requestSubmit();
+      }
+      return;
+    }
+
+    const fillAtpv = e.target.closest('[data-fill-atpv]');
+    if (fillAtpv) {
+      const input = document.getElementById('atpvPlaca');
+      if (input) input.value = fillAtpv.getAttribute('data-fill-atpv');
+      return;
+    }
+
+    const copyVal = e.target.closest('[data-copy-val]');
+    if (copyVal) {
+      copyText(copyVal.getAttribute('data-copy-val'), copyVal);
+      return;
+    }
+
+    const copyEl = e.target.closest('[data-copy-el]');
+    if (copyEl) {
+      const target = document.getElementById(copyEl.getAttribute('data-copy-el'));
+      if (target) copyText(target.value, copyEl);
+      return;
+    }
+
+    const expEl = e.target.closest('[data-export]');
+    if (expEl && lastResultData) {
+      const signed = await P2P.wrapSignedJson(lastResultData);
+      const jsonStr = JSON.stringify(signed, null, 2);
+      if (expEl.getAttribute('data-export') === 'copy') {
+        copyText(jsonStr, expEl);
+      } else {
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `kiik-glassosint-${lastModuleId}-${Date.now()}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    }
+  });
+
+  window.addEventListener('hashchange', render);
+  document.addEventListener('DOMContentLoaded', render);
+})();
 </script>
 </body>
 </html>
