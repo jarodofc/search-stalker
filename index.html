@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GlassOSINT | Investigação Digital</title>
-<!-- Ícone: Impressão Digital Branca -->
+<title>GlassOSINT | Pegada Digital</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 3 12.01 3c-1.98 0-3.86.47-5.57 1.41-.24.13-.54.04-.68-.2-.13-.24-.04-.55.2-.68C7.82 2.52 9.86 2 12.01 2c2.13 0 3.99.47 6.03 1.52.25.13.34.43.21.67-.09.18-.26.28-.44.28zM3.5 9.72c-.1 0-.2-.03-.29-.09-.23-.16-.28-.47-.12-.7.99-1.4 2.25-2.5 3.75-3.27C9.98 4.04 14 4.03 17.15 5.65c1.5.77 2.76 1.86 3.75 3.25.16.22.11.54-.12.7-.23.16-.54.11-.7-.12-.9-1.26-2.04-2.25-3.39-2.94-2.87-1.47-6.54-1.47-9.4.01-1.36.7-2.5 1.7-3.4 2.96-.08.14-.23.21-.39.21zm6.25 12.07c-.13 0-.26-.05-.35-.15-.87-.87-1.34-1.43-2.01-2.64-.69-1.23-1.05-2.73-1.05-4.34 0-2.97 2.54-5.39 5.66-5.39s5.66 2.42 5.66 5.39c0 .28-.22.5-.5.5s-.5-.22-.5-.5c0-2.42-2.09-4.39-4.66-4.39-2.57 0-4.66 1.97-4.66 4.39 0 1.44.32 2.77.93 3.85.64 1.15 1.08 1.64 1.85 2.42.19.2.19.51 0 .71-.11.1-.24.15-.37.15zm7.17-1.85c-1.19 0-2.24-.3-3.1-.89-1.49-1.01-2.38-2.65-2.38-4.39 0-.28.22-.5.5-.5s.5.22.5.5c0 1.41.72 2.74 1.94 3.56.71.48 1.54.71 2.54.71.24 0 .64-.03 1.04-.1.27-.05.53.13.58.41.05.27-.13.53-.41.58-.57.11-1.07.12-1.21.12zM14.91 22c-.04 0-.09-.01-.13-.02-1.59-.44-2.63-1.03-3.72-2.1-1.4-1.39-2.17-3.24-2.17-5.22 0-1.62 1.38-2.94 3.08-2.94 1.7 0 3.08 1.32 3.08 2.94 0 1.07.93 1.94 2.08 1.94s2.08-.87 2.08-1.94c0-3.77-3.25-6.83-7.25-6.83-2.84 0-5.44 1.58-6.61 4.03-.39.81-.59 1.76-.59 2.8 0 .78.07 2.01.67 3.61.1.26-.03.55-.29.64-.26.1-.55-.04-.64-.29-.49-1.31-.73-2.61-.73-3.96 0-1.2.23-2.29.68-3.24 1.33-2.79 4.28-4.6 7.51-4.6 4.55 0 8.25 3.51 8.25 7.83 0 1.62-1.38 2.94-3.08 2.94s-3.08-1.32-3.08-2.94c0-1.07-.93-1.94-2.08-1.94s-2.08.87-2.08 1.94c0 1.71.66 3.31 1.87 4.51.95.94 1.86 1.46 3.27 1.85.27.07.42.35.35.61-.05.23-.26.38-.47.38z'/%3E%3C/svg%3E">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -108,7 +107,7 @@
       </div>
       <div>
         <span class="font-bold text-2xl tracking-tight block leading-none">Glass<span class="text-[var(--accent)]">OSINT</span></span>
-        <span class="text-xs text-[var(--text-muted)] font-medium tracking-wider uppercase">Investigação Digital</span>
+        <span class="text-xs text-[var(--text-muted)] font-medium tracking-wider uppercase">Pegada Digital</span>
       </div>
     </div>
   </header>
@@ -133,7 +132,8 @@ const ICON_MAP = {
   'modelo': 'commute', 'ano': 'update', 'cor': 'palette', 'chassi': 'tag', 'combustivel': 'local_gas_station',
   'carrier': 'cell_tower', 'type': 'category', 'breach': 'security', 'leak': 'warning',
   'processo': 'gavel', 'tribunal': 'account_balance', 'karma': 'star', 'repos': 'folder',
-  'platform': 'apps', 'url': 'link', 'username': 'alternate_email'
+  'platform': 'apps', 'url': 'link', 'username': 'alternate_email', 'adult': 'visibility_off',
+  'dating': 'favorite'
 };
 
 function getIcon(key) {
@@ -154,15 +154,13 @@ async function tryFallback(sources) {
 
 const MODULES = [
   { 
-    id: 'sherlock', name: 'Sherlock (Username)', desc: 'Busca em Redes Sociais', icon: 'search', placeholder: 'Ex: johndoe', max: 30, digits: false,
+    id: 'sherlock', name: 'Sherlock (Username)', desc: 'Redes Sociais & Fóruns', icon: 'search', placeholder: 'Ex: johndoe', max: 30, digits: false,
     fetchApi: async (v) => {
       const username = v.trim(); const results = [];
-      // GitHub (API pública, CORS habilitado)
       try { 
         const gh = await fetch(`https://api.github.com/users/${username}`); 
         if (gh.ok) { const d = await gh.json(); if (d.login) results.push({ platform: 'GitHub', found: true, url: d.html_url, name: d.name, repos: d.public_repos }); } 
       } catch(e) {}
-      // Reddit (via proxy CORS)
       try { 
         const rd = await fetch(`${CONFIG.corsProxy}${encodeURIComponent(`https://www.reddit.com/user/${username}/about.json`)}`); 
         if (rd.ok) { const d = await rd.json(); if (d.data && !d.data.error) results.push({ platform: 'Reddit', found: true, url: `https://reddit.com/user/${username}`, name: d.data.name, karma: d.data.link_karma }); } 
@@ -172,10 +170,9 @@ const MODULES = [
     }
   },
   { 
-    id: 'email', name: 'Email Breach', desc: 'Vazamentos (XposedOrNot)', icon: 'mail', placeholder: 'exemplo@email.com', max: 50, digits: false,
+    id: 'email', name: 'Holehe (Email/Telefone)', desc: 'Vazamentos & Contas', icon: 'mail', placeholder: 'exemplo@email.com', max: 50, digits: false,
     fetchApi: async (v) => {
       const email = v.trim();
-      // API pública do XposedOrNot (sem chave) [citation:3]
       const r = await fetch(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
       if(!r.ok) {
         if (r.status === 404) return { email: email, status: 'Seguro', message: 'Nenhum vazamento conhecido encontrado.' };
@@ -186,25 +183,36 @@ const MODULES = [
     }
   },
   { 
-    id: 'telefone', name: 'Telefone (OSINT)', desc: 'Operadora e Região', icon: 'call', placeholder: 'DDD + Número', max: 11, digits: true,
+    id: 'adult_dating', name: 'Adult & Dating (Dork)', desc: 'Busca via Google (OSINT)', icon: 'visibility_off', placeholder: 'Ex: username ou email', max: 50, digits: false,
     fetchApi: async (v) => {
-      const clean = v.replace(/\D/g,'');
-      return await tryFallback([
-        async () => {
-          // BrasilAPI DDD (público, sem chave) [citation:12]
-          const r = await fetch(`https://brasilapi.com.br/api/ddd/v1/${clean.substring(0,2)}`);
-          if(!r.ok) throw new Error();
-          const dddData = await r.json();
-          return {
-            telefone: clean,
-            ddd: clean.substring(0,2),
-            estado: dddData.state,
-            cidades: dddData.cities ? dddData.cities.slice(0, 8).join(', ') : 'N/A',
-            tipo_linha: clean.length === 11 ? 'Celular (provável)' : 'Fixo (provável)'
-          };
-        },
-        async () => { return { telefone: clean, aviso: 'Consulta de DDD indisponível.' }; }
-      ]);
+      const query = v.trim();
+      // Técnica OSINT: Google Dork para sites adultos e de namoro
+      const dorks = [
+        `site:tinder.com "${query}"`,
+        `site:ashleymadison.com "${query}"`,
+        `site:adultfriendfinder.com "${query}"`,
+        `site:onlyfans.com "${query}"`,
+        `site:fetlife.com "${query}"`,
+        `site:grindr.com "${query}"`,
+        `site:bumble.com "${query}"`,
+        `site:okcupid.com "${query}"`
+      ];
+      
+      // Gera links de busca para o investigador
+      const links = dorks.map((dork, index) => {
+        const names = ['Tinder', 'Ashley Madison', 'AdultFriendFinder', 'OnlyFans', 'FetLife', 'Grindr', 'Bumble', 'OkCupid'];
+        return {
+          platform: names[index],
+          url: `https://www.google.com/search?q=${encodeURIComponent(dork)}`,
+          dork: dork
+        };
+      });
+      
+      return { 
+        query: query, 
+        message: 'Clique nos links abaixo para verificar manualmente cada plataforma.', 
+        links: links 
+      };
     }
   },
   { 
@@ -264,8 +272,8 @@ function render() {
     `).join('');
     view.innerHTML = `
       <div class="text-center mb-10 mt-4">
-        <h1 class="text-3xl md:text-4xl font-bold mb-2">Painel de <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent)] to-[#BF5AF2]">Investigação</span></h1>
-        <p class="text-[var(--text-muted)]">Ferramentas OSINT para detetives e investigadores.</p>
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">Pegada <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent)] to-[#BF5AF2]">Digital</span></h1>
+        <p class="text-[var(--text-muted)]">Ferramentas OSINT para rastreamento de identidade.</p>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${cards}</div>
     `;
@@ -333,6 +341,24 @@ async function handleSearch(e, id) {
           </div>
         `).join('');
       } else htmlResult = `<p class="text-[var(--text-muted)]">${data.message || 'Nenhum dado.'}</p>`;
+    } else if (id === 'adult_dating') {
+      htmlResult = `
+        <div class="mb-4 p-4 rounded-xl bg-[var(--warning)] bg-opacity-10 border border-[var(--warning)] border-opacity-30">
+          <p class="text-sm text-[var(--warning)]"><strong>⚠️ Aviso:</strong> Não há API pública gratuita para consulta direta. Use os links abaixo (Google Dorks) para verificar manualmente.</p>
+        </div>
+        <div class="data-grid">
+          ${data.links.map(l => `
+            <div class="data-item">
+              <span class="material-symbols-rounded data-icon">${getIcon('adult')}</span>
+              <div class="flex flex-col">
+                <span class="data-label">${l.platform}</span>
+                <a href="${l.url}" target="_blank" class="data-value text-[var(--accent)] underline">Abrir Busca</a>
+                <span class="text-[10px] text-[var(--text-muted)] mt-1 font-mono">${l.dork}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
     } else {
       if (Array.isArray(data)) htmlResult = data.map((item, idx) => `<div class="mb-4"><h4 class="text-sm font-bold mb-2 text-[var(--accent)]">Resultado ${idx + 1}</h4>${renderDataGrid(item)}</div>`).join('');
       else htmlResult = renderDataGrid(data);
