@@ -1,18 +1,18 @@
-# GlassOSINT • Sherlock, Sites, CNPJ & Proxy Remoto (KIIK HACKING)
+# SHERLOCK 221B • Laboratório Forense & OSINT (KIIK HACKING)
 
+[![Theme](https://img.shields.io/badge/Theme-Sherlock%20221B%20%7C%20Liquid%20Glass-E2B354?style=for-the-badge&logo=apple)](#)
 [![Transport](https://img.shields.io/badge/Network-Remote%20Proxy%20Tunnel-30D158?style=for-the-badge&logo=vercel)](#)
-[![Design](https://img.shields.io/badge/UI-iOS%20Liquid%20Glass%20%7C%20Material%203-0A84FF?style=for-the-badge&logo=apple)](#)
-[![Security](https://img.shields.io/badge/Security-P2P%20E2EE%20%7C%20KIIK%20HACKING-5E5CE6?style=for-the-badge&logo=shield)](#)
+[![Security](https://img.shields.io/badge/Security-P2P%20E2EE%20%7C%20KIIK%20HACKING-5AC8FA?style=for-the-badge&logo=shield)](#)
 
-> Painel de investigação OSINT, análise forense de metadados (EXIF/GPS), Dorks, Web Scraping, análise de domínios e consulta CNPJ, inicializado e conectado nativamente via **Proxy Remoto**, com criptografia P2P silenciosa e assinatura **KIIK HACKING**.
+> Suíte de perícia digital, análise forense de arquivos/imagens, OSINT e inteligência web com estética **Sherlock 221B (Liquid Glass + Material Design 3)**, inicialização animada via **Proxy Remoto**, criptografia P2P silenciosa e assinatura **KIIK HACKING**.
 
 ---
 
-## 📁 Estrutura do Projeto
+## 📁 Estrutura do Repositório
 
 ```text
 /
 ├── api/
 │   └── proxy.js      # Proxy Remoto Serverless (Vercel) com proteção anti-SSRF
-├── index.html        # Interface iOS Liquid Glass + Material 3 com boot animado
+├── index.html        # Interface Sherlock 221B Forensics (arquivo único)
 └── README.md         # Documentação
