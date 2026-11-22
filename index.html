@@ -162,16 +162,23 @@
       </div>
       <div>
         <span class="font-bold text-xl tracking-tight block leading-none">Glass<span class="text-[var(--accent)]">OSINT</span></span>
-        <span class="text-[11px] text-[var(--text-muted)] font-medium tracking-wider uppercase">Fontes Abertas</span>
+        <span class="text-[11px] text-[var(--text-muted)] font-medium tracking-wider uppercase">Pegada Digital</span>
       </div>
     </div>
-    <span class="badge hidden sm:inline-flex">100% APIs Públicas</span>
+    <span class="badge hidden sm:inline-flex">OSINT Multi-Fontes</span>
   </header>
 
   <main id="view" class="w-full"></main>
 </div>
 
 <script>
+// ==========================================
+// CONFIGURAÇÃO
+// ==========================================
+const CONFIG = {
+  cpfKey: '778433e124468b1aa60f2681919cd918f852afe1761056985813881cb72a550f'
+};
+
 // ==========================================
 // UTILITÁRIOS
 // ==========================================
@@ -187,14 +194,15 @@ function escapeHtml(str) {
 }
 
 const ICON_MAP = {
-  cnpj: 'badge', cpf: 'fingerprint', email: 'mail', nome: 'person', razao: 'domain',
-  fantasia: 'storefront', uf: 'map', estado: 'map', pais: 'public', country: 'public',
-  municipio: 'location_city', cidade: 'location_city', city: 'location_city',
+  cnpj: 'badge', cpf: 'fingerprint', email: 'mail', nome: 'person', name: 'person',
+  razao: 'domain', fantasia: 'storefront', uf: 'map', estado: 'map', pais: 'public',
+  country: 'public', municipio: 'location_city', cidade: 'location_city', city: 'location_city',
   cep: 'markunread_mailbox', logradouro: 'signpost', bairro: 'holiday_village',
-  data: 'calendar_today', abertura: 'event', situacao: 'info', status: 'check_circle',
-  cnae: 'category', natureza: 'gavel', capital: 'payments', ip: 'router',
-  isp: 'dns', org: 'hub', asn: 'lan', latitude: 'location_on', longitude: 'location_on',
-  ddd: 'call', telefone: 'call', regiao: 'explore', platform: 'apps', url: 'link'
+  data: 'calendar_today', nascimento: 'cake', birth: 'cake', genero: 'wc', gender: 'wc',
+  abertura: 'event', situacao: 'info', status: 'check_circle', cnae: 'category',
+  natureza: 'gavel', capital: 'payments', ip: 'router', isp: 'dns', org: 'hub',
+  asn: 'lan', latitude: 'location_on', longitude: 'location_on', ddd: 'call',
+  telefone: 'call', regiao: 'explore', platform: 'apps', url: 'link'
 };
 
 function getIcon(key) {
@@ -205,11 +213,11 @@ function getIcon(key) {
   return 'data_object';
 }
 
-async function fetchJson(url, timeoutMs = 10000) {
+async function fetchJson(url, options = {}, timeoutMs = 10000) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
-    const r = await fetch(url, { signal: ctrl.signal });
+    const r = await fetch(url, { ...options, signal: ctrl.signal });
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     return await r.json();
   } finally {
@@ -227,7 +235,7 @@ async function tryFallback(sources) {
       lastErr = e;
     }
   }
-  throw new Error(lastErr?.message || 'Nenhuma fonte pública respondeu.');
+  throw new Error(lastErr?.message || 'Nenhuma fonte respondeu.');
 }
 
 function saveHistory(moduleId, query) {
@@ -250,9 +258,67 @@ function getHistory(moduleId) {
 }
 
 // ==========================================
-// MÓDULOS OSINT (APIs PÚBLICAS)
+// MÓDULOS OSINT
 // ==========================================
 const MODULES = [
+  {
+    id: 'cpf',
+    name: 'CPF',
+    desc: 'CPFHub.io + Validação Local',
+    icon: 'fingerprint',
+    placeholder: 'Apenas números (11 dígitos)',
+    max: 14,
+    digits: true,
+    fetchApi: async (v) => {
+      const cpf = v.replace(/\D/g, '');
+      if (cpf.length !== 11) throw new Error('Informe um CPF com 11 dígitos.');
+
+      return await tryFallback([
+        async () => {
+          const raw = await fetchJson(`https://api.cpfhub.io/cpf/${cpf}`, {
+            headers: {
+              'x-api-key': CONFIG.cpfKey,
+              'Accept': 'application/json'
+            }
+          });
+          const info = raw.data || raw.result || raw;
+          if (!info || typeof info !== 'object') throw new Error('Resposta inválida da CPFHub.io');
+
+          const resumo = {};
+          for (const [k, val] of Object.entries(info)) {
+            if (val !== null && val !== '' && typeof val !== 'object') {
+              resumo[k] = val === true ? 'Sim' : val === false ? 'Não' : val;
+            }
+          }
+          return { resumo, raw };
+        },
+        async () => {
+          const isRepeated = /^(\d)\1{10}$/.test(cpf);
+          const calcDigit = (slice) => {
+            let sum = 0;
+            for (let i = 0; i < slice.length; i++) sum += Number(slice[i]) * (slice.length + 1 - i);
+            const mod = (sum * 10) % 11;
+            return mod === 10 ? 0 : mod;
+          };
+          const isValid = !isRepeated && calcDigit(cpf.slice(0, 9)) === Number(cpf[9]) && calcDigit(cpf.slice(0, 10)) === Number(cpf[10]);
+          const regioes = {
+            '0': 'RS', '1': 'DF, GO, MS, MT, TO', '2': 'AC, AM, AP, PA, RO, RR',
+            '3': 'CE, MA, PI', '4': 'AL, PB, PE, RN', '5': 'BA, SE',
+            '6': 'MG', '7': 'ES, RJ', '8': 'SP', '9': 'PR, SC'
+          };
+          return {
+            resumo: {
+              cpf: cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'),
+              status_api: 'CPFHub.io indisponível (fallback local)',
+              valido: isValid ? 'Sim (Dígitos válidos)' : 'Não (Dígitos inválidos)',
+              regiao_fiscal: isValid ? regioes[cpf[8]] : '-'
+            },
+            raw: { cpf, valid: isValid, regiao_fiscal: regioes[cpf[8]] }
+          };
+        }
+      ]);
+    }
+  },
   {
     id: 'cnpj',
     name: 'CNPJ',
@@ -329,7 +395,7 @@ const MODULES = [
     name: 'IP / Geolocalização',
     desc: 'ipwho.is / ipapi.co',
     icon: 'router',
-    placeholder: 'Ex: 8.8.8.8 (ou deixe vazio)',
+    placeholder: 'Ex: 8.8.8.8 (ou vazio)',
     max: 45,
     digits: false,
     optional: true,
@@ -501,46 +567,6 @@ const MODULES = [
         raw: data
       };
     }
-  },
-  {
-    id: 'cpf',
-    name: 'CPF (Validador)',
-    desc: 'Validação matemática + Região Fiscal',
-    icon: 'fingerprint',
-    placeholder: 'Apenas números (11 dígitos)',
-    max: 14,
-    digits: true,
-    fetchApi: async (v) => {
-      const cpf = v.replace(/\D/g, '');
-      if (cpf.length !== 11 || /^(\d)\1{10}$/.test(cpf)) {
-        return { resumo: { cpf, valido: 'Não', motivo: 'Formato inválido ou sequência repetida' }, raw: { cpf, valid: false } };
-      }
-      const calcDigit = (slice) => {
-        let sum = 0;
-        for (let i = 0; i < slice.length; i++) sum += Number(slice[i]) * (slice.length + 1 - i);
-        const mod = (sum * 10) % 11;
-        return mod === 10 ? 0 : mod;
-      };
-      const d1 = calcDigit(cpf.slice(0, 9));
-      const d2 = calcDigit(cpf.slice(0, 10));
-      const isValid = d1 === Number(cpf[9]) && d2 === Number(cpf[10]);
-
-      const regioes = {
-        '0': 'RS', '1': 'DF, GO, MS, MT, TO', '2': 'AC, AM, AP, PA, RO, RR',
-        '3': 'CE, MA, PI', '4': 'AL, PB, PE, RN', '5': 'BA, SE',
-        '6': 'MG', '7': 'ES, RJ', '8': 'SP', '9': 'PR, SC'
-      };
-
-      return {
-        resumo: {
-          cpf: cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'),
-          valido: isValid ? 'Sim (Dígitos válidos)' : 'Não (Dígitos inválidos)',
-          regiao_fiscal: isValid ? regioes[cpf[8]] : '-',
-          observacao: 'Consulta nominal de CPF não existe em API pública gratuita (LGPD).'
-        },
-        raw: { cpf, valid: isValid, regiao_fiscal: regioes[cpf[8]] }
-      };
-    }
   }
 ];
 
@@ -571,7 +597,7 @@ function render() {
         <h1 class="text-3xl md:text-4xl font-bold mb-2">
           Pegada <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent)] to-[#BF5AF2]">Digital</span>
         </h1>
-        <p class="text-sm text-[var(--text-muted)]">Módulos OSINT conectados diretamente a APIs públicas abertas.</p>
+        <p class="text-sm text-[var(--text-muted)]">Módulos OSINT integrados a APIs públicas e CPFHub.io.</p>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">${cards}</div>
     `;
@@ -654,7 +680,7 @@ async function handleSearch(e, id) {
   resDiv.className = 'min-h-[320px] liquid-glass p-6 flex flex-col justify-center items-center text-center';
   resDiv.innerHTML = `
     <span class="material-symbols-rounded spinner text-4xl mb-3 text-[var(--accent)]">refresh</span>
-    <p class="text-sm font-medium text-[var(--accent)]">Consultando APIs públicas...</p>
+    <p class="text-sm font-medium text-[var(--accent)]">Consultando bases...</p>
   `;
 
   try {
