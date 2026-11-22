@@ -131,7 +131,7 @@
   .md-label { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 14px; pointer-events: none; transition: all 0.2s ease; }
   .md-input:focus ~ .md-label, .md-input:not(:placeholder-shown) ~ .md-label { top: 11px; font-size: 11px; font-weight: 700; color: var(--gold); }
 
-  .dropzone-glass { border: 1.5px dashed rgba(226,179,84,0.55); background: rgba(226,179,84,0.06); border-radius: 22px; padding: 26px 18px; text-align: center; cursor: pointer; transition: all 0.25s var(--spring); }
+  .dropzone-glass { border: 1.5px dashed rgba(226,179,84,0.55); background: rgba(226,179,84,0.06); border-radius: 22px; padding: 22px 18px; text-align: center; cursor: pointer; transition: all 0.25s var(--spring); }
   .dropzone-glass:hover, .dropzone-glass.drag-over { background: rgba(226,179,84,0.14); border-color: #F4CF7B; transform: scale(1.01); }
 
   .map-frame-wrap { border-radius: 22px; overflow: hidden; border: 1px solid rgba(226,179,84,0.24); background: rgba(14,14,20,0.7); box-shadow: 0 14px 32px rgba(0,0,0,0.48); }
@@ -163,9 +163,15 @@
   .ela-stage canvas, .ela-stage img { width: 100%; height: auto; max-height: 390px; object-fit: contain; display: block; margin: 0 auto; }
   input[type="range"].gold-range { width: 100%; accent-color: #E2B354; cursor: pointer; }
 
+  /* Score Ring VirusTotal */
+  .vt-kpi {
+    padding: 12px; border-radius: 18px; text-align: center;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+  }
+
   .ios-dock-wrap { position: fixed; left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom)); z-index: 60; display: flex; justify-content: center; pointer-events: none; padding: 0 14px; }
   .ios-dock { pointer-events: auto; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 26px; background: rgba(14,15,22,0.80); backdrop-filter: blur(32px) saturate(200%); -webkit-backdrop-filter: blur(32px) saturate(200%); border: 1px solid rgba(226,179,84,0.24); box-shadow: 0 18px 44px rgba(0,0,0,0.72), inset 0 1px 0 rgba(255,232,185,0.22); }
-  .dock-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 7px 14px; border-radius: 18px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; transition: all 0.22s var(--spring); }
+  .dock-item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 7px 13px; border-radius: 18px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; transition: all 0.22s var(--spring); }
   .dock-item:hover { color: #FFFFFF; background: rgba(226,179,84,0.10); }
   .dock-item.active { color: var(--gold); background: rgba(226,179,84,0.18); box-shadow: inset 0 0 0 1px rgba(226,179,84,0.45); }
   .dock-item .material-symbols-rounded { font-size: 21px; }
@@ -282,13 +288,13 @@
       <span class="material-symbols-rounded">grid_view</span>
       <span class="dock-lbl">Painel</span>
     </button>
+    <button type="button" class="dock-item" data-nav="virustotal" data-dock="virustotal">
+      <span class="material-symbols-rounded">bug_report</span>
+      <span class="dock-lbl">VirusTotal</span>
+    </button>
     <button type="button" class="dock-item" data-nav="metadata" data-dock="metadata">
       <span class="material-symbols-rounded">photo_camera</span>
       <span class="dock-lbl">EXIF</span>
-    </button>
-    <button type="button" class="dock-item" data-nav="ela" data-dock="ela">
-      <span class="material-symbols-rounded">compare</span>
-      <span class="dock-lbl">ELA</span>
     </button>
     <button type="button" class="dock-item" data-nav="custody" data-dock="custody">
       <span class="material-symbols-rounded">fingerprint</span>
@@ -345,14 +351,12 @@
           { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
         );
         const hmac = await crypto.subtle.importKey(
-          'raw', enc.encode(`${AUTHOR_SIGNATURE}::SHERLOCK221B::V13`),
+          'raw', enc.encode(`${AUTHOR_SIGNATURE}::SHERLOCK221B::V14`),
           { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
         );
         ctx = { aes, hmac };
         return ctx;
-      } catch {
-        return null;
-      }
+      } catch { return null; }
     }
 
     async function seal(str) {
@@ -389,10 +393,11 @@
     return { init, seal, signJson };
   })();
 
-  // 3. CAMADA NATIVA DE PROXY REMOTO COM ROTAÇÃO DE FALLBACK
+  // 3. CAMADA NATIVA DE PROXY REMOTO + ROTA VIRUSTOTAL
   const RemoteProxy = (() => {
     let mode = 'initializing';
     let modeLabel = 'Conectando Proxy...';
+    let vtServerConfigured = false;
     let initPromise = null;
 
     const updateIndicator = (color, label) => {
@@ -420,23 +425,43 @@
               const info = await r.json();
               if (info?.ok) {
                 mode = 'vercel';
+                vtServerConfigured = Boolean(info.vtConfigured);
                 updateIndicator('#30D158', `Proxy Remoto (${info.region || 'Edge'})`);
-                return { mode, label: modeLabel };
+                return { mode, label: modeLabel, vtServerConfigured };
               }
             }
           } catch {}
         }
         mode = 'public-remote';
         updateIndicator('#30D158', 'Proxy Remoto Ativo');
-        return { mode, label: modeLabel };
+        return { mode, label: modeLabel, vtServerConfigured: false };
       })();
       return initPromise;
+    }
+
+    async function queryVirusTotal(type, target, customKey = '') {
+      await init();
+      if (mode !== 'vercel') {
+        throw new Error('A API v3 do VirusTotal exige o proxy serverless (/api/proxy.js) publicado na Vercel.');
+      }
+      const headers = customKey ? { 'X-VT-Key': customKey } : {};
+      const r = await rawTimeoutFetch(
+        `/api/proxy?vt=1&type=${encodeURIComponent(type)}&target=${encodeURIComponent(target)}`,
+        { headers },
+        12500
+      );
+      const data = await r.json().catch(() => ({}));
+      if (r.status === 404) return { notFound: true };
+      if (!r.ok) {
+        const msg = data?.error?.message || data?.error || `Erro VirusTotal (HTTP ${r.status})`;
+        throw new Error(msg);
+      }
+      return data;
     }
 
     async function request(targetUrl, options = {}, timeoutMs = 11000) {
       await init();
 
-      // 1. Tenta o Proxy Remoto próprio (/api/proxy na Vercel)
       if (mode === 'vercel') {
         try {
           const proxyHeaders = {};
@@ -451,7 +476,6 @@
         } catch {}
       }
 
-      // 2. Fallback para Gateways Públicos (AllOrigins -> CorsProxy -> CodeTabs)
       try {
         const r = await rawTimeoutFetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
         if (r.ok) {
@@ -480,7 +504,6 @@
         }
       } catch {}
 
-      // 3. Último recurso: requisição direta para APIs com CORS aberto
       const direct = await rawTimeoutFetch(targetUrl, options, timeoutMs);
       const bodyText = await direct.text();
       return { ok: direct.ok, status: direct.status, text: () => Promise.resolve(bodyText), json: () => Promise.resolve(JSON.parse(bodyText)), via: 'Fallback Direto' };
@@ -499,7 +522,11 @@
       return { html, code: r.status, via: r.via };
     }
 
-    return { init, request, fetchJson, fetchHtml, getModeLabel: () => modeLabel };
+    return {
+      init, queryVirusTotal, request, fetchJson, fetchHtml,
+      getModeLabel: () => modeLabel,
+      isVtServerConfigured: () => vtServerConfigured
+    };
   })();
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
@@ -507,15 +534,12 @@
   async function runBootSequence() {
     const bootEl = document.getElementById('proxyBoot');
     if (!bootEl) return;
-
     const finishBoot = () => {
       if (!bootEl.classList.contains('boot-done')) {
         bootEl.classList.add('boot-done');
         setTimeout(() => bootEl.remove(), 550);
       }
     };
-
-    // Failsafe: garante que a tela de boot nunca trave
     const hardStop = setTimeout(finishBoot, 3600);
 
     try {
@@ -574,6 +598,7 @@
   let lastModuleId = 'sherlock';
   let activeSectorFilter = 'all';
   let homeSearchQuery = '';
+  let pendingVtQuery = '';
   let historyCache = [];
   try { historyCache = JSON.parse(localStorage.getItem('sherlock221b_history') || '[]'); } catch { historyCache = []; }
 
@@ -584,6 +609,13 @@
   function formatCnpj(digits) {
     const d = String(digits || '').replace(/\D/g, '');
     return d.length === 14 ? d.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5') : d;
+  }
+
+  function toBase64Url(str) {
+    const bytes = new TextEncoder().encode(str);
+    let bin = '';
+    bytes.forEach(b => { bin += String.fromCharCode(b); });
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
 
   function copyText(text, btnEl) {
@@ -669,7 +701,8 @@
     lente:'camera', software:'memory', iso:'iso', abertura_lente:'camera', exposicao:'shutter_speed',
     flash:'flash_on', resolucao:'aspect_ratio', arquivo:'description', tamanho:'data_usage', hash:'fingerprint',
     sha:'fingerprint', magic:'memory', extensao:'rule', assin:'verified_user', servidor:'dns', vazamentos:'security',
-    subdominios:'account_tree', certificados:'workspace_premium', erro:'analytics'
+    subdominios:'account_tree', certificados:'workspace_premium', erro:'analytics', reputacao:'shield',
+    pulsos:'radar', ameaca:'bug_report', classificacao:'gpp_maybe', alvo:'target', tipo:'category'
   };
 
   function getIcon(key) {
@@ -761,17 +794,18 @@
     return out;
   }
 
-  // 5. SETORES & 12 MÓDULOS FORENSES
+  // 5. SETORES & 13 MÓDULOS FORENSES
   const SECTORS = [
-    { id: 'forense', title: 'Laboratório Forense — Imagens, Arquivos & Artefatos', subtitle: 'Perícia local EXIF/GPS, detecção de adulteração ELA, cadeia de custódia e decodificador', short: 'Lab Forense', icon: 'biotech', accent: '#E2B354' },
+    { id: 'forense', title: 'Laboratório Forense — Malware, Imagens & Artefatos', subtitle: 'VirusTotal + OTX, EXIF/GPS, detecção de adulteração ELA, cadeia de custódia e decodificador', short: 'Lab Forense', icon: 'biotech', accent: '#E2B354' },
     { id: 'sherlock', title: 'Rastreamento Sherlock — OSINT, Dorks & Vazamentos', subtitle: 'Investigação de perfis, Google Hacking forense de documentos e exposição de e-mails', short: 'Sherlock OSINT', icon: 'policy', accent: '#5AC8FA' },
     { id: 'web', title: 'Inteligência Web, SSL & Empresas (CNPJ)', subtitle: 'Subdomínios crt.sh, proprietário RDAP/DNS, Web Scraper, IP no mapa e consulta CNPJ', short: 'Web & CNPJ', icon: 'language', accent: '#30D158' }
   ];
 
   const MODULES = [
+    { id: 'virustotal', sector: 'forense', name: 'VirusTotal & Threat Intel', desc: 'Analisa arquivos (SHA-256 local), hashes, URLs, domínios e IPs em 70+ antivírus + fallback AlienVault OTX.', keywords: 'virustotal virus malware hash sha256 md5 url dominio ip ameaca threat intel antivirus', apisLabel: 'VT v3 + OTX', tagClass: 'tag-err', icon: 'bug_report', gradient: 'linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)', customView: 'virustotal' },
     { id: 'metadata', sector: 'forense', name: 'Metadados & EXIF (Foto)', desc: 'Extrai aparelho, lente, SO, data original, hash SHA-256, coordenadas GPS e mapa.', keywords: 'metadados exif foto imagem gps localizacao mapa aparelho camera forense', apisLabel: 'EXIF + Mapa', tagClass: 'tag-gold', icon: 'photo_camera', gradient: 'linear-gradient(135deg, #E2B354 0%, #9E6E1F 100%)', customView: 'metadata' },
     { id: 'ela', sector: 'forense', name: 'Análise ELA (Adulteração)', desc: 'Error Level Analysis em Canvas para revelar edições, montagens e colagens em fotos.', keywords: 'ela adulteracao fraude montagem photoshop edicao imagem forense pericia', apisLabel: 'Perícia Visual', tagClass: 'tag-gold', icon: 'compare', gradient: 'linear-gradient(135deg, #FF453A 0%, #9B1C26 100%)', customView: 'ela' },
-    { id: 'custody', sector: 'forense', name: 'Cadeia de Custódia & Magic Bytes', desc: 'Gera SHA-256/512/1, detecta extensão falsificada (spoofing) e extrai strings do arquivo.', keywords: 'custodia hash sha256 sha512 magic bytes hex spoofing binario strings pericia arquivo', apisLabel: 'Hashes + Hex', tagClass: 'tag-gold', icon: 'fingerprint', gradient: 'linear-gradient(135deg, #5AC8FA 0%, #1E5BB8 100%)', customView: 'custody' },
+    { id: 'custody', sector: 'forense', name: 'Cadeia de Custódia & Magic Bytes', desc: 'Gera SHA-256/512/1, detecta extensão falsificada (spoofing), extrai strings e envia para o VirusTotal.', keywords: 'custodia hash sha256 sha512 magic bytes hex spoofing binario strings pericia arquivo', apisLabel: 'Hashes + Hex', tagClass: 'tag-gold', icon: 'fingerprint', gradient: 'linear-gradient(135deg, #5AC8FA 0%, #1E5BB8 100%)', customView: 'custody' },
     { id: 'decoder', sector: 'forense', name: 'Decodificador Forense', desc: 'Analisa tokens JWT, Base64, Hexadecimal, URL Encoding e Timestamps Unix.', keywords: 'jwt base64 hex url timestamp decoder decodificador artefato forense', apisLabel: '5 Motores', tagClass: 'tag-gold', icon: 'terminal', gradient: 'linear-gradient(135deg, #BF5AF2 0%, #6B21A8 100%)', customView: 'decoder' },
     { id: 'osint', sector: 'sherlock', name: 'Sherlock OSINT (11 APIs)', desc: 'Verifica username em 11 plataformas compatíveis em tempo real via Proxy Remoto.', keywords: 'osint sherlock usuario username github reddit perfis rastreamento', apisLabel: '11 APIs Diretas', tagClass: 'tag-info', icon: 'travel_explore', gradient: 'linear-gradient(135deg, #5E5CE6 0%, #312E81 100%)', placeholder: 'Username (ex: torvalds)', max: 60, customSearch: 'osint_api' },
     { id: 'dork', sector: 'sherlock', name: 'Central de Dorks Forenses', desc: 'Google Hacking para documentos expostos (PDF/XLS/Pastes), redes sociais e plataformas.', keywords: 'dork google hacking documentos pdf pastes vazamento redes sociais', apisLabel: '4 Categorias', tagClass: 'tag-warn', icon: 'manage_search', gradient: 'linear-gradient(135deg, #FF9F0A 0%, #B45309 100%)', placeholder: 'Nome, domínio, @user ou termo', max: 90, customSearch: 'dork_only' },
@@ -954,7 +988,302 @@
     }
   ];
 
-  // 6. METADADOS & EXIF
+  // ==========================================================
+  // 6. MÓDULO VIRUSTOTAL & THREAT INTEL (VT v3 + OTX FALLBACK)
+  // ==========================================================
+  function detectVtIndicator(raw) {
+    const val = raw.trim();
+    if (/^[a-fA-F0-9]{32}$|^[a-fA-F0-9]{40}$|^[a-fA-F0-9]{64}$/.test(val)) {
+      return { type: 'file', clean: val.toLowerCase(), guiUrl: `https://www.virustotal.com/gui/file/${val.toLowerCase()}`, label: 'Hash de Arquivo' };
+    }
+    if (/^(?:\d{1,3}\.){3}\d{1,3}$/.test(val)) {
+      return { type: 'ip', clean: val, guiUrl: `https://www.virustotal.com/gui/ip-address/${val}`, label: 'Endereço IPv4' };
+    }
+    if (/^https?:\/\//i.test(val)) {
+      return { type: 'url', clean: val, guiUrl: `https://www.virustotal.com/gui/url/${toBase64Url(val)}`, label: 'URL Completa' };
+    }
+    const domain = val.toLowerCase().replace(/^www\./, '').split('/')[0];
+    if (domain.includes('.') && !/\s/.test(domain)) {
+      return { type: 'domain', clean: domain, guiUrl: `https://www.virustotal.com/gui/domain/${encodeURIComponent(domain)}`, label: 'Domínio' };
+    }
+    return null;
+  }
+
+  function renderVirusTotalView(view) {
+    const savedKey = localStorage.getItem('sherlock_vt_key') || '';
+    const history = getHistory('virustotal');
+    const historyHtml = history.length ? `
+      <div class="mt-4 pt-4 border-t border-white/10">
+        <span class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold block mb-2">Consultas Recentes</span>
+        <div class="flex flex-wrap gap-2">${history.map(h => `<button type="button" class="ios-chip py-1 px-3 font-forensic text-[11px]" data-fill-vt="${escapeHtml(h.query)}">${escapeHtml(h.query.length > 22 ? h.query.slice(0, 22) + '…' : h.query)}</button>`).join('')}</div>
+      </div>` : '';
+
+    view.innerHTML = `
+      <div class="view-enter">
+        <button type="button" data-nav="" class="ios-chip mb-5"><span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar ao Painel</button>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          <div class="lg:col-span-5 liquid-card p-6 lg:sticky lg:top-6">
+            <div class="flex items-center gap-3.5 mb-4">
+              <div class="squircle" style="background:linear-gradient(135deg,#3B82F6,#1D4ED8)"><span class="material-symbols-rounded">bug_report</span></div>
+              <div>
+                <h2 class="text-lg font-bold leading-tight">VirusTotal & Threat Intel</h2>
+                <span class="pill-tag tag-err mt-1">VT API v3 + AlienVault OTX</span>
+              </div>
+            </div>
+            <p class="text-xs text-[var(--text-secondary)] mb-4 leading-relaxed">
+              Consulte <strong>Hash (MD5/SHA-1/SHA-256)</strong>, <strong>URL</strong>, <strong>Domínio</strong>, <strong>IP</strong> ou solte um arquivo abaixo para calcular o SHA-256 localmente e checar ameaças.
+            </p>
+
+            <input type="file" id="vtFileInput" class="hidden">
+            <div id="vtDropzone" class="dropzone-glass mb-4">
+              <span class="material-symbols-rounded text-2xl text-[#5AC8FA] mb-1">shield</span>
+              <p class="text-xs font-semibold text-white">Arrastar arquivo (calcula SHA-256 local)</p>
+              <p class="text-[10px] text-[var(--text-secondary)] mt-0.5">O arquivo não é enviado — apenas a assinatura hash é consultada</p>
+            </div>
+
+            <form id="vtForm">
+              <div class="md-field">
+                <input type="text" id="vtTarget" class="md-input font-forensic text-xs" placeholder=" " maxlength="300" required autocomplete="off">
+                <label for="vtTarget" class="md-label">Hash, URL, Domínio ou IP</label>
+              </div>
+
+              <details class="mb-4">
+                <summary class="cursor-pointer text-[11px] text-[#E2B354] font-semibold px-1 py-1">
+                  ${RemoteProxy.isVtServerConfigured() ? 'Chave VT_API_KEY ativa no servidor (opcional substituir)' : 'Configurar API Key gratuita do VirusTotal (opcional)'}
+                </summary>
+                <div class="mt-2">
+                  <div class="md-field mb-1">
+                    <input type="password" id="vtApiKey" class="md-input font-forensic text-xs" placeholder=" " value="${escapeHtml(savedKey)}" autocomplete="off">
+                    <label for="vtApiKey" class="md-label">Sua VT API Key (salva só neste navegador)</label>
+                  </div>
+                  <p class="text-[10px] text-[var(--text-tertiary)] px-1">Sem chave configurada, o painel ativa o fallback AlienVault OTX + link direto do VirusTotal.</p>
+                </div>
+              </details>
+
+              <button type="submit" class="ios-btn"><span class="material-symbols-rounded text-lg">radar</span> Escanear Ameaça</button>
+            </form>
+            ${historyHtml}
+          </div>
+
+          <div class="lg:col-span-7">
+            <div id="vtResult" class="min-h-[340px] liquid-card p-6 flex flex-col justify-center items-center text-center">
+              <div class="w-16 h-16 rounded-2xl bg-[#3B82F6]/15 border border-[#3B82F6]/30 flex items-center justify-center mb-3"><span class="material-symbols-rounded text-3xl text-[#5AC8FA]">bug_report</span></div>
+              <p class="text-sm font-semibold text-white mb-1">Pronto para varredura</p>
+              <p class="text-xs text-[var(--text-secondary)] max-w-sm">
+                Detecção automática de tipo (Hash, URL, Domínio ou IP) com relatório de motores antivírus, reputação e inteligência OTX.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    const fileInput = document.getElementById('vtFileInput');
+    const dropzone = document.getElementById('vtDropzone');
+    const targetInput = document.getElementById('vtTarget');
+    const keyInput = document.getElementById('vtApiKey');
+    const form = document.getElementById('vtForm');
+
+    const handleFileDrop = async (file) => {
+      targetInput.value = 'Calculando SHA-256...';
+      const buf = await file.arrayBuffer();
+      const sha256 = await digestHex('SHA-256', buf);
+      targetInput.value = sha256;
+      form.requestSubmit();
+    };
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+    dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.classList.remove('drag-over'); if (e.dataTransfer?.files?.[0]) handleFileDrop(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', () => { if (fileInput.files?.[0]) handleFileDrop(fileInput.files[0]); });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const rawVal = targetInput.value.trim();
+      const userKey = keyInput.value.trim();
+      if (userKey) localStorage.setItem('sherlock_vt_key', userKey);
+      else localStorage.removeItem('sherlock_vt_key');
+
+      const parsed = detectVtIndicator(rawVal);
+      const resDiv = document.getElementById('vtResult');
+      const btn = form.querySelector('button[type="submit"]');
+
+      if (!parsed) {
+        resDiv.className = 'min-h-[340px] liquid-card p-6 flex flex-col justify-center items-center text-center';
+        resDiv.innerHTML = `<span class="material-symbols-rounded text-5xl mb-2 text-[#FF453A]">error</span><h3 class="font-bold text-base mb-1">Indicador não reconhecido</h3><p class="text-xs text-[var(--text-secondary)]">Informe um Hash (MD5/SHA-1/SHA-256), IPv4, Domínio ou URL completa (https://...).</p>`;
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<span class="material-symbols-rounded spinner text-lg">refresh</span> Escaneando...';
+      resDiv.className = 'min-h-[340px] liquid-card p-6 flex flex-col justify-center items-center text-center';
+      resDiv.innerHTML = `<span class="material-symbols-rounded spinner text-4xl mb-3 text-[#5AC8FA]">refresh</span><p class="text-sm font-semibold text-white">Consultando VirusTotal v3 (${escapeHtml(parsed.label)})...</p><p class="text-xs text-[var(--text-secondary)] mt-1">Com fallback automático AlienVault OTX via Proxy Remoto</p>`;
+
+      await saveHistory('virustotal', parsed.clean);
+      lastModuleId = `virustotal-${parsed.type}`;
+
+      // 1. Tenta VirusTotal v3 via /api/proxy
+      let vtError = null;
+      try {
+        const vt = await RemoteProxy.queryVirusTotal(parsed.type, parsed.clean, userKey);
+        if (vt.notFound) {
+          lastResultData = { fonte: 'VirusTotal v3', tipo: parsed.label, alvo: parsed.clean, status: 'Não encontrado na base do VirusTotal' };
+          resDiv.className = 'min-h-[340px] liquid-card p-6 text-left';
+          resDiv.innerHTML = `
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
+              <div><h3 class="font-bold text-lg">Sem registro no VirusTotal</h3><span class="text-[11px] text-[#E2B354] font-semibold">Tipo: ${escapeHtml(parsed.label)}</span></div>
+              <a href="${escapeHtml(parsed.guiUrl)}" target="_blank" rel="noopener noreferrer" class="ios-chip"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">open_in_new</span> Abrir no VirusTotal</a>
+            </div>
+            <div class="p-4 rounded-2xl bg-[#FF9F0A]/12 border border-[#FF9F0A]/30 text-xs text-[var(--text-secondary)]">
+              Este indicador ainda não foi indexado ou enviado anteriormente ao VirusTotal.
+            </div>`;
+          btn.disabled = false;
+          btn.innerHTML = '<span class="material-symbols-rounded text-lg">radar</span> Escanear Ameaça';
+          return;
+        }
+
+        const attr = vt?.data?.attributes || {};
+        const stats = attr.last_analysis_stats || {};
+        const mal = stats.malicious || 0;
+        const susp = stats.suspicious || 0;
+        const harm = stats.harmless || 0;
+        const undet = stats.undetected || 0;
+        const total = mal + susp + harm + undet;
+
+        const flaggedEngines = Object.entries(attr.last_analysis_results || {})
+          .filter(([, r]) => r.category === 'malicious' || r.category === 'suspicious')
+          .map(([eng, r]) => `${eng}: ${r.result || r.category}`);
+
+        const resumo = {
+          alvo: parsed.clean,
+          tipo: parsed.label,
+          veredito: mal > 0 ? `AMEAÇA DETECTADA (${mal}/${total} motores)` : (susp > 0 ? `SUSPEITO (${susp}/${total})` : `LIMPO (0/${total} detecções)`),
+          reputacao_comunidade: attr.reputation ?? 0,
+          nome_arquivo: attr.meaningful_name || attr.names?.[0] || '-',
+          tipo_arquivo: attr.type_description || '-',
+          classificacao_ameaca: attr.popular_threat_classification?.suggested_threat_label || '-',
+          ultima_analise: attr.last_analysis_date ? new Date(attr.last_analysis_date * 1000).toLocaleString('pt-BR') : '-',
+          pais_ou_asn: attr.country ? `${attr.country}${attr.as_owner ? ' • ' + attr.as_owner : ''}` : (attr.registrar || '-')
+        };
+
+        lastResultData = { fonte: 'VirusTotal v3', stats, resumo, motores_deteccao: flaggedEngines, raw: vt };
+
+        const verdictClass = mal > 0
+          ? 'bg-[#FF453A]/15 border-[#FF453A]/45 text-[#FF453A]'
+          : (susp > 0 ? 'bg-[#FF9F0A]/15 border-[#FF9F0A]/40 text-[#FF9F0A]' : 'bg-[#30D158]/14 border-[#30D158]/35 text-[#30D158]');
+
+        resDiv.className = 'min-h-[340px] liquid-card p-6 text-left';
+        resDiv.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
+            <div>
+              <div class="flex items-center gap-2"><span class="material-symbols-rounded ${mal > 0 ? 'text-[#FF453A]' : 'text-[#30D158]'} text-2xl">${mal > 0 ? 'gpp_bad' : 'verified_user'}</span><h3 class="font-bold text-lg">Laudo VirusTotal</h3></div>
+              <span class="text-[11px] text-[#E2B354] font-semibold">VirusTotal API v3 via Proxy Remoto</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <a href="${escapeHtml(parsed.guiUrl)}" target="_blank" rel="noopener noreferrer" class="ios-chip"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">open_in_new</span> VT Oficial</a>
+              <button type="button" class="ios-chip" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button>
+              <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#E2B354]">verified</span> Dossiê</button>
+            </div>
+          </div>
+
+          <div class="mb-4 p-4 rounded-2xl border ${verdictClass}">
+            <span class="text-xs uppercase tracking-wider font-bold block">${escapeHtml(resumo.veredito)}</span>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mb-5">
+            <div class="vt-kpi"><span class="block text-xl font-bold text-[#FF453A] font-forensic">${mal}</span><span class="text-[10px] uppercase text-[var(--text-secondary)]">Maliciosos</span></div>
+            <div class="vt-kpi"><span class="block text-xl font-bold text-[#FF9F0A] font-forensic">${susp}</span><span class="text-[10px] uppercase text-[var(--text-secondary)]">Suspeitos</span></div>
+            <div class="vt-kpi"><span class="block text-xl font-bold text-[#30D158] font-forensic">${harm}</span><span class="text-[10px] uppercase text-[var(--text-secondary)]">Inofensivos</span></div>
+            <div class="vt-kpi"><span class="block text-xl font-bold text-white/80 font-forensic">${undet}</span><span class="text-[10px] uppercase text-[var(--text-secondary)]">Não Detect.</span></div>
+          </div>
+
+          ${renderIosList(resumo)}
+
+          ${flaggedEngines.length ? `
+            <h4 class="text-xs uppercase tracking-wider text-[#FF453A] font-semibold mt-5 mb-2 px-1">Motores que Acusaram Ameaça (${flaggedEngines.length})</h4>
+            <div class="flex flex-wrap gap-2 max-h-52 overflow-y-auto">
+              ${flaggedEngines.map(f => `<span class="text-xs font-forensic px-3 py-1.5 rounded-full bg-[#FF453A]/15 border border-[#FF453A]/35 text-[#FF9088]">${escapeHtml(f)}</span>`).join('')}
+            </div>
+          ` : ''}`;
+
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-rounded text-lg">radar</span> Escanear Ameaça';
+        return;
+      } catch (err) {
+        vtError = err.message;
+      }
+
+      // 2. Fallback Automático: AlienVault OTX (Aberto, sem chave) + Link Direto VirusTotal
+      try {
+        const otxMap = {
+          file: `https://otx.alienvault.com/api/v1/indicators/file/${encodeURIComponent(parsed.clean)}/general`,
+          ip: `https://otx.alienvault.com/api/v1/indicators/IPv4/${encodeURIComponent(parsed.clean)}/general`,
+          domain: `https://otx.alienvault.com/api/v1/indicators/domain/${encodeURIComponent(parsed.clean)}/general`,
+          url: `https://otx.alienvault.com/api/v1/indicators/url/${encodeURIComponent(parsed.clean)}/general`
+        };
+        const otx = await RemoteProxy.fetchJson(otxMap[parsed.type], {}, 11000);
+        const pulseCount = otx?.pulse_info?.count ?? 0;
+        const pulses = (otx?.pulse_info?.pulses || []).slice(0, 15).map(p => `${p.name} (${(p.tags || []).slice(0, 3).join(', ') || 'Threat Intel'})`);
+
+        const resumo = {
+          alvo: parsed.clean,
+          tipo: parsed.label,
+          pulsos_ameaca_otx: pulseCount,
+          status_otx: pulseCount > 0 ? `ALERTA: Citado em ${pulseCount} relatório(s) de ameaça` : 'Sem registros maliciosos no AlienVault OTX',
+          pais: otx.country_name || '-',
+          asn: otx.asn || '-',
+          nota_virustotal: vtError
+        };
+
+        lastResultData = { fonte: 'AlienVault OTX (Fallback)', resumo, pulses, virustotal_gui: parsed.guiUrl, raw: otx };
+
+        resDiv.className = 'min-h-[340px] liquid-card p-6 text-left';
+        resDiv.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
+            <div>
+              <div class="flex items-center gap-2"><span class="material-symbols-rounded ${pulseCount > 0 ? 'text-[#FF453A]' : 'text-[#30D158]'} text-2xl">${pulseCount > 0 ? 'gpp_maybe' : 'verified_user'}</span><h3 class="font-bold text-lg">Inteligência de Ameaças</h3></div>
+              <span class="text-[11px] text-[#E2B354] font-semibold">Fonte: AlienVault OTX (Fallback Automático)</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <a href="${escapeHtml(parsed.guiUrl)}" target="_blank" rel="noopener noreferrer" class="ios-chip"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">open_in_new</span> Abrir no VirusTotal</a>
+              <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#E2B354]">verified</span> Dossiê</button>
+            </div>
+          </div>
+
+          <div class="mb-4 p-3.5 rounded-2xl bg-[#FF9F0A]/12 border border-[#FF9F0A]/30 text-xs text-[var(--text-secondary)]">
+            <strong class="text-[#FF9F0A]">VirusTotal API v3:</strong> ${escapeHtml(vtError)} — exibindo inteligência alternativa do <strong>AlienVault OTX</strong>. Você também pode abrir o relatório oficial clicando em <em>Abrir no VirusTotal</em>.
+          </div>
+
+          ${renderIosList(resumo)}
+
+          ${pulses.length ? `
+            <h4 class="text-xs uppercase tracking-wider text-[#FF9F0A] font-semibold mt-5 mb-2 px-1">Relatórios de Ameaça / Pulses (${pulses.length})</h4>
+            <div class="flex flex-wrap gap-2 max-h-52 overflow-y-auto">
+              ${pulses.map(p => `<span class="text-xs font-forensic px-3 py-1.5 rounded-full bg-[#FF9F0A]/12 border border-[#FF9F0A]/30 text-white">${escapeHtml(p)}</span>`).join('')}
+            </div>
+          ` : ''}`;
+      } catch (err2) {
+        resDiv.className = 'min-h-[340px] liquid-card p-6 flex flex-col justify-center items-center text-center';
+        resDiv.innerHTML = `
+          <span class="material-symbols-rounded text-5xl mb-2 text-[#FF9F0A]">warning</span>
+          <h3 class="font-bold text-base mb-1">Consulta indisponível via API</h3>
+          <p class="text-xs text-[var(--text-secondary)] max-w-md mb-4">${escapeHtml(vtError || err2.message)}</p>
+          <a href="${escapeHtml(parsed.guiUrl)}" target="_blank" rel="noopener noreferrer" class="ios-chip"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">open_in_new</span> Abrir Relatório Direto no VirusTotal</a>`;
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-rounded text-lg">radar</span> Escanear Ameaça';
+      }
+    });
+
+    // Se veio direto da Cadeia de Custódia com um hash
+    if (pendingVtQuery) {
+      targetInput.value = pendingVtQuery;
+      pendingVtQuery = '';
+      setTimeout(() => form.requestSubmit(), 120);
+    }
+  }
+
+  // 7. METADADOS & EXIF
   function formatDateExif(val) {
     if (!val) return '-';
     if (val instanceof Date && !isNaN(val)) return val.toLocaleString('pt-BR');
@@ -1048,7 +1377,7 @@
       resDiv.innerHTML = `
         <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
           <div><div class="flex items-center gap-2"><span class="material-symbols-rounded text-[#30D158] text-2xl">check_circle</span><h3 class="font-bold text-lg">Laudo de Metadados</h3></div><span class="text-[11px] text-[#E2B354] font-semibold">Aparelho: ${escapeHtml(aparelho)}</span></div>
-          <div class="flex flex-wrap gap-2"><button type="button" class="ios-chip" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button><button type="button" class="ios-chip" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button><button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#E2B354]">verified</span> Dossiê</button></div>
+          <div class="flex flex-wrap gap-2"><button type="button" class="ios-chip" data-vt-hash="${escapeHtml(sha256)}"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">bug_report</span> VirusTotal</button><button type="button" class="ios-chip" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button><button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#E2B354]">verified</span> Dossiê</button></div>
         </div>
         ${gpsBanner}
         ${hasGps ? renderIosList(gpsInfo) + renderMapBlock(lat, lon, 'Local Exato da Captura') : ''}
@@ -1063,7 +1392,7 @@
     }
   }
 
-  // 7. ANÁLISE ELA (ADULTERAÇÃO DE IMAGEM)
+  // 8. ANÁLISE ELA (ADULTERAÇÃO DE IMAGEM)
   function renderElaView(view) {
     view.innerHTML = `
       <div class="view-enter">
@@ -1182,7 +1511,7 @@
     qualInput.addEventListener('input', () => { document.getElementById('elaQualVal').textContent = `${qualInput.value}%`; computeEla(); });
   }
 
-  // 8. CADEIA DE CUSTÓDIA & MAGIC BYTES
+  // 9. CADEIA DE CUSTÓDIA & MAGIC BYTES (COM BOTÃO DIRETO PRO VIRUSTOTAL)
   function renderCustodyView(view) {
     view.innerHTML = `
       <div class="view-enter">
@@ -1193,7 +1522,7 @@
               <div class="squircle" style="background:linear-gradient(135deg,#5AC8FA,#1E5BB8)"><span class="material-symbols-rounded">fingerprint</span></div>
               <div><h2 class="text-lg font-bold leading-tight">Cadeia de Custódia</h2><span class="pill-tag tag-gold mt-1">Hashes • Magic Bytes • Strings</span></div>
             </div>
-            <p class="text-xs text-[var(--text-secondary)] mb-5 leading-relaxed">Suba qualquer evidência digital (PDF, ZIP, imagem, áudio, documento). Gera SHA-256/512/1, detecta extensão falsificada pelo cabeçalho hexadecimal e extrai strings.</p>
+            <p class="text-xs text-[var(--text-secondary)] mb-5 leading-relaxed">Suba qualquer evidência digital (PDF, ZIP, imagem, áudio, executável). Gera SHA-256/512/1, detecta extensão falsificada e permite checar o hash no VirusTotal em 1 toque.</p>
             <input type="file" id="custodyFileInput" class="hidden">
             <div id="custodyDropzone" class="dropzone-glass mb-4">
               <div class="w-14 h-14 mx-auto rounded-2xl bg-[#5AC8FA]/20 border border-[#5AC8FA]/40 flex items-center justify-center mb-3"><span class="material-symbols-rounded text-3xl text-[#5AC8FA]">upload_file</span></div>
@@ -1241,7 +1570,11 @@
         resDiv.innerHTML = `
           <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
             <div><div class="flex items-center gap-2"><span class="material-symbols-rounded text-[#E2B354] text-2xl">verified</span><h3 class="font-bold text-lg">Certificado de Custódia</h3></div><span class="text-[11px] text-[var(--text-secondary)]">Perícia local • Selo KIIK HACKING</span></div>
-            <div class="flex flex-wrap gap-2"><button type="button" class="ios-chip" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button><button type="button" class="ios-chip" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button><button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#E2B354]">verified</span> Dossiê</button></div>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" class="ios-chip" data-vt-hash="${escapeHtml(sha256)}"><span class="material-symbols-rounded text-sm text-[#5AC8FA]">bug_report</span> Checar no VirusTotal</button>
+              <button type="button" class="ios-chip" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button>
+              <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#E2B354]">verified</span> Dossiê</button>
+            </div>
           </div>
           ${alertBanner}${renderIosList(resumo)}
           ${strings.highlighted.length ? `<h4 class="text-xs uppercase tracking-wider text-[#E2B354] font-semibold mt-5 mb-2 px-1">Indícios / Strings de Interesse (${strings.highlighted.length})</h4><div class="code-block">${escapeHtml(strings.highlighted.join('\n'))}</div>` : ''}
@@ -1258,7 +1591,7 @@
     fileInput.addEventListener('change', () => { if (fileInput.files?.[0]) processFile(fileInput.files[0]); });
   }
 
-  // 9. DECODIFICADOR FORENSE
+  // 10. DECODIFICADOR FORENSE
   function decodeBase64Utf8(str) {
     const norm = str.replace(/-/g, '+').replace(/_/g, '/').replace(/\s+/g, '');
     const padded = norm + '='.repeat((4 - (norm.length % 4)) % 4);
@@ -1348,7 +1681,7 @@
     });
   }
 
-  // 10. OSINT DIRETO & DORKS FORENSES
+  // 11. OSINT DIRETO & DORKS FORENSES
   function getCompatibleOsintApis(alvo) {
     const enc = encodeURIComponent(alvo);
     return [
@@ -1463,7 +1796,7 @@
     btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Gerar Dorks';
   }
 
-  // 11. HOME SCREEN & ROTEADOR
+  // 12. HOME SCREEN & ROTEADOR
   function navigate(id) { window.location.hash = id ? '#' + id : ''; }
 
   function updateDockState(hash) {
@@ -1511,11 +1844,11 @@
             <div class="mb-5 px-1">
               <span class="text-[11px] font-forensic uppercase tracking-[0.2em] text-[#E2B354] block mb-1">Baker Street 221B • Suite Pericial</span>
               <h1 class="font-sherlock text-2xl sm:text-3xl font-bold text-white">Laboratório Forense & OSINT</h1>
-              <p class="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">Perícia de imagens (EXIF/ELA), cadeia de custódia, decodificador, OSINT, SSL, sites e CNPJ via Proxy Remoto.</p>
+              <p class="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">VirusTotal, EXIF/ELA, cadeia de custódia, decodificador, OSINT, SSL, sites e CNPJ via Proxy Remoto.</p>
             </div>
             <div class="spotlight-bar mb-4">
               <span class="material-symbols-rounded text-[#E2B354] text-xl">search</span>
-              <input type="text" id="spotlightInput" class="spotlight-input" placeholder="Investigar ferramenta (ex: ELA, EXIF, custódia, JWT, crt.sh, dork, CNPJ...)" value="${escapeHtml(homeSearchQuery)}" autocomplete="off">
+              <input type="text" id="spotlightInput" class="spotlight-input" placeholder="Investigar ferramenta (ex: VirusTotal, ELA, EXIF, custódia, JWT, crt.sh, CNPJ...)" value="${escapeHtml(homeSearchQuery)}" autocomplete="off">
               ${homeSearchQuery ? '<button type="button" id="clearSpotlight" class="text-[var(--text-secondary)] hover:text-white"><span class="material-symbols-rounded text-lg">close</span></button>' : ''}
             </div>
             <div class="sector-tabs">
@@ -1533,6 +1866,7 @@
 
     const m = MODULES.find(x => x.id === hash);
     if (!m) return navigate('');
+    if (m.customView === 'virustotal') return renderVirusTotalView(view);
     if (m.customView === 'metadata') return renderMetadataView(view);
     if (m.customView === 'ela') return renderElaView(view);
     if (m.customView === 'custody') return renderCustodyView(view);
@@ -1620,15 +1954,28 @@
     const entries = Object.entries(obj).filter(([, v]) => v !== undefined && v !== null && v !== '');
     if (!entries.length) return '<p class="text-sm text-[var(--text-secondary)]">Nenhum dado retornado.</p>';
     return `<div class="ios-group">${entries.map(([k, v]) => {
-      const isMono = /(hash|sha|hex|ip|latitude|longitude|cnpj|base64)/i.test(k);
+      const isMono = /(hash|sha|hex|ip|latitude|longitude|cnpj|base64|alvo)/i.test(k);
       return `<div class="ios-row"><div class="flex items-center gap-3 min-w-0"><span class="material-symbols-rounded text-[#E2B354] text-xl shrink-0">${escapeHtml(getIcon(k))}</span><div class="flex flex-col min-w-0"><span class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold">${escapeHtml(k.replace(/_/g, ' '))}</span><span class="${isMono ? 'font-forensic text-xs' : 'text-sm'} font-medium text-white break-words">${escapeHtml(v)}</span></div></div><button type="button" class="ios-chip text-[11px] py-1 px-2.5 shrink-0" data-copy-val="${escapeHtml(v)}"><span class="material-symbols-rounded text-xs">content_copy</span></button></div>`;
     }).join('')}</div>`;
   }
 
-  // 12. EVENTOS & BOOT
+  // 13. EVENTOS & BOOT
   document.addEventListener('click', async (e) => {
     const navEl = e.target.closest('[data-nav]');
     if (navEl) return navigate(navEl.getAttribute('data-nav'));
+
+    const vtHashEl = e.target.closest('[data-vt-hash]');
+    if (vtHashEl) {
+      pendingVtQuery = vtHashEl.getAttribute('data-vt-hash');
+      return navigate('virustotal');
+    }
+
+    const fillVtEl = e.target.closest('[data-fill-vt]');
+    if (fillVtEl) {
+      const input = document.getElementById('vtTarget');
+      if (input) { input.value = fillVtEl.getAttribute('data-fill-vt'); document.getElementById('vtForm')?.requestSubmit(); }
+      return;
+    }
 
     const secEl = e.target.closest('[data-sector]');
     if (secEl) {
