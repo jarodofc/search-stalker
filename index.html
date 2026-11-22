@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#040408">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="no-referrer">
-<title>GlassOSINT • Central Sherlock & Buscas</title>
+<title>GlassOSINT • Sherlock & Web Forensics</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230A84FF'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js"></script>
@@ -158,14 +158,12 @@
   .squircle .material-symbols-rounded { font-size: 25px; color: #FFFFFF; }
 
   .md-field { position: relative; margin-bottom: 13px; }
-  .md-input, .md-select {
+  .md-input {
     width: 100%; padding: 22px 16px 8px; background: rgba(118,118,128,0.20);
     border: 1px solid rgba(255,255,255,0.14); border-radius: 17px; color: #FFFFFF;
     font-size: 15px; outline: none; transition: all 0.2s ease;
   }
-  .md-select { padding: 14px 16px; appearance: none; cursor: pointer; }
-  .md-select option { background: #14141c; color: #ffffff; }
-  .md-input:focus, .md-select:focus { background: rgba(118,118,128,0.30); border-color: var(--ios-blue); box-shadow: 0 0 0 3px rgba(10,132,255,0.26); }
+  .md-input:focus { background: rgba(118,118,128,0.30); border-color: var(--ios-blue); box-shadow: 0 0 0 3px rgba(10,132,255,0.26); }
   .md-label {
     position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
     color: var(--text-secondary); font-size: 14px; pointer-events: none; transition: all 0.2s ease;
@@ -237,7 +235,6 @@
   .tag-err { background: rgba(255,69,58,0.18); color: var(--ios-red); }
   .tag-warn { background: rgba(255,159,10,0.18); color: var(--ios-orange); }
   .tag-info { background: rgba(10,132,255,0.18); color: var(--ios-blue); }
-  .tag-pro { background: rgba(191,90,242,0.18); color: var(--ios-purple); }
 
   .ios-dock-wrap { position: fixed; left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom)); z-index: 60; display: flex; justify-content: center; pointer-events: none; padding: 0 14px; }
   .ios-dock {
@@ -378,15 +375,15 @@
     </button>
     <button type="button" class="dock-item" data-nav="osint" data-dock="osint">
       <span class="material-symbols-rounded">travel_explore</span>
-      <span class="dock-lbl">Sherlock</span>
+      <span class="dock-lbl">OSINT</span>
     </button>
-    <button type="button" class="dock-item" data-nav="cpf" data-dock="cpf">
-      <span class="material-symbols-rounded">fingerprint</span>
-      <span class="dock-lbl">Buscas</span>
+    <button type="button" class="dock-item" data-nav="dork" data-dock="dork">
+      <span class="material-symbols-rounded">manage_search</span>
+      <span class="dock-lbl">Dorks</span>
     </button>
-    <button type="button" class="dock-item" data-nav="atpv" data-dock="atpv">
-      <span class="material-symbols-rounded">directions_car</span>
-      <span class="dock-lbl">Veículos</span>
+    <button type="button" class="dock-item" data-nav="domain" data-dock="domain">
+      <span class="material-symbols-rounded">language</span>
+      <span class="dock-lbl">Sites</span>
     </button>
   </div>
 </nav>
@@ -396,7 +393,7 @@
   'use strict';
 
   // ==========================================================
-  // 1. PROTEÇÃO ANTI-INSPEÇÃO
+  // 1. PROTEÇÃO ANTI-INSPEÇÃO (ZERO FALSOS POSITIVOS)
   // ==========================================================
   const AUTHOR_SIGNATURE = 'KIIK HACKING';
   const lockOverlay = document.getElementById('securityLock');
@@ -443,7 +440,7 @@
         { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
       );
       const hmac = await crypto.subtle.importKey(
-        'raw', enc.encode(`${AUTHOR_SIGNATURE}::P2P::V9`),
+        'raw', enc.encode(`${AUTHOR_SIGNATURE}::P2P::V10`),
         { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
       );
       ctx = { aes, hmac };
@@ -484,7 +481,7 @@
   })();
 
   // ==========================================================
-  // 3. CAMADA NATIVA DE PROXY REMOTO + ADAPTADOR DE MÓDULOS
+  // 3. CAMADA NATIVA DE CONEXÃO VIA PROXY REMOTO (BOOT DO SITE)
   // ==========================================================
   const RemoteProxy = (() => {
     let mode = 'initializing';
@@ -529,26 +526,10 @@
       return initPromise;
     }
 
-    async function callPrivateModule(moduleKey, params = {}) {
-      await init();
-      if (mode !== 'vercel') {
-        throw new Error('Módulo exige o proxy serverless (/api/proxy.js) publicado na Vercel com API_BASE_URL configurada.');
-      }
-      const r = await rawTimeoutFetch('/api/proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ module: moduleKey, params })
-      }, 16000);
-      const json = await r.json().catch(() => ({}));
-      if (!r.ok || json.success === false) {
-        throw new Error(json.error || `Falha na consulta (HTTP ${r.status}).`);
-      }
-      return json.data;
-    }
-
     async function request(targetUrl, options = {}, timeoutMs = 10500) {
       await init();
 
+      // Rota 1: Proxy Remoto próprio (/api/proxy na Vercel)
       if (mode === 'vercel') {
         const proxyHeaders = {};
         if (options.headers && Object.keys(options.headers).length) {
@@ -559,28 +540,28 @@
         return { ok: r.ok, status: r.status, text: () => Promise.resolve(bodyText), json: () => Promise.resolve(JSON.parse(bodyText)), via: 'Proxy Remoto (Vercel)' };
       }
 
-      const hasAuth = Boolean(options.headers && Object.keys(options.headers).some(h => h.toLowerCase() === 'x-api-key'));
-      if (!hasAuth) {
-        try {
-          const r = await rawTimeoutFetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
-          if (r.ok) {
-            const env = await r.json();
-            const code = env?.status?.http_code || 200;
-            const contents = env?.contents ?? '';
-            return { ok: code >= 200 && code < 300, status: code, text: () => Promise.resolve(contents), json: () => Promise.resolve(JSON.parse(contents)), via: 'Proxy Remoto (AllOrigins)' };
-          }
-        } catch {}
-        try {
-          const r = await rawTimeoutFetch(`https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
-          const bodyText = await r.text();
-          return { ok: r.ok, status: r.status, text: () => Promise.resolve(bodyText), json: () => Promise.resolve(JSON.parse(bodyText)), via: 'Proxy Remoto (CorsProxy)' };
-        } catch {}
-        try {
-          const r = await rawTimeoutFetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
-          const bodyText = await r.text();
-          return { ok: r.ok, status: r.status, text: () => Promise.resolve(bodyText), json: () => Promise.resolve(JSON.parse(bodyText)), via: 'Proxy Remoto (CodeTabs)' };
-        } catch {}
-      }
+      // Rota 2: Gateways de Proxy Remoto Públicos (AllOrigins → CorsProxy → CodeTabs)
+      try {
+        const r = await rawTimeoutFetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
+        if (r.ok) {
+          const env = await r.json();
+          const code = env?.status?.http_code || 200;
+          const contents = env?.contents ?? '';
+          return { ok: code >= 200 && code < 300, status: code, text: () => Promise.resolve(contents), json: () => Promise.resolve(JSON.parse(contents)), via: 'Proxy Remoto (AllOrigins)' };
+        }
+      } catch {}
+
+      try {
+        const r = await rawTimeoutFetch(`https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
+        const bodyText = await r.text();
+        return { ok: r.ok, status: r.status, text: () => Promise.resolve(bodyText), json: () => Promise.resolve(JSON.parse(bodyText)), via: 'Proxy Remoto (CorsProxy)' };
+      } catch {}
+
+      try {
+        const r = await rawTimeoutFetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
+        const bodyText = await r.text();
+        return { ok: r.ok, status: r.status, text: () => Promise.resolve(bodyText), json: () => Promise.resolve(JSON.parse(bodyText)), via: 'Proxy Remoto (CodeTabs)' };
+      } catch {}
 
       const direct = await rawTimeoutFetch(targetUrl, options, timeoutMs);
       const bodyText = await direct.text();
@@ -600,7 +581,7 @@
       return { html, code: r.status, via: r.via };
     }
 
-    return { init, callPrivateModule, request, fetchJson, fetchHtml, getModeLabel: () => modeLabel };
+    return { init, request, fetchJson, fetchHtml, getModeLabel: () => modeLabel };
   })();
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
@@ -656,25 +637,14 @@
   }
 
   // ==========================================================
-  // 4. UTILITÁRIOS, MAPA EMBUTIDO & VISUALIZADOR ANALÍTICO
+  // 4. UTILITÁRIOS, MAPA EMBUTIDO & EXTRAÇÃO RDAP
   // ==========================================================
-  const _vault = ['Nzc4NDMzZTEyNDQ2OGIxYWE2MGYyNjgxOTE5Y2Q5MThmODUyYWZlMTc2MTA1Njk4NTgxMzg4MWNiNzJhNTUwZg=='];
-  const getCpfKey = () => atob(_vault[0]);
-
-  const UFS_BR = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
-  const PORTAIS_VEICULARES = [
-    { nome: 'Situação do Veículo (DETRAN-MG)', desc: 'Restrições, débitos e cadastro MG', icone: 'fact_check', cor: 'linear-gradient(135deg,#0A84FF,#0055D4)', url: 'https://detran.mg.gov.br/veiculos/situacao-do-veiculo/consulta-de-situacao-do-veiculo' },
-    { nome: 'ATPV-e (DETRAN-MG)', desc: 'Autorização de transferência digital', icone: 'description', cor: 'linear-gradient(135deg,#5E5CE6,#3634A3)', url: 'https://detran.mg.gov.br/veiculos/transferencias/emitir-a-autorizacao-para-transferencia-de-propriedade-do-veiculo-atpv-e' },
-    { nome: 'Portal SENATRAN (SERPRO)', desc: 'Base nacional de veículos e infrações', icone: 'public', cor: 'linear-gradient(135deg,#30D158,#1E9E3E)', url: 'https://portalservicos.senatran.serpro.gov.br/#/veiculos/consultar' },
-    { nome: 'Multas PBH (Belo Horizonte)', desc: 'Infrações municipais de BH', icone: 'local_police', cor: 'linear-gradient(135deg,#FF9F0A,#D97706)', url: 'https://multas.pbh.gov.br/' }
-  ];
-
   let lastResultData = null;
   let lastModuleId = 'osint';
   let activeSectorFilter = 'all';
   let homeSearchQuery = '';
   let historyCache = [];
-  try { historyCache = JSON.parse(localStorage.getItem('kiik_v9_history') || '[]'); } catch { historyCache = []; }
+  try { historyCache = JSON.parse(localStorage.getItem('kiik_v10_history') || '[]'); } catch { historyCache = []; }
 
   function escapeHtml(str) {
     return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -690,20 +660,15 @@
   }
 
   const ICON_MAP = {
-    cnpj:'badge', cpf:'fingerprint', email:'mail', emails:'mail', nome:'person', name:'person', mae:'family_restroom',
-    proprietario:'person_check', titular:'person_check', documento:'badge', responsavel:'manage_accounts',
-    registrador:'storefront', razao:'domain', fantasia:'storefront', uf:'map', estado:'map', pais:'public',
-    municipio:'location_city', cidade:'location_city', cep:'markunread_mailbox', logradouro:'signpost',
-    endereco:'pin_drop', bairro:'holiday_village', data:'calendar_today', nascimento:'cake', abertura:'event',
-    registro:'event', expiracao:'event_busy', situacao:'info', status:'check_circle', cnae:'category',
-    capital:'payments', score:'speed', renda:'payments', credito:'credit_score', ip:'router', isp:'dns',
-    asn:'lan', latitude:'location_on', longitude:'location_on', altitude:'terrain', bussola:'explore',
-    regiao:'explore', url:'link', links:'link', placa:'directions_car', chassi:'directions_car', renavam:'pin',
-    multa:'local_police', processo:'gavel', tribunal:'account_balance', cnh:'id_card', telefone:'call',
-    celular:'smartphone', titulo:'title', descricao:'description', idioma:'translate', tecnologia:'memory',
+    email:'mail', emails:'mail', proprietario:'person_check', titular:'person_check', registro_titular:'badge',
+    registrador:'storefront', pais:'public', cidade:'location_city', endereco:'pin_drop', data:'calendar_today',
+    registro:'event', expiracao:'event_busy', status:'check_circle', ip:'router', isp:'dns', asn:'lan',
+    latitude:'location_on', longitude:'location_on', altitude:'terrain', bussola:'explore', regiao:'explore',
+    url:'link', links:'link', titulo:'title', descricao:'description', idioma:'translate', tecnologia:'memory',
     imagens:'image', dominio:'language', aparelho:'smartphone', fabricante:'devices', modelo:'smartphone',
-    lente:'camera', software:'memory', iso:'iso', abertura_lente:'camera', exposicao:'shutter_speed',
-    flash:'flash_on', resolucao:'aspect_ratio', arquivo:'image', tamanho:'data_usage', hash:'fingerprint'
+    lente:'camera', software:'memory', iso:'iso', abertura:'camera', exposicao:'shutter_speed',
+    flash:'flash_on', resolucao:'aspect_ratio', arquivo:'image', tamanho:'data_usage', hash:'fingerprint',
+    servidor:'dns', vazamentos:'security'
   };
 
   function getIcon(key) {
@@ -731,8 +696,8 @@
     historyCache.unshift({ moduleId, query, ts: Date.now() });
     historyCache = historyCache.slice(0, 20);
     try {
-      localStorage.setItem('kiik_v9_history', JSON.stringify(historyCache));
-      localStorage.setItem('kiik_v9_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
+      localStorage.setItem('kiik_v10_history', JSON.stringify(historyCache));
+      localStorage.setItem('kiik_v10_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
     } catch {}
   }
 
@@ -740,7 +705,6 @@
     return historyCache.filter(i => i.moduleId === moduleId).slice(0, 5);
   }
 
-  // Widget de Mapa Interativo (OpenStreetMap + Google Maps + Street View + Apple Maps)
   function renderMapBlock(lat, lon, label = 'Localização no Mapa') {
     const la = Number(lat);
     const lo = Number(lon);
@@ -798,66 +762,8 @@
     }
   }
 
-  function renderAnalyticResponse(payload) {
-    if (!payload || typeof payload !== 'object') {
-      return `<p class="text-sm text-[var(--text-secondary)]">${escapeHtml(String(payload ?? 'Sem dados.'))}</p>`;
-    }
-    const root = payload.data && typeof payload.data === 'object' && !Array.isArray(payload.data) ? payload.data : payload;
-    const scalars = {};
-    const sections = [];
-    const images = [];
-    const isBase64Img = (val) => typeof val === 'string' && (/^data:image\//i.test(val) || (val.length > 250 && /^[A-Za-z0-9+/=\r\n]+$/.test(val.trim())));
-
-    for (const [k, v] of Object.entries(root)) {
-      if (v === null || v === undefined || v === '') continue;
-      if (isBase64Img(v) || (k.toLowerCase().includes('foto') && typeof v === 'string' && v.length > 60)) {
-        const src = /^data:image\//i.test(v) || /^https?:\/\//i.test(v) ? v : `data:image/jpeg;base64,${v.replace(/\s+/g, '')}`;
-        images.push({ label: k, src });
-      } else if (typeof v !== 'object') {
-        scalars[k] = v === true ? 'Sim' : v === false ? 'Não' : v;
-      } else if (Array.isArray(v) && v.length) {
-        sections.push({ titulo: k.replace(/_/g, ' '), itens: v });
-      } else if (typeof v === 'object' && Object.keys(v).length) {
-        sections.push({ titulo: k.replace(/_/g, ' '), obj: v });
-      }
-    }
-
-    let html = '';
-    if (images.length) {
-      html += `<div class="mb-5 grid grid-cols-1 sm:grid-cols-2 gap-4">${images.map(img => `
-        <div class="p-3 rounded-2xl bg-white/5 border border-white/10 text-center">
-          <img src="${escapeHtml(img.src)}" alt="${escapeHtml(img.label)}" class="max-h-64 mx-auto rounded-xl object-contain">
-          <span class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] block mt-2">${escapeHtml(img.label)}</span>
-        </div>`).join('')}</div>`;
-    }
-    if (Object.keys(scalars).length) html += renderIosList(scalars);
-    for (const sec of sections) {
-      if (sec.obj) {
-        const flat = {};
-        for (const [sk, sv] of Object.entries(sec.obj)) {
-          if (sv !== null && sv !== undefined && sv !== '') flat[sk] = typeof sv === 'object' ? JSON.stringify(sv) : sv;
-        }
-        if (Object.keys(flat).length) html += `<h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mt-5 mb-2 px-1">${escapeHtml(sec.titulo)}</h4>${renderIosList(flat)}`;
-      } else if (sec.itens) {
-        html += `<h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mt-5 mb-2 px-1">${escapeHtml(sec.titulo)} (${sec.itens.length})</h4>`;
-        if (typeof sec.itens[0] === 'object') {
-          html += `<div class="space-y-3">${sec.itens.slice(0, 25).map(item => {
-            const row = {};
-            for (const [ik, iv] of Object.entries(item || {})) {
-              if (iv !== null && iv !== undefined && iv !== '') row[ik] = typeof iv === 'object' ? JSON.stringify(iv) : iv;
-            }
-            return renderIosList(row);
-          }).join('')}</div>`;
-        } else {
-          html += `<div class="flex flex-wrap gap-2">${sec.itens.slice(0, 40).map(i => `<span class="text-xs px-3 py-1.5 rounded-full bg-white/10 text-white">${escapeHtml(i)}</span>`).join('')}</div>`;
-        }
-      }
-    }
-    return html || '<p class="text-sm text-[var(--text-secondary)]">Nenhum campo preenchido retornado.</p>';
-  }
-
   function extractRdapOwner(rdap) {
-    const out = { proprietario: 'Protegido por privacidade / Não divulgado', documento_titular: '-', email_contato: '-', registrador: '-' };
+    const out = { proprietario: 'Protegido por privacidade / Não divulgado', registro_titular: '-', email_contato: '-', registrador: '-' };
     if (!rdap || !Array.isArray(rdap.entities)) return out;
     const getVcard = (entity, field) => {
       const vc = entity?.vcardArray?.[1];
@@ -869,7 +775,7 @@
     const reg = rdap.entities.find(e => (e.roles || []).includes('registrar'));
     if (owner) {
       out.proprietario = getVcard(owner, 'fn') || getVcard(owner, 'org') || out.proprietario;
-      out.documento_titular = owner.publicIds?.[0]?.identifier || owner.handle || '-';
+      out.registro_titular = owner.publicIds?.[0]?.identifier || owner.handle || '-';
       out.email_contato = getVcard(owner, 'email') || '-';
     }
     if (reg) out.registrador = getVcard(reg, 'fn') || reg.handle || '-';
@@ -877,37 +783,29 @@
   }
 
   // ==========================================================
-  // 5. SETORIZAÇÃO CENTRALIZADA: SHERLOCK | BUSCAS | VEÍCULOS
+  // 5. SETORES & MÓDULOS (FOCO EM SHERLOCK, SITES & FORENSE)
   // ==========================================================
   const SECTORS = [
     {
       id: 'sherlock',
-      title: 'Área Sherlock — Investigação OSINT & Forense',
-      subtitle: 'Metadados de fotos, perfis, Dorks, scraping, vazamentos e infraestrutura web',
+      title: 'Área Sherlock — Investigação & Forense',
+      subtitle: 'Metadados de fotos (EXIF/GPS), perfis OSINT, Google Dorks e vazamentos',
       short: 'Área Sherlock',
       icon: 'policy',
       accent: '#5E5CE6'
     },
     {
-      id: 'buscas',
-      title: 'Área Buscas — Pessoas, Documentos & Crédito',
-      subtitle: 'CPF, CNPJ, BigData, CADSUS, CredLink, Score, Telefone, CNH, Fotos e CEP',
-      short: 'Área Buscas',
-      icon: 'person_search',
-      accent: '#30D158'
-    },
-    {
-      id: 'veiculos',
-      title: 'Área Veículos & Jurídico',
-      subtitle: 'Central MG (DETRAN/SENATRAN/PBH), Placas, Multas, Vistoria, EAR e Processos',
-      short: 'Veículos & Jurídico',
-      icon: 'directions_car',
+      id: 'web',
+      title: 'Sites, Scraping & Rede',
+      subtitle: 'Proprietário de domínios (RDAP/DNS), Web Scraper e IP via Proxy Remoto',
+      short: 'Sites & Scraping',
+      icon: 'language',
       accent: '#0A84FF'
     }
   ];
 
   const MODULES = [
-    // ==================== ÁREA SHERLOCK (OSINT & FORENSE) ====================
+    // ==================== ÁREA SHERLOCK ====================
     {
       id: 'metadata',
       sector: 'sherlock',
@@ -945,101 +843,6 @@
       placeholder: 'Nome, @user ou e-mail',
       max: 80,
       customSearch: 'dork_only'
-    },
-    {
-      id: 'scraping',
-      sector: 'sherlock',
-      name: 'Web Scraper',
-      desc: 'Extrai metadados HTML, e-mails, telefones e links públicos via proxy remoto.',
-      keywords: 'scraper sherlock html extrair links telefones emails site',
-      apisLabel: 'Proxy Remoto',
-      icon: 'code',
-      gradient: 'linear-gradient(135deg, #32ADE6 0%, #007AFF 100%)',
-      placeholder: 'Ex: https://site.com.br',
-      max: 150,
-      fetchApi: async (v) => {
-        let target = v.trim();
-        if (!target) throw new Error('Informe uma URL pública.');
-        if (!/^https?:\/\//i.test(target)) target = 'https://' + target;
-        let parsedUrl;
-        try { parsedUrl = new URL(target); } catch { throw new Error('URL inválida.'); }
-
-        const { html, via } = await RemoteProxy.fetchHtml(parsedUrl.href);
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        const textContent = doc.body?.innerText || doc.body?.textContent || '';
-        const title = doc.querySelector('title')?.textContent?.trim() || '-';
-        const description = doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim() || '-';
-        const generator = doc.querySelector('meta[name="generator"]')?.getAttribute('content')?.trim() || '-';
-        const emails = [...new Set((html.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || []).filter(e => !/\.(png|jpg|jpeg|gif|svg|webp|css|js)$/i.test(e)))].slice(0, 30);
-        const telefones = [...new Set((textContent.match(/(?:\+55\s?)?(?:\(?\d{2}\)?\s?)(?:9\d{4}|\d{4})-?\d{4}/g) || []).map(t => t.trim()))].slice(0, 20);
-        const uniqueLinks = [...new Set([...doc.querySelectorAll('a[href]')].map(a => a.getAttribute('href')?.trim()).filter(h => h && /^https?:\/\//i.test(h)))];
-        const socialRx = /(instagram\.com|facebook\.com|linkedin\.com|x\.com|twitter\.com|youtube\.com|tiktok\.com|wa\.me|whatsapp\.com|t\.me|github\.com)/i;
-        const redes = uniqueLinks.filter(l => socialRx.test(l)).slice(0, 20);
-        const externos = uniqueLinks.filter(l => !l.includes(parsedUrl.hostname) && !socialRx.test(l)).slice(0, 20);
-
-        return {
-          provider: via,
-          resumo: { url: parsedUrl.href, titulo: title, descricao: description, tecnologia: generator, total_links: uniqueLinks.length, total_imagens: doc.querySelectorAll('img').length, emails_encontrados: emails.length },
-          listas: [
-            { titulo: 'E-mails Públicos', itens: emails },
-            { titulo: 'Telefones Encontrados', itens: telefones },
-            { titulo: 'Redes Sociais / Contato', itens: redes },
-            { titulo: 'Links Externos', itens: externos }
-          ].filter(l => l.itens.length > 0),
-          raw: { url: parsedUrl.href, title, description, emails, telefones, redes, externos }
-        };
-      }
-    },
-    {
-      id: 'domain',
-      sector: 'sherlock',
-      name: 'Proprietário de Site',
-      desc: 'Retorna titular (dono), CNPJ/CPF (.br), registrador, datas e DNS.',
-      keywords: 'site dominio dono proprietario whois rdap dns sherlock',
-      apisLabel: 'RDAP + 2 DNS',
-      icon: 'language',
-      gradient: 'linear-gradient(135deg, #64D2FF 0%, #0A84FF 100%)',
-      placeholder: 'Ex: uol.com.br ou site.com',
-      max: 80,
-      fetchApi: async (v) => {
-        const domain = v.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
-        if (!domain || !domain.includes('.')) throw new Error('Informe um domínio válido (ex: exemplo.com.br).');
-
-        const resolveDns = async (type) => {
-          const { data } = await tryFallback([
-            { name: 'Google DoH', run: () => RemoteProxy.fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=${type}`) },
-            { name: 'Cloudflare DoH', run: () => RemoteProxy.fetchJson(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${type}`, { headers: { Accept: 'application/dns-json' } }) }
-          ]);
-          return (data?.Answer || []).map(a => a.data);
-        };
-
-        const rdapResult = await tryFallback([
-          { name: domain.endsWith('.br') ? 'RDAP Registro.br via Proxy' : 'RDAP.org via Proxy', run: () => RemoteProxy.fetchJson(domain.endsWith('.br') ? `https://rdap.registro.br/domain/${encodeURIComponent(domain)}` : `https://rdap.org/domain/${encodeURIComponent(domain)}`) },
-          { name: 'RDAP Verisign via Proxy', run: () => RemoteProxy.fetchJson(`https://rdap.verisign.com/com/v1/domain/${encodeURIComponent(domain)}`) }
-        ]).catch(() => ({ data: null, provider: 'DNS Only (RDAP indisponível)' }));
-
-        const [aRec, mxRec, nsRec, txtRec] = await Promise.all([resolveDns('A').catch(() => []), resolveDns('MX').catch(() => []), resolveDns('NS').catch(() => []), resolveDns('TXT').catch(() => [])]);
-        const rdap = rdapResult.data;
-        const owner = extractRdapOwner(rdap);
-        const events = (rdap?.events || []).reduce((acc, ev) => { acc[ev.eventAction] = ev.eventDate?.split('T')[0]; return acc; }, {});
-
-        return {
-          provider: `${rdapResult.provider} + DNS`,
-          resumo: {
-            dominio: domain, proprietario: owner.proprietario, documento_titular: owner.documento_titular,
-            email_contato: owner.email_contato, registrador: owner.registrador,
-            status_rdap: (rdap?.status || []).join(', ') || 'Não retornado',
-            registro: events.registration || '-', expiracao: events.expiration || '-'
-          },
-          listas: [
-            { titulo: 'IPs do Servidor (A)', itens: aRec },
-            { titulo: 'Servidores de E-mail (MX)', itens: mxRec },
-            { titulo: 'Nameservers (NS)', itens: nsRec },
-            { titulo: 'Registros TXT', itens: txtRec }
-          ].filter(l => l.itens.length > 0),
-          raw: { domain, owner, rdap, dns: { aRec, mxRec, nsRec, txtRec } }
-        };
-      }
     },
     {
       id: 'breach',
@@ -1080,12 +883,122 @@
         return { ...data, provider };
       }
     },
+
+    // ==================== SITES, SCRAPING & REDE ====================
+    {
+      id: 'domain',
+      sector: 'web',
+      name: 'Proprietário de Site',
+      desc: 'Retorna titular (dono), registro público, registrador, datas e DNS.',
+      keywords: 'site dominio dono proprietario whois rdap dns',
+      apisLabel: 'RDAP + 2 DNS',
+      icon: 'language',
+      gradient: 'linear-gradient(135deg, #64D2FF 0%, #0A84FF 100%)',
+      placeholder: 'Ex: uol.com.br ou site.com',
+      max: 80,
+      fetchApi: async (v) => {
+        const domain = v.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+        if (!domain || !domain.includes('.')) throw new Error('Informe um domínio válido (ex: exemplo.com.br).');
+
+        const resolveDns = async (type) => {
+          const { data } = await tryFallback([
+            { name: 'Google DoH', run: () => RemoteProxy.fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=${type}`) },
+            { name: 'Cloudflare DoH', run: () => RemoteProxy.fetchJson(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${type}`, { headers: { Accept: 'application/dns-json' } }) }
+          ]);
+          return (data?.Answer || []).map(a => a.data);
+        };
+
+        const rdapResult = await tryFallback([
+          { name: domain.endsWith('.br') ? 'RDAP Registro.br via Proxy' : 'RDAP.org via Proxy', run: () => RemoteProxy.fetchJson(domain.endsWith('.br') ? `https://rdap.registro.br/domain/${encodeURIComponent(domain)}` : `https://rdap.org/domain/${encodeURIComponent(domain)}`) },
+          { name: 'RDAP Verisign via Proxy', run: () => RemoteProxy.fetchJson(`https://rdap.verisign.com/com/v1/domain/${encodeURIComponent(domain)}`) }
+        ]).catch(() => ({ data: null, provider: 'DNS Only (RDAP indisponível)' }));
+
+        const [aRec, mxRec, nsRec, txtRec] = await Promise.all([
+          resolveDns('A').catch(() => []),
+          resolveDns('MX').catch(() => []),
+          resolveDns('NS').catch(() => []),
+          resolveDns('TXT').catch(() => [])
+        ]);
+
+        const rdap = rdapResult.data;
+        const owner = extractRdapOwner(rdap);
+        const events = (rdap?.events || []).reduce((acc, ev) => { acc[ev.eventAction] = ev.eventDate?.split('T')[0]; return acc; }, {});
+
+        return {
+          provider: `${rdapResult.provider} + DNS`,
+          resumo: {
+            dominio: domain,
+            proprietario: owner.proprietario,
+            registro_titular: owner.registro_titular,
+            email_contato: owner.email_contato,
+            registrador: owner.registrador,
+            status_rdap: (rdap?.status || []).join(', ') || 'Não retornado',
+            registro: events.registration || '-',
+            expiracao: events.expiration || '-'
+          },
+          listas: [
+            { titulo: 'IPs do Servidor (A)', itens: aRec },
+            { titulo: 'Servidores de E-mail (MX)', itens: mxRec },
+            { titulo: 'Nameservers (NS)', itens: nsRec },
+            { titulo: 'Registros TXT', itens: txtRec }
+          ].filter(l => l.itens.length > 0),
+          raw: { domain, owner, rdap, dns: { aRec, mxRec, nsRec, txtRec } }
+        };
+      }
+    },
+    {
+      id: 'scraping',
+      sector: 'web',
+      name: 'Web Scraper',
+      desc: 'Extrai metadados HTML, e-mails, telefones e links públicos via proxy remoto.',
+      keywords: 'scraper html extrair links telefones emails site proxy',
+      apisLabel: 'Proxy Remoto',
+      icon: 'code',
+      gradient: 'linear-gradient(135deg, #32ADE6 0%, #007AFF 100%)',
+      placeholder: 'Ex: https://site.com.br',
+      max: 150,
+      fetchApi: async (v) => {
+        let target = v.trim();
+        if (!target) throw new Error('Informe uma URL pública.');
+        if (!/^https?:\/\//i.test(target)) target = 'https://' + target;
+        let parsedUrl;
+        try { parsedUrl = new URL(target); } catch { throw new Error('URL inválida.'); }
+
+        const { html, via } = await RemoteProxy.fetchHtml(parsedUrl.href);
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const textContent = doc.body?.innerText || doc.body?.textContent || '';
+        const title = doc.querySelector('title')?.textContent?.trim() || '-';
+        const description = doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim() || '-';
+        const generator = doc.querySelector('meta[name="generator"]')?.getAttribute('content')?.trim() || '-';
+        const emails = [...new Set((html.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || []).filter(e => !/\.(png|jpg|jpeg|gif|svg|webp|css|js)$/i.test(e)))].slice(0, 30);
+        const telefones = [...new Set((textContent.match(/(?:\+55\s?)?(?:\(?\d{2}\)?\s?)(?:9\d{4}|\d{4})-?\d{4}/g) || []).map(t => t.trim()))].slice(0, 20);
+        const uniqueLinks = [...new Set([...doc.querySelectorAll('a[href]')].map(a => a.getAttribute('href')?.trim()).filter(h => h && /^https?:\/\//i.test(h)))];
+        const socialRx = /(instagram\.com|facebook\.com|linkedin\.com|x\.com|twitter\.com|youtube\.com|tiktok\.com|wa\.me|whatsapp\.com|t\.me|github\.com)/i;
+        const redes = uniqueLinks.filter(l => socialRx.test(l)).slice(0, 20);
+        const externos = uniqueLinks.filter(l => !l.includes(parsedUrl.hostname) && !socialRx.test(l)).slice(0, 20);
+
+        return {
+          provider: via,
+          resumo: {
+            url: parsedUrl.href, titulo: title, descricao: description, tecnologia: generator,
+            total_links: uniqueLinks.length, total_imagens: doc.querySelectorAll('img').length, emails_encontrados: emails.length
+          },
+          listas: [
+            { titulo: 'E-mails Públicos', itens: emails },
+            { titulo: 'Telefones Encontrados', itens: telefones },
+            { titulo: 'Redes Sociais / Contato', itens: redes },
+            { titulo: 'Links Externos', itens: externos }
+          ].filter(l => l.itens.length > 0),
+          raw: { url: parsedUrl.href, title, description, emails, telefones, redes, externos }
+        };
+      }
+    },
     {
       id: 'ip',
-      sector: 'sherlock',
+      sector: 'web',
       name: 'IP & Geolocalização',
       desc: 'Operadora, ASN e mapa de localização (vazio retorna o IP do Proxy Remoto).',
-      keywords: 'ip geo localizacao mapa operadora asn servidor proxy sherlock',
+      keywords: 'ip geo localizacao mapa operadora asn servidor proxy',
       apisLabel: '3 APIs + Mapa',
       icon: 'router',
       gradient: 'linear-gradient(135deg, #BF5AF2 0%, #892CDC 100%)',
@@ -1105,415 +1018,15 @@
           resumo: {
             ip: data.ip || data.ipAddress || target,
             pais: `${data.country || data.country_name || data.countryName || '-'} (${data.country_code || data.countryCode || '-'})`,
-            regiao: data.region || data.regionName || '-', cidade: data.city || data.cityName || '-',
-            isp: data.connection?.isp || data.org || '-', asn: data.connection?.asn || data.asn || '-',
-            latitude: data.latitude ?? '-', longitude: data.longitude ?? '-'
+            regiao: data.region || data.regionName || '-',
+            cidade: data.city || data.cityName || '-',
+            isp: data.connection?.isp || data.org || '-',
+            asn: data.connection?.asn || data.asn || '-',
+            latitude: data.latitude ?? '-',
+            longitude: data.longitude ?? '-'
           },
           raw: data
         };
-      }
-    },
-
-    // ==================== ÁREA BUSCAS (PESSOAS & DOCUMENTOS) ====================
-    {
-      id: 'cpf',
-      sector: 'buscas',
-      name: 'CPF Completo',
-      desc: 'CPF Full (API Privada) → CPFHub.io → validação fiscal local em cascata.',
-      keywords: 'cpf pessoa documento full receita buscas',
-      apisLabel: '3 APIs + Fallback',
-      icon: 'fingerprint',
-      gradient: 'linear-gradient(135deg, #FF375F 0%, #C91D42 100%)',
-      placeholder: 'CPF (11 dígitos)',
-      max: 14,
-      digits: true,
-      fetchApi: async (v) => {
-        const cpf = v.replace(/\D/g, '');
-        if (cpf.length !== 11) throw new Error('Informe um CPF com 11 dígitos.');
-        const { data, provider } = await tryFallback([
-          {
-            name: 'CPF Full (API Privada)',
-            run: async () => {
-              const raw = await RemoteProxy.callPrivateModule('cpf_full', { cpf, valor: cpf, query: cpf });
-              return { analyticRaw: raw, raw };
-            }
-          },
-          {
-            name: 'CPFHub.io via Proxy Remoto',
-            run: async () => {
-              const raw = await RemoteProxy.fetchJson(`https://api.cpfhub.io/cpf/${cpf}`, {
-                headers: { 'x-api-key': getCpfKey(), 'Accept': 'application/json' }
-              });
-              const info = raw.data || raw.result || raw;
-              if (!info || typeof info !== 'object') throw new Error('Resposta inválida');
-              const resumo = {};
-              for (const [k, val] of Object.entries(info)) {
-                if (val !== null && val !== '' && typeof val !== 'object') resumo[k] = val === true ? 'Sim' : val === false ? 'Não' : val;
-              }
-              return { resumo, raw };
-            }
-          },
-          {
-            name: 'Motor Fiscal Local (Fallback)',
-            run: async () => {
-              const isRep = /^(\d)\1{10}$/.test(cpf);
-              const calc = (s) => { let sum = 0; for (let i = 0; i < s.length; i++) sum += Number(s[i]) * (s.length + 1 - i); const m = (sum * 10) % 11; return m === 10 ? 0 : m; };
-              const valid = !isRep && calc(cpf.slice(0,9)) === Number(cpf[9]) && calc(cpf.slice(0,10)) === Number(cpf[10]);
-              const reg = {'0':'RS','1':'DF, GO, MS, MT, TO','2':'AC, AM, AP, PA, RO, RR','3':'CE, MA, PI','4':'AL, PB, PE, RN','5':'BA, SE','6':'MG','7':'ES, RJ','8':'SP','9':'PR, SC'};
-              return {
-                resumo: { cpf: cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4'), valido: valid ? 'Sim (Válido)' : 'Não (Inválido)', regiao_fiscal: valid ? reg[cpf[8]] : '-' },
-                raw: { cpf, valid, regiao_fiscal: reg[cpf[8]] }
-              };
-            }
-          }
-        ]);
-        return { ...data, provider };
-      }
-    },
-    {
-      id: 'cnpj',
-      sector: 'buscas',
-      name: 'Consulta CNPJ',
-      desc: 'Razão social, situação, CNAE e sócios (QSA) com 3 APIs via proxy remoto.',
-      keywords: 'cnpj empresa socios qsa receita buscas',
-      apisLabel: '3 APIs BR',
-      icon: 'domain',
-      gradient: 'linear-gradient(135deg, #30D158 0%, #1E9E3E 100%)',
-      placeholder: 'CNPJ (14 dígitos)',
-      max: 18,
-      digits: true,
-      fetchApi: async (v) => {
-        const clean = v.replace(/\D/g, '');
-        if (clean.length !== 14) throw new Error('Informe um CNPJ válido com 14 dígitos.');
-        const { data, provider } = await tryFallback([
-          { name: 'BrasilAPI via Proxy', run: () => RemoteProxy.fetchJson(`https://brasilapi.com.br/api/cnpj/v1/${clean}`) },
-          { name: 'MinhaReceita via Proxy', run: () => RemoteProxy.fetchJson(`https://minhareceita.org/${clean}`) },
-          { name: 'CNPJ.ws via Proxy', run: () => RemoteProxy.fetchJson(`https://publica.cnpj.ws/cnpj/${clean}`) }
-        ]);
-        const socios = (data.qsa || data.socios || []).map(s => `${s.nome_socio || s.nome || '-'} — ${s.qualificacao_socio || s.qualificacao?.descricao || '-'}`);
-        return {
-          provider,
-          resumo: {
-            cnpj: data.cnpj || clean, razao_social: data.razao_social,
-            nome_fantasia: data.nome_fantasia || data.estabelecimento?.nome_fantasia || '-',
-            situacao: data.descricao_situacao_cadastral || data.estabelecimento?.situacao_cadastral || '-',
-            data_abertura: data.data_inicio_atividade || data.estabelecimento?.data_inicio_atividade || '-',
-            cnae_principal: data.cnae_fiscal_descricao || data.estabelecimento?.atividade_principal?.descricao || '-',
-            capital_social: data.capital_social != null ? `R$ ${Number(data.capital_social).toLocaleString('pt-BR')}` : '-',
-            municipio_uf: `${data.municipio || data.estabelecimento?.cidade?.nome || '-'} / ${data.uf || data.estabelecimento?.estado?.sigla || '-'}`,
-            logradouro: `${data.logradouro || data.estabelecimento?.logradouro || ''}, ${data.numero || data.estabelecimento?.numero || 'S/N'}`,
-            cep: data.cep || data.estabelecimento?.cep || '-'
-          },
-          listas: socios.length ? [{ titulo: 'Quadro Societário (QSA)', itens: socios }] : [],
-          raw: data
-        };
-      }
-    },
-    {
-      id: 'bigdata',
-      sector: 'buscas',
-      name: 'BigData Pessoas',
-      desc: 'Pesquisa por CPF, Nome, E-mail, Telefone, CEP, PIS, Mãe ou RG.',
-      keywords: 'bigdata cpf nome email telefone cep pis mae rg buscas',
-      apisLabel: 'API Privada',
-      tagClass: 'tag-pro',
-      icon: 'database',
-      gradient: 'linear-gradient(135deg, #5E5CE6 0%, #3634A3 100%)',
-      customView: 'multi_private',
-      privateConfig: {
-        moduleKey: 'bigdata',
-        types: [
-          { value: 'cpf', label: 'CPF', fields: [{ name: 'valor', label: 'CPF (11 dígitos)', digits: true, max: 11 }] },
-          { value: 'nome', label: 'Nome Completo', fields: [{ name: 'valor', label: 'Nome completo', max: 100 }] },
-          { value: 'email', label: 'E-mail', fields: [{ name: 'valor', label: 'E-mail', max: 100 }] },
-          { value: 'telefone', label: 'Telefone', fields: [{ name: 'valor', label: 'Telefone com DDD', digits: true, max: 11 }] },
-          { value: 'cep', label: 'CEP', fields: [{ name: 'valor', label: 'CEP (8 dígitos)', digits: true, max: 8 }] },
-          { value: 'pis', label: 'PIS / PASEP', fields: [{ name: 'valor', label: 'Número PIS', digits: true, max: 11 }] },
-          { value: 'nome_mae', label: 'Nome da Mãe', fields: [{ name: 'valor', label: 'Nome da mãe', max: 100 }] },
-          { value: 'rg', label: 'RG', fields: [{ name: 'valor', label: 'Número RG', max: 20 }] }
-        ]
-      }
-    },
-    {
-      id: 'cadsus',
-      sector: 'buscas',
-      name: 'CADSUS (SUS)',
-      desc: 'Consulta por CPF, Nome, Telefone, CEP, Nascimento, Mãe ou Nome Parcial.',
-      keywords: 'cadsus sus saude cpf nome mae nascimento uf buscas',
-      apisLabel: 'API Privada',
-      tagClass: 'tag-pro',
-      icon: 'medical_information',
-      gradient: 'linear-gradient(135deg, #00C7BE 0%, #0D9488 100%)',
-      customView: 'multi_private',
-      privateConfig: {
-        moduleKey: 'cadsus',
-        types: [
-          { value: 'cpf', label: 'CPF', fields: [{ name: 'valor', label: 'CPF (11 dígitos)', digits: true, max: 11 }] },
-          { value: 'nome', label: 'Nome Completo', fields: [{ name: 'valor', label: 'Nome completo', max: 100 }] },
-          { value: 'telefone', label: 'Telefone', fields: [{ name: 'valor', label: 'Telefone com DDD', digits: true, max: 11 }] },
-          { value: 'cep', label: 'CEP', fields: [{ name: 'valor', label: 'CEP (8 dígitos)', digits: true, max: 8 }] },
-          { value: 'data_nascimento', label: 'Data de Nascimento', fields: [{ name: 'valor', label: 'Data (DD/MM/AAAA)', max: 10 }] },
-          { value: 'nome_mae', label: 'Nome da Mãe', fields: [{ name: 'valor', label: 'Nome da mãe', max: 100 }] },
-          { value: 'nome_parcial_uf', label: 'Nome Parcial + UF', fields: [{ name: 'nome', label: 'Nome parcial', max: 80 }, { name: 'uf', label: 'Estado (UF)', options: UFS_BR }] },
-          { value: 'nome_parcial_mae', label: 'Nome Parcial + Mãe', fields: [{ name: 'nome_parcial', label: 'Nome parcial', max: 80 }, { name: 'mae', label: 'Nome da mãe', max: 80 }] }
-        ]
-      }
-    },
-    {
-      id: 'credlink',
-      sector: 'buscas',
-      name: 'CredLink',
-      desc: 'Busca por CPF, E-mail, Celular, Nome + Cidade/Ano/Veículo/Mês.',
-      keywords: 'credlink cpf email celular nome cidade veiculo buscas',
-      apisLabel: 'API Privada',
-      tagClass: 'tag-pro',
-      icon: 'hub',
-      gradient: 'linear-gradient(135deg, #0A84FF 0%, #1D4ED8 100%)',
-      customView: 'multi_private',
-      privateConfig: {
-        moduleKey: 'credlink',
-        types: [
-          { value: 'cpf', label: 'CPF', fields: [{ name: 'valor', label: 'CPF (11 dígitos)', digits: true, max: 11 }] },
-          { value: 'email', label: 'E-mail', fields: [{ name: 'valor', label: 'E-mail', max: 100 }] },
-          { value: 'celular', label: 'Celular', fields: [{ name: 'valor', label: 'Celular com DDD', digits: true, max: 11 }] },
-          { value: 'nome', label: 'Nome Completo', fields: [{ name: 'valor', label: 'Nome completo', max: 100 }] },
-          { value: 'cep', label: 'CEP', fields: [{ name: 'valor', label: 'CEP (8 dígitos)', digits: true, max: 8 }] },
-          { value: 'nome_cidade', label: 'Nome + Cidade', fields: [{ name: 'nome', label: 'Nome completo', max: 90 }, { name: 'cidade', label: 'Cidade', max: 60 }] },
-          { value: 'nome_ano_nasc', label: 'Nome + Ano Nasc.', fields: [{ name: 'nome', label: 'Nome completo', max: 90 }, { name: 'ano_nascimento', label: 'Ano (ex: 1995)', digits: true, max: 4 }] },
-          { value: 'cidade_nome_inicial', label: 'Cidade + Inicial', fields: [{ name: 'cidade', label: 'Cidade', max: 60 }, { name: 'inicial', label: 'Inicial (ex: M)', max: 1 }] },
-          { value: 'nome_veiculos', label: 'Nome + Veículo', fields: [{ name: 'nome_veiculo', label: 'Nome completo', max: 90 }, { name: 'veiculo', label: 'Modelo do veículo', max: 60 }] },
-          { value: 'nome_mes_ano', label: 'Nome + Mês/Ano', fields: [{ name: 'nome_mes', label: 'Nome completo', max: 90 }, { name: 'mes', label: 'Mês (1-12)', digits: true, max: 2 }, { name: 'ano', label: 'Ano (ex: 2023)', digits: true, max: 4 }] }
-        ]
-      }
-    },
-    {
-      id: 'financeiro_credito',
-      sector: 'buscas',
-      name: 'Score & Crédito',
-      desc: 'Consulta perfil financeiro, renda presumida e score de crédito por CPF.',
-      keywords: 'score credito financeiro serasa renda cpf buscas',
-      apisLabel: 'API Privada',
-      tagClass: 'tag-pro',
-      icon: 'credit_score',
-      gradient: 'linear-gradient(135deg, #30D158 0%, #15803D 100%)',
-      placeholder: 'CPF (11 dígitos)',
-      max: 11,
-      digits: true,
-      fetchApi: async (v) => {
-        const cpf = v.replace(/\D/g, '');
-        if (cpf.length !== 11) throw new Error('Informe um CPF com 11 dígitos.');
-        const raw = await RemoteProxy.callPrivateModule('financeiro_credito', { valor: cpf, cpf });
-        return { provider: 'Score & Crédito via Proxy', analyticRaw: raw, raw };
-      }
-    },
-    {
-      id: 'telefone',
-      sector: 'buscas',
-      name: 'Consulta Telefone',
-      desc: 'Localiza titular e vínculos associados ao número (DDD + 9 dígitos).',
-      keywords: 'telefone celular numero ddd titular buscas',
-      apisLabel: 'API Privada',
-      tagClass: 'tag-pro',
-      icon: 'call',
-      gradient: 'linear-gradient(135deg, #32ADE6 0%, #0284C7 100%)',
-      placeholder: 'Ex: 31999999999',
-      max: 11,
-      digits: true,
-      fetchApi: async (v) => {
-        const tel = v.replace(/\D/g, '');
-        if (tel.length < 10) throw new Error('Informe o telefone com DDD (10 ou 11 dígitos).');
-        const raw = await RemoteProxy.callPrivateModule('telefone', { telefone: tel, valor: tel });
-        return { provider: 'Consulta Telefone via Proxy', analyticRaw: raw, raw };
-      }
-    },
-    {
-      id: 'cnh_sp',
-      sector: 'buscas',
-      name: 'CNH São Paulo',
-      desc: 'Consulta registro de habilitação (CNH SP) vinculada ao CPF.',
-      keywords: 'cnh sp habilitacao motorista documento cpf buscas',
-      apisLabel: 'API Privada',
-      tagClass: 'tag-pro',
-      icon: 'id_card',
-      gradient: 'linear-gradient(135deg, #FF9F0A 0%, #B45309 100%)',
-      placeholder: 'CPF (11 dígitos)',
-      max: 11,
-      digits: true,
-      fetchApi: async (v) => {
-        const cpf = v.replace(/\D/g, '');
-        if (cpf.length !== 11) throw new Error('Informe um CPF com 11 dígitos.');
-        const raw = await RemoteProxy.callPrivateModule('cnh_sp', { cpf, valor: cpf });
-        return { provider: 'CNH SP via Proxy', analyticRaw: raw, raw };
-      }
-    },
-    {
-      id: 'fotos_uf',
-      sector: 'buscas',
-      name: 'Fotos Estaduais',
-      desc: 'Consulta biométrica unificada por CPF para CE, ES, MA, PE, PR e RJ.',
-      keywords: 'foto retrato biometria ce es ma pe pr rj cpf buscas',
-      apisLabel: '6 Estados (UF)',
-      tagClass: 'tag-pro',
-      icon: 'photo_camera_front',
-      gradient: 'linear-gradient(135deg, #BF5AF2 0%, #7E22CE 100%)',
-      customView: 'multi_private',
-      privateConfig: {
-        dynamicModuleFromType: true,
-        types: [
-          { value: 'foto_ce', label: 'Ceará (CE)', fields: [{ name: 'valor', label: 'CPF (11 dígitos)', digits: true, max: 11 }] },
-          { value: 'foto_es', label: 'Espírito Santo (ES)', fields: [{ name: 'valor', label: 'CPF (11 dígitos)', digits: true, max: 11 }] },
-          { value: 'foto_ma', label: 'Maranhão (MA)', fields: [{ name: 'valor', label: 'CPF (11 dígitos)', digits: true, max: 11 }] },
-          { value: 'foto_pe', label: 'Pernambuco (PE)', fields: [{ name: 'valor', label: 'CPF (11 dígitos)', digits: true, max: 11 }] },
-          { value: 'foto_pr', label: 'Paraná (PR)', fields: [{ name: 'valor', label: 'CPF (11 dígitos)', digits: true, max: 11 }] },
-          { value: 'foto_rj', label: 'Rio de Janeiro (RJ)', fields: [{ name: 'valor', label: 'CPF (11 dígitos)', digits: true, max: 11 }] }
-        ]
-      }
-    },
-    {
-      id: 'cep',
-      sector: 'buscas',
-      name: 'Consulta CEP',
-      desc: 'Endereço completo, coordenadas e mapa via BrasilAPI, ViaCEP e AwesomeAPI.',
-      keywords: 'cep endereco rua bairro cidade mapa buscas',
-      apisLabel: '3 APIs + Mapa',
-      icon: 'location_on',
-      gradient: 'linear-gradient(135deg, #FF9F0A 0%, #D97706 100%)',
-      placeholder: 'CEP (8 dígitos)',
-      max: 9,
-      digits: true,
-      fetchApi: async (v) => {
-        const clean = v.replace(/\D/g, '');
-        if (clean.length !== 8) throw new Error('Informe um CEP com 8 dígitos.');
-        const { data, provider } = await tryFallback([
-          { name: 'BrasilAPI v2 via Proxy', run: () => RemoteProxy.fetchJson(`https://brasilapi.com.br/api/cep/v2/${clean}`) },
-          { name: 'ViaCEP via Proxy', run: async () => { const r = await RemoteProxy.fetchJson(`https://viacep.com.br/ws/${clean}/json/`); if (r.erro) throw new Error('Não encontrado'); return r; } },
-          { name: 'AwesomeAPI via Proxy', run: () => RemoteProxy.fetchJson(`https://cep.awesomeapi.com.br/json/${clean}`) }
-        ]);
-        const lat = data.location?.coordinates?.latitude || data.lat;
-        const lon = data.location?.coordinates?.longitude || data.lng;
-        return {
-          provider,
-          coords: (lat && lon) ? { lat, lon, label: `Localização do CEP ${clean}` } : null,
-          resumo: {
-            cep: data.cep || clean, logradouro: data.street || data.logradouro || data.address || '-',
-            bairro: data.neighborhood || data.bairro || data.district || '-', cidade: data.city || data.localidade || '-',
-            uf: data.state || data.uf || '-', latitude: lat || '-', longitude: lon || '-'
-          },
-          raw: data
-        };
-      }
-    },
-
-    // ==================== ÁREA VEÍCULOS & JURÍDICO ====================
-    {
-      id: 'atpv',
-      sector: 'veiculos',
-      name: 'Central Veicular (MG)',
-      desc: 'Placa, titular automático, FIPE e portais DETRAN-MG, SENATRAN e PBH.',
-      keywords: 'veiculo carro moto placa renavam atpv crlv detran multas fipe',
-      apisLabel: '4 Portais + FIPE',
-      icon: 'directions_car',
-      gradient: 'linear-gradient(135deg, #0A84FF 0%, #0055D4 100%)',
-      customView: 'atpv'
-    },
-    {
-      id: 'placas',
-      sector: 'veiculos',
-      name: 'Placas Online',
-      desc: 'Consulta completa de veículo, restrições e débitos por placa (7 caracteres).',
-      keywords: 'placa carro moto chassi renavam restricoes debitos',
-      apisLabel: 'API Privada',
-      tagClass: 'tag-pro',
-      icon: 'minor_crash',
-      gradient: 'linear-gradient(135deg, #32ADE6 0%, #0A84FF 100%)',
-      placeholder: 'Placa (ABC1234 ou ABC1D23)',
-      max: 7,
-      uppercase: true,
-      fetchApi: async (v) => {
-        const placa = v.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-        if (placa.length !== 7) throw new Error('Informe uma placa válida com 7 caracteres.');
-        const raw = await RemoteProxy.callPrivateModule('placas', { valor: placa, placa });
-        return { provider: 'Placas Online via Proxy', analyticRaw: raw, raw };
-      }
-    },
-    {
-      id: 'veicular_multas_mg',
-      sector: 'veiculos',
-      name: 'Multas MG (RENAVAM)',
-      desc: 'Consulta detalhada de infrações e autuações em Minas Gerais por RENAVAM.',
-      keywords: 'multas mg renavam detran infracoes minas gerais',
-      apisLabel: 'API Privada',
-      tagClass: 'tag-pro',
-      icon: 'local_police',
-      gradient: 'linear-gradient(135deg, #FF453A 0%, #B91C1C 100%)',
-      placeholder: 'RENAVAM (11 dígitos)',
-      max: 11,
-      digits: true,
-      fetchApi: async (v) => {
-        const renavam = v.replace(/\D/g, '');
-        if (renavam.length < 9) throw new Error('Informe um RENAVAM válido.');
-        const raw = await RemoteProxy.callPrivateModule('veicular_multas_mg', { valor: renavam, renavam });
-        return { provider: 'Multas MG via Proxy', analyticRaw: raw, raw };
-      }
-    },
-    {
-      id: 'veicular_vistoria',
-      sector: 'veiculos',
-      name: 'Vistoria Veicular',
-      desc: 'Histórico de vistoria, sinistro e laudo técnico veicular por placa.',
-      keywords: 'vistoria laudo sinistro leilao placa veiculo',
-      apisLabel: 'API Privada',
-      tagClass: 'tag-pro',
-      icon: 'fact_check',
-      gradient: 'linear-gradient(135deg, #30D158 0%, #0D9488 100%)',
-      placeholder: 'Placa (ABC1234 ou ABC1D23)',
-      max: 7,
-      uppercase: true,
-      fetchApi: async (v) => {
-        const placa = v.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-        if (placa.length !== 7) throw new Error('Informe uma placa válida com 7 caracteres.');
-        const raw = await RemoteProxy.callPrivateModule('veicular_vistoria', { valor: placa, placa });
-        return { provider: 'Vistoria Veicular via Proxy', analyticRaw: raw, raw };
-      }
-    },
-    {
-      id: 'veicular_ear',
-      sector: 'veiculos',
-      name: 'EAR Veicular',
-      desc: 'Verifica exercício de atividade remunerada (EAR) na CNH pelo CPF.',
-      keywords: 'ear atividade remunerada cnh motorista cpf',
-      apisLabel: 'API Privada',
-      tagClass: 'tag-pro',
-      icon: 'badge',
-      gradient: 'linear-gradient(135deg, #FF9F0A 0%, #EA580C 100%)',
-      placeholder: 'CPF (11 dígitos)',
-      max: 11,
-      digits: true,
-      fetchApi: async (v) => {
-        const cpf = v.replace(/\D/g, '');
-        if (cpf.length !== 11) throw new Error('Informe um CPF com 11 dígitos.');
-        const raw = await RemoteProxy.callPrivateModule('veicular_ear', { valor: cpf, cpf });
-        return { provider: 'EAR Veicular via Proxy', analyticRaw: raw, raw };
-      }
-    },
-    {
-      id: 'processos',
-      sector: 'veiculos',
-      name: 'Processos Judiciais',
-      desc: 'Consulta processos ativos, tribunais e movimentações por CPF.',
-      keywords: 'processos judiciais tribunal justica juridico cpf',
-      apisLabel: 'API Privada',
-      tagClass: 'tag-pro',
-      icon: 'gavel',
-      gradient: 'linear-gradient(135deg, #5E5CE6 0%, #4338CA 100%)',
-      placeholder: 'CPF (11 dígitos)',
-      max: 11,
-      digits: true,
-      fetchApi: async (v) => {
-        const cpf = v.replace(/\D/g, '');
-        if (cpf.length !== 11) throw new Error('Informe um CPF com 11 dígitos.');
-        const raw = await RemoteProxy.callPrivateModule('processos', { valor: cpf, cpf });
-        return { provider: 'Processos Judiciais via Proxy', analyticRaw: raw, raw };
       }
     }
   ];
@@ -1577,7 +1090,7 @@
               </div>
               <p class="text-sm font-medium text-white mb-1">Aguardando imagem</p>
               <p class="text-xs text-[var(--text-secondary)] max-w-sm">
-                Dica: fotos enviadas diretamente da galeria ou por arquivo/e-mail preservam o EXIF e GPS; redes sociais e WhatsApp (modo padrão) costumam remover esses dados.
+                Dica: fotos enviadas diretamente da galeria ou como arquivo preservam o EXIF e o GPS; redes sociais e WhatsApp (modo padrão) costumam remover esses dados.
               </p>
             </div>
           </div>
@@ -1637,12 +1150,8 @@
       let exifAll = null;
       let gpsOnly = null;
       if (window.exifr) {
-        try {
-          exifAll = await window.exifr.parse(file, { tiff: true, exif: true, gps: true, xmp: true, iptc: true, ifd0: true });
-        } catch {}
-        try {
-          gpsOnly = await window.exifr.gps(file);
-        } catch {}
+        try { exifAll = await window.exifr.parse(file, { tiff: true, exif: true, gps: true, xmp: true, iptc: true, ifd0: true }); } catch {}
+        try { gpsOnly = await window.exifr.gps(file); } catch {}
       }
 
       const lat = gpsOnly?.latitude ?? exifAll?.latitude ?? null;
@@ -1650,9 +1159,7 @@
       const hasGps = Number.isFinite(Number(lat)) && Number.isFinite(Number(lon));
 
       let resolvedAddress = null;
-      if (hasGps) {
-        resolvedAddress = await reverseGeocode(Number(lat), Number(lon));
-      }
+      if (hasGps) resolvedAddress = await reverseGeocode(Number(lat), Number(lon));
 
       const make = exifAll?.Make || '';
       const model = exifAll?.Model || '';
@@ -1675,7 +1182,7 @@
         software_so: exifAll?.Software || exifAll?.HostComputer || '-',
         lente: exifAll?.LensModel || exifAll?.LensInfo || '-',
         data_captura: formatDateExif(exifAll?.DateTimeOriginal || exifAll?.CreateDate),
-        abertura_lente: exifAll?.FNumber ? `f/${exifAll.FNumber}` : '-',
+        abertura: exifAll?.FNumber ? `f/${exifAll.FNumber}` : '-',
         exposicao: exifAll?.ExposureTime ? (exifAll.ExposureTime < 1 ? `1/${Math.round(1 / exifAll.ExposureTime)}s` : `${exifAll.ExposureTime}s`) : '-',
         iso: exifAll?.ISO || '-',
         distancia_focal: exifAll?.FocalLength ? `${exifAll.FocalLength} mm` : '-',
@@ -1690,7 +1197,6 @@
         direcao_bussola: exifAll?.GPSImgDirection != null ? `${Number(exifAll.GPSImgDirection).toFixed(1)}°` : '-'
       } : null;
 
-      // Metadados brutos extras
       const rawTags = {};
       if (exifAll && typeof exifAll === 'object') {
         for (const [k, v] of Object.entries(exifAll)) {
@@ -1716,7 +1222,7 @@
                <span class="material-symbols-rounded text-[#FF9F0A] text-xl">location_off</span>
                <span class="text-xs uppercase tracking-wider text-[#FF9F0A] font-bold">Sem Coordenadas GPS na Imagem</span>
              </div>
-             <p class="text-xs text-[var(--text-secondary)]">Esta foto não contém tags GPS embutidas (comum em capturas de tela ou imagens baixadas de WhatsApp/Instagram).</p>
+             <p class="text-xs text-[var(--text-secondary)]">Esta foto não contém tags GPS embutidas (comum em capturas de tela ou imagens baixadas de redes sociais).</p>
            </div>`;
 
       resDiv.className = 'min-h-[340px] liquid-card p-6 text-left';
@@ -1929,146 +1435,7 @@
   }
 
   // ==========================================================
-  // 8. VIEW MULTI-PARÂMETRO (BIGDATA / CADSUS / CREDLINK / FOTOS)
-  // ==========================================================
-  function renderMultiPrivateView(view, m) {
-    const cfg = m.privateConfig;
-    view.innerHTML = `
-      <div class="view-enter">
-        <button type="button" data-nav="" class="ios-chip mb-5">
-          <span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar ao Início
-        </button>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          <div class="lg:col-span-4 liquid-card p-6 lg:sticky lg:top-6">
-            <div class="flex items-center gap-3.5 mb-4">
-              <div class="squircle" style="background:${m.gradient};">
-                <span class="material-symbols-rounded">${escapeHtml(m.icon)}</span>
-              </div>
-              <div>
-                <h2 class="text-lg font-bold leading-tight">${escapeHtml(m.name)}</h2>
-                <span class="pill-tag ${m.tagClass || 'tag-pro'} mt-1">${escapeHtml(m.apisLabel)}</span>
-              </div>
-            </div>
-            <p class="text-xs text-[var(--text-secondary)] mb-5 leading-relaxed">${escapeHtml(m.desc)}</p>
-
-            <form id="multiForm">
-              <div class="mb-4">
-                <label class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold block mb-1.5 pl-1">
-                  ${cfg.dynamicModuleFromType ? 'Estado (UF)' : 'Tipo de Consulta'}
-                </label>
-                <select id="multiType" class="md-select">
-                  ${cfg.types.map(t => `<option value="${escapeHtml(t.value)}">${escapeHtml(t.label)}</option>`).join('')}
-                </select>
-              </div>
-              <div id="multiFields"></div>
-              <button type="submit" class="ios-btn mt-1">
-                <span class="material-symbols-rounded text-lg">search</span> Consultar
-              </button>
-            </form>
-          </div>
-
-          <div class="lg:col-span-8">
-            <div id="result" class="min-h-[300px] liquid-card p-6 flex flex-col justify-center items-center text-center">
-              <div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-3">
-                <span class="material-symbols-rounded text-3xl text-white/30">${escapeHtml(m.icon)}</span>
-              </div>
-              <p class="text-sm font-medium text-white mb-1">Pronto para consultar</p>
-              <p class="text-xs text-[var(--text-secondary)] max-w-xs">
-                Requisição roteada via Proxy Remoto (${escapeHtml(RemoteProxy.getModeLabel())}).
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    const typeSel = document.getElementById('multiType');
-    const fieldsBox = document.getElementById('multiFields');
-
-    const drawFields = () => {
-      const selected = cfg.types.find(t => t.value === typeSel.value) || cfg.types[0];
-      fieldsBox.innerHTML = selected.fields.map(f => {
-        if (f.options) {
-          return `
-            <div class="mb-3">
-              <label class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold block mb-1 pl-1">${escapeHtml(f.label)}</label>
-              <select name="${escapeHtml(f.name)}" class="md-select" required>
-                ${f.options.map(op => `<option value="${escapeHtml(op)}">${escapeHtml(op)}</option>`).join('')}
-              </select>
-            </div>
-          `;
-        }
-        return `
-          <div class="md-field">
-            <input type="text" name="${escapeHtml(f.name)}" class="md-input" placeholder=" " maxlength="${f.max || 100}" ${f.digits ? 'data-digits="1"' : ''} required autocomplete="off">
-            <label class="md-label">${escapeHtml(f.label)}</label>
-          </div>
-        `;
-      }).join('');
-      fieldsBox.querySelectorAll('[data-digits="1"]').forEach(inp => {
-        inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g, ''); });
-      });
-    };
-
-    typeSel.addEventListener('change', drawFields);
-    drawFields();
-
-    document.getElementById('multiForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = e.target.querySelector('button[type="submit"]');
-      const resDiv = document.getElementById('result');
-      const selectedType = typeSel.value;
-      const fd = new FormData(e.target);
-      const params = {};
-      if (!cfg.dynamicModuleFromType) params.tipo = selectedType;
-      for (const [k, v] of fd.entries()) params[k] = String(v).trim();
-      const targetModuleKey = cfg.dynamicModuleFromType ? selectedType : cfg.moduleKey;
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="material-symbols-rounded spinner text-lg">refresh</span> Consultando...';
-      resDiv.className = 'min-h-[300px] liquid-card p-6 flex flex-col justify-center items-center text-center';
-      resDiv.innerHTML = `<span class="material-symbols-rounded spinner text-4xl mb-3 text-[#0A84FF]">refresh</span><p class="text-sm font-semibold text-white">Consultando ${escapeHtml(m.name)} via Proxy Remoto...</p>`;
-
-      try {
-        const raw = await RemoteProxy.callPrivateModule(targetModuleKey, params);
-        lastResultData = raw;
-        lastModuleId = targetModuleKey;
-
-        resDiv.className = 'min-h-[300px] liquid-card p-6 text-left';
-        resDiv.innerHTML = `
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="material-symbols-rounded text-[#30D158] text-2xl">check_circle</span>
-                <h3 class="font-bold text-lg">Relatório Analítico</h3>
-              </div>
-              <span class="text-[11px] text-[#0A84FF] font-semibold">Módulo: ${escapeHtml(targetModuleKey)} • Proxy Remoto</span>
-            </div>
-            <div class="flex flex-wrap gap-2">
-              <button type="button" class="ios-chip" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button>
-              <button type="button" class="ios-chip" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button>
-              <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#0A84FF]">verified</span> Assinado</button>
-            </div>
-          </div>
-          ${renderAnalyticResponse(raw)}
-        `;
-      } catch (err) {
-        resDiv.className = 'min-h-[300px] liquid-card p-6 flex flex-col justify-center items-center text-center';
-        resDiv.innerHTML = `
-          <span class="material-symbols-rounded text-5xl mb-2 text-[#FF453A]">error</span>
-          <h3 class="font-bold text-base mb-1">Falha na consulta</h3>
-          <p class="text-xs text-[var(--text-secondary)] max-w-md">${escapeHtml(err.message)}</p>
-        `;
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Consultar';
-      }
-    });
-  }
-
-  // ==========================================================
-  // 9. CENTRAL VEICULAR (MG)
+  // 8. HOME SCREEN & ROTEADOR
   // ==========================================================
   function navigate(id) { window.location.hash = id ? '#' + id : ''; }
 
@@ -2078,196 +1445,6 @@
     });
   }
 
-  function renderAtpvView(view) {
-    const history = getHistory('atpv');
-    const historyHtml = history.length ? `
-      <div class="mt-4 pt-4 border-t border-white/10">
-        <span class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold block mb-2">Placas Recentes</span>
-        <div class="flex flex-wrap gap-2">
-          ${history.map(h => `<button type="button" class="ios-chip text-xs py-1 px-3" data-fill-atpv="${escapeHtml(h.query)}">${escapeHtml(h.query)}</button>`).join('')}
-        </div>
-      </div>
-    ` : '';
-
-    const portaisHtml = PORTAIS_VEICULARES.map(p => `
-      <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="ios-row">
-        <div class="flex items-center gap-3.5 min-w-0">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:${p.cor}">
-            <span class="material-symbols-rounded text-white text-xl">${p.icone}</span>
-          </div>
-          <div class="flex flex-col min-w-0">
-            <span class="font-semibold text-sm text-white truncate">${p.nome}</span>
-            <span class="text-xs text-[var(--text-secondary)] truncate">${p.desc}</span>
-          </div>
-        </div>
-        <span class="material-symbols-rounded text-lg text-[var(--text-tertiary)]">chevron_right</span>
-      </a>
-    `).join('');
-
-    view.innerHTML = `
-      <div class="view-enter">
-        <button type="button" data-nav="" class="ios-chip mb-5">
-          <span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar ao Início
-        </button>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          <div class="lg:col-span-5 liquid-card p-6">
-            <div class="flex items-center gap-3.5 mb-5">
-              <div class="squircle" style="background:linear-gradient(135deg,#0A84FF,#0055D4)">
-                <span class="material-symbols-rounded">directions_car</span>
-              </div>
-              <div>
-                <h2 class="text-lg font-bold leading-tight">Central Veicular</h2>
-                <p class="text-xs text-[var(--text-secondary)]">DETRAN-MG • SENATRAN • PBH • FIPE</p>
-              </div>
-            </div>
-
-            <form id="atpvForm">
-              <div class="md-field">
-                <input type="text" id="atpvPlaca" class="md-input uppercase" placeholder=" " maxlength="7" required autocomplete="off">
-                <label for="atpvPlaca" class="md-label">Placa (Ex: ABC1D23)</label>
-              </div>
-              <div class="md-field">
-                <input type="text" id="atpvRenavam" class="md-input" placeholder=" " maxlength="11" autocomplete="off">
-                <label for="atpvRenavam" class="md-label">RENAVAM (11 dígitos)</label>
-              </div>
-              <div class="md-field">
-                <input type="text" id="atpvDoc" class="md-input" placeholder=" " maxlength="18" autocomplete="off">
-                <label for="atpvDoc" class="md-label">CPF / CNPJ do Proprietário</label>
-              </div>
-              <div class="md-field">
-                <input type="text" id="atpvFipe" class="md-input" placeholder=" " maxlength="10" autocomplete="off">
-                <label for="atpvFipe" class="md-label">Código FIPE (opcional, ex: 001004-9)</label>
-              </div>
-              <button type="submit" class="ios-btn mt-1">
-                <span class="material-symbols-rounded text-lg">fact_check</span> Preparar & Consultar
-              </button>
-            </form>
-            ${historyHtml}
-          </div>
-
-          <div class="lg:col-span-7">
-            <div id="atpvResult" class="liquid-card p-6">
-              <h3 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mb-3 px-1">Portais Oficiais Integrados</h3>
-              <div class="ios-group">${portaisHtml}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.getElementById('atpvForm').addEventListener('submit', handleAtpvPrepare);
-  }
-
-  async function handleAtpvPrepare(e) {
-    e.preventDefault();
-    const placa = document.getElementById('atpvPlaca').value.trim().toUpperCase();
-    const renavam = document.getElementById('atpvRenavam').value.replace(/\D/g, '');
-    const doc = document.getElementById('atpvDoc').value.replace(/\D/g, '');
-    const fipeCode = document.getElementById('atpvFipe').value.trim();
-
-    const padraoPlaca = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/.test(placa) ? 'Mercosul' : (/^[A-Z]{3}[0-9]{4}$/.test(placa) ? 'Cinza (Antigo)' : 'Formato não padrão');
-
-    lastResultData = { placa, padrao: padraoPlaca, renavam: renavam || '-', cpf_cnpj: doc || '-', fipe: fipeCode || '-' };
-    lastModuleId = `veiculo-${placa}`;
-    await saveHistory('atpv', placa);
-
-    const campos = [
-      { label: 'Placa', val: `${placa} (${padraoPlaca})` },
-      ...(renavam ? [{ label: 'RENAVAM', val: renavam }] : []),
-      ...(doc ? [{ label: 'CPF / CNPJ', val: doc }] : [])
-    ];
-
-    let extrasHtml = '';
-    if (doc.length === 14) {
-      try {
-        const res = await MODULES.find(m => m.id === 'cnpj').fetchApi(doc);
-        extrasHtml += `
-          <div class="mb-4 p-4 rounded-2xl bg-[#30D158]/10 border border-[#30D158]/30">
-            <span class="text-[11px] uppercase tracking-wider text-[#30D158] font-bold block mb-1">Titular (CNPJ • ${escapeHtml(res.provider)})</span>
-            <p class="text-sm font-bold text-white">${escapeHtml(res.resumo.razao_social || '-')}</p>
-            <p class="text-xs text-[var(--text-secondary)] mt-0.5">${escapeHtml(res.resumo.situacao)} • ${escapeHtml(res.resumo.municipio_uf)}</p>
-          </div>
-        `;
-      } catch {}
-    } else if (doc.length === 11) {
-      try {
-        const res = await MODULES.find(m => m.id === 'cpf').fetchApi(doc);
-        const nome = res.resumo?.nome || res.resumo?.name || res.resumo?.regiao_fiscal || 'CPF consultado';
-        extrasHtml += `
-          <div class="mb-4 p-4 rounded-2xl bg-[#30D158]/10 border border-[#30D158]/30">
-            <span class="text-[11px] uppercase tracking-wider text-[#30D158] font-bold block mb-1">Titular (CPF • ${escapeHtml(res.provider)})</span>
-            <p class="text-sm font-bold text-white">${escapeHtml(nome)}</p>
-          </div>
-        `;
-      } catch {}
-    }
-
-    if (fipeCode) {
-      try {
-        const { data: fipeList, provider } = await tryFallback([
-          { name: 'BrasilAPI FIPE via Proxy', run: () => RemoteProxy.fetchJson(`https://brasilapi.com.br/api/fipe/preco/v1/${encodeURIComponent(fipeCode)}`) }
-        ]);
-        const item = Array.isArray(fipeList) ? fipeList[0] : fipeList;
-        if (item) {
-          extrasHtml += `
-            <div class="mb-4 p-4 rounded-2xl bg-[#0A84FF]/10 border border-[#0A84FF]/30">
-              <span class="text-[11px] uppercase tracking-wider text-[#0A84FF] font-bold block mb-1">Tabela FIPE (${escapeHtml(provider)})</span>
-              <p class="text-sm font-bold text-white">${escapeHtml(item.marca)} ${escapeHtml(item.modelo)} (${escapeHtml(item.anoModelo)})</p>
-              <p class="text-xs text-[var(--text-secondary)] mt-0.5">Valor: <strong class="text-white">${escapeHtml(item.valor)}</strong> • Ref: ${escapeHtml(item.mesReferencia)}</p>
-            </div>
-          `;
-        }
-      } catch {}
-    }
-
-    const portaisHtml = PORTAIS_VEICULARES.map(p => `
-      <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="ios-row">
-        <div class="flex items-center gap-3 min-w-0">
-          <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style="background:${p.cor}">
-            <span class="material-symbols-rounded text-white text-lg">${p.icone}</span>
-          </div>
-          <div class="flex flex-col min-w-0">
-            <span class="font-semibold text-sm text-white truncate">${p.nome}</span>
-            <span class="text-xs text-[var(--text-secondary)] truncate">${p.desc}</span>
-          </div>
-        </div>
-        <span class="material-symbols-rounded text-lg text-[var(--text-tertiary)]">chevron_right</span>
-      </a>
-    `).join('');
-
-    document.getElementById('atpvResult').innerHTML = `
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
-        <div class="flex items-center gap-2">
-          <span class="material-symbols-rounded text-[#30D158] text-2xl">check_circle</span>
-          <h3 class="font-bold text-lg">Veículo ${escapeHtml(placa)}</h3>
-        </div>
-        <button type="button" class="ios-chip" data-export="download">
-          <span class="material-symbols-rounded text-sm text-[#0A84FF]">verified</span> Exportar Assinado
-        </button>
-      </div>
-      ${extrasHtml}
-      <div class="ios-group mb-5">
-        ${campos.map(c => `
-          <div class="ios-row">
-            <div class="flex flex-col min-w-0">
-              <span class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold">${escapeHtml(c.label)}</span>
-              <span class="text-sm font-semibold text-white truncate">${escapeHtml(c.val)}</span>
-            </div>
-            <button type="button" class="ios-chip py-1.5 px-3" data-copy-val="${escapeHtml(c.val.split(' ')[0])}">
-              <span class="material-symbols-rounded text-sm">content_copy</span> Copiar
-            </button>
-          </div>
-        `).join('')}
-      </div>
-      <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mb-2.5 px-1">Abrir Portal Oficial</h4>
-      <div class="ios-group">${portaisHtml}</div>
-    `;
-  }
-
-  // ==========================================================
-  // 10. HOME SCREEN & ROTEADOR
-  // ==========================================================
   function renderHomeSectors() {
     const container = document.getElementById('sectorsContainer');
     if (!container) return;
@@ -2341,15 +1518,15 @@
         <div class="view-enter">
           <div class="mb-7">
             <div class="mb-5 px-1">
-              <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">Central de Investigação</h1>
+              <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">Central Sherlock & Web</h1>
               <p class="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
-                Separado entre <strong>Área Sherlock (OSINT & Forense)</strong>, <strong>Área Buscas</strong> e <strong>Veículos</strong>.
+                Metadados EXIF, OSINT, Dorks, Web Scraper, Proprietário de Sites e IP via Proxy Remoto.
               </p>
             </div>
 
             <div class="spotlight-bar mb-4">
               <span class="material-symbols-rounded text-[var(--text-secondary)] text-xl">search</span>
-              <input type="text" id="spotlightInput" class="spotlight-input" placeholder="Buscar ferramenta (ex: metadados, foto, EXIF, CPF, placa, CADSUS, dork...)" value="${escapeHtml(homeSearchQuery)}" autocomplete="off">
+              <input type="text" id="spotlightInput" class="spotlight-input" placeholder="Buscar ferramenta (ex: metadados, foto, scraper, dork, site, IP...)" value="${escapeHtml(homeSearchQuery)}" autocomplete="off">
               ${homeSearchQuery ? '<button type="button" id="clearSpotlight" class="text-[var(--text-secondary)] hover:text-white"><span class="material-symbols-rounded text-lg">close</span></button>' : ''}
             </div>
 
@@ -2378,8 +1555,6 @@
     const m = MODULES.find(x => x.id === hash);
     if (!m) return navigate('');
     if (m.customView === 'metadata') { renderMetadataView(view); return; }
-    if (m.customView === 'atpv') { renderAtpvView(view); return; }
-    if (m.customView === 'multi_private') { renderMultiPrivateView(view, m); return; }
 
     const history = getHistory(m.id);
     const historyHtml = history.length ? `
@@ -2412,7 +1587,7 @@
 
             <form id="searchForm">
               <div class="md-field">
-                <input type="text" id="searchInput" class="md-input ${m.uppercase ? 'uppercase' : ''}" placeholder=" " maxlength="${m.max}" ${m.optional ? '' : 'required'} autocomplete="off">
+                <input type="text" id="searchInput" class="md-input" placeholder=" " maxlength="${m.max}" ${m.optional ? '' : 'required'} autocomplete="off">
                 <label for="searchInput" class="md-label">${escapeHtml(m.placeholder)}</label>
               </div>
               <button type="submit" class="ios-btn">
@@ -2437,9 +1612,6 @@
       </div>
     `;
 
-    const inputEl = document.getElementById('searchInput');
-    if (m.digits) inputEl.addEventListener('input', () => { inputEl.value = inputEl.value.replace(/\D/g, ''); });
-    if (m.uppercase) inputEl.addEventListener('input', () => { inputEl.value = inputEl.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase(); });
     document.getElementById('searchForm').addEventListener('submit', (e) => handleSearch(e, m.id));
   }
 
@@ -2470,21 +1642,17 @@
       if (val) await saveHistory(id, val);
 
       let html = '';
-      if (data.analyticRaw) {
-        html = renderAnalyticResponse(data.analyticRaw);
-      } else {
-        if (data.resumo) html += renderIosList(data.resumo);
-        if (data.coords) html += renderMapBlock(data.coords.lat, data.coords.lon, data.coords.label);
-        if (data.listas?.length) {
-          html += data.listas.map(l => `
-            <div class="mt-5">
-              <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mb-2 px-1">${escapeHtml(l.titulo)} (${l.itens.length})</h4>
-              <div class="flex flex-wrap gap-2 max-h-60 overflow-y-auto">
-                ${l.itens.map(item => `<span class="text-xs px-3 py-1.5 rounded-full bg-white/10 text-white">${escapeHtml(item)}</span>`).join('')}
-              </div>
+      if (data.resumo) html += renderIosList(data.resumo);
+      if (data.coords) html += renderMapBlock(data.coords.lat, data.coords.lon, data.coords.label);
+      if (data.listas?.length) {
+        html += data.listas.map(l => `
+          <div class="mt-5">
+            <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mb-2 px-1">${escapeHtml(l.titulo)} (${l.itens.length})</h4>
+            <div class="flex flex-wrap gap-2 max-h-60 overflow-y-auto">
+              ${l.itens.map(item => `<span class="text-xs px-3 py-1.5 rounded-full bg-white/10 text-white">${escapeHtml(item)}</span>`).join('')}
             </div>
-          `).join('');
-        }
+          </div>
+        `).join('');
       }
 
       resDiv.className = 'min-h-[300px] liquid-card p-6 text-left';
@@ -2542,7 +1710,7 @@
   }
 
   // ==========================================================
-  // 11. EVENTOS CENTRALIZADOS & BOOT
+  // 9. EVENTOS CENTRALIZADOS & BOOT
   // ==========================================================
   document.addEventListener('click', async (e) => {
     const navEl = e.target.closest('[data-nav]');
@@ -2563,13 +1731,6 @@
     if (fillEl) {
       const input = document.getElementById('searchInput');
       if (input) { input.value = fillEl.getAttribute('data-fill'); document.getElementById('searchForm')?.requestSubmit(); }
-      return;
-    }
-
-    const fillAtpv = e.target.closest('[data-fill-atpv]');
-    if (fillAtpv) {
-      const input = document.getElementById('atpvPlaca');
-      if (input) input.value = fillAtpv.getAttribute('data-fill-atpv');
       return;
     }
 
