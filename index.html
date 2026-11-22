@@ -15,8 +15,6 @@
 <style>
   :root {
     --ios-bg: #05050A;
-    --glass-bg: rgba(255, 255, 255, 0.06);
-    --glass-bg-hover: rgba(255, 255, 255, 0.10);
     --glass-border: rgba(255, 255, 255, 0.14);
     --glass-highlight: rgba(255, 255, 255, 0.28);
     --text-primary: #FFFFFF;
@@ -60,24 +58,17 @@
       #05050A;
   }
 
-  /* Material 3 + iOS Liquid Glass Surface */
   .liquid-card {
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.03) 100%);
     backdrop-filter: blur(32px) saturate(200%);
     -webkit-backdrop-filter: blur(32px) saturate(200%);
     border: 1px solid var(--glass-border);
-    box-shadow:
-      0 16px 36px rgba(0, 0, 0, 0.45),
-      inset 0 1px 0 0 var(--glass-highlight);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 var(--glass-highlight);
     border-radius: 26px;
     transition: transform 0.26s var(--spring), background 0.2s ease, border-color 0.2s ease;
   }
 
-  .app-widget {
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
+  .app-widget { cursor: pointer; position: relative; overflow: hidden; }
   .app-widget:hover {
     transform: translateY(-4px);
     background: linear-gradient(145deg, rgba(255, 255, 255, 0.13) 0%, rgba(255, 255, 255, 0.05) 100%);
@@ -85,7 +76,6 @@
   }
   .app-widget:active { transform: scale(0.97); }
 
-  /* Dynamic Island */
   .dynamic-island {
     background: rgba(14, 14, 18, 0.85);
     backdrop-filter: blur(24px) saturate(180%);
@@ -101,30 +91,19 @@
   }
   .dynamic-island:active { transform: scale(0.96); }
 
-  /* iOS Squircle Icon */
   .squircle {
-    width: 52px;
-    height: 52px;
-    border-radius: 16px;
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow:
-      0 8px 20px rgba(0, 0, 0, 0.4),
-      inset 0 1.5px 1px rgba(255, 255, 255, 0.45),
-      inset 0 -2px 4px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4), inset 0 1.5px 1px rgba(255, 255, 255, 0.45), inset 0 -2px 4px rgba(0, 0, 0, 0.25);
   }
-  .squircle .material-symbols-rounded {
-    font-size: 27px;
-    color: #FFFFFF;
-  }
+  .squircle .material-symbols-rounded { font-size: 26px; color: #FFFFFF; }
 
-  /* Material Design 3 Filled Glass Inputs */
-  .md-field {
-    position: relative;
-    margin-bottom: 14px;
-  }
+  .md-field { position: relative; margin-bottom: 14px; }
   .md-input {
     width: 100%;
     padding: 22px 16px 8px;
@@ -159,7 +138,6 @@
     color: var(--ios-blue);
   }
 
-  /* Buttons */
   .ios-btn {
     width: 100%;
     background: var(--ios-blue);
@@ -198,7 +176,6 @@
   .ios-chip:hover { background: rgba(255, 255, 255, 0.16); }
   .ios-chip:active { transform: scale(0.95); }
 
-  /* iOS Grouped List */
   .ios-group {
     background: rgba(20, 20, 26, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.10);
@@ -233,6 +210,21 @@
   .tag-err { background: rgba(255, 69, 58, 0.18); color: var(--ios-red); }
   .tag-warn { background: rgba(255, 159, 10, 0.18); color: var(--ios-orange); }
   .tag-info { background: rgba(10, 132, 255, 0.18); color: var(--ios-blue); }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+    padding-left: 4px;
+  }
+  .section-header h2 {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+  }
 
   .view-enter { animation: iosEnter 0.26s var(--spring) forwards; }
   @keyframes iosEnter {
@@ -277,12 +269,11 @@
 </div>
 
 <div class="max-w-5xl mx-auto px-4 pt-4 sm:pt-6">
-  <!-- Dynamic Island Header -->
-  <header class="flex items-center justify-between mb-6">
+  <header class="flex items-center justify-between mb-7">
     <button type="button" data-nav="" class="dynamic-island cursor-pointer">
       <span class="w-2.5 h-2.5 rounded-full bg-[#30D158] shadow-[0_0_8px_#30D158]"></span>
       <span class="font-semibold text-sm tracking-tight text-white">GlassOSINT</span>
-      <span class="text-[11px] text-[var(--text-secondary)] font-medium hidden sm:inline">• Multi-API</span>
+      <span class="text-[11px] text-[var(--text-secondary)] font-medium hidden sm:inline">• Setorizado</span>
     </button>
 
     <div class="dynamic-island text-[11px] font-semibold text-[var(--text-secondary)]">
@@ -306,7 +297,7 @@
   'use strict';
 
   // ==========================================================
-  // 1. PROTEÇÃO ANTI-INSPEÇÃO (ZERO FALSOS POSITIVOS)
+  // 1. PROTEÇÃO ANTI-INSPEÇÃO
   // ==========================================================
   const AUTHOR_SIGNATURE = 'KIIK HACKING';
   const lockOverlay = document.getElementById('securityLock');
@@ -353,7 +344,7 @@
         { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
       );
       const hmac = await crypto.subtle.importKey(
-        'raw', enc.encode(`${AUTHOR_SIGNATURE}::P2P::V3`),
+        'raw', enc.encode(`${AUTHOR_SIGNATURE}::P2P::V4`),
         { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
       );
       ctx = { aes, hmac };
@@ -393,22 +384,10 @@
   })();
 
   // ==========================================================
-  // 3. UTILITÁRIOS, FALLBACK MULTI-API & TABELA LOCAL DDD
+  // 3. UTILITÁRIOS & MOTOR MULTI-API
   // ==========================================================
   const _vault = ['Nzc4NDMzZTEyNDQ2OGIxYWE2MGYyNjgxOTE5Y2Q5MThmODUyYWZlMTc2MTA1Njk4NTgxMzg4MWNiNzJhNTUwZg=='];
   const getCpfKey = () => atob(_vault[0]);
-
-  const DDD_LOCAL = {
-    '11':'SP (São Paulo e Região)','12':'SP (Vale do Paraíba)','13':'SP (Baixada Santista)','14':'SP (Bauru/Marília)','15':'SP (Sorocaba)','16':'SP (Ribeirão Preto)','17':'SP (S. J. do Rio Preto)','18':'SP (Presidente Prudente)','19':'SP (Campinas)',
-    '21':'RJ (Rio de Janeiro)','22':'RJ (Campos/Região dos Lagos)','24':'RJ (Volta Redonda/Petrópolis)','27':'ES (Vitória)','28':'ES (Cachoeiro de Itapemirim)',
-    '31':'MG (Belo Horizonte e RMBH)','32':'MG (Juiz de Fora)','33':'MG (Governador Valadares/Vale do Aço)','34':'MG (Uberlândia/Uberaba)','35':'MG (Poços de Caldas/Pouso Alegre)','37':'MG (Divinópolis)','38':'MG (Montes Claros)',
-    '41':'PR (Curitiba)','42':'PR (Ponta Grossa)','43':'PR (Londrina)','44':'PR (Maringá)','45':'PR (Foz do Iguaçu/Cascavel)','46':'PR (Francisco Beltrão)','47':'SC (Joinville/Blumenau)','48':'SC (Florianópolis)','49':'SC (Chapecó)',
-    '51':'RS (Porto Alegre)','53':'RS (Pelotas)','54':'RS (Caxias do Sul)','55':'RS (Santa Maria)',
-    '61':'DF/GO (Brasília e Entorno)','62':'GO (Goiânia)','63':'TO (Palmas)','64':'GO (Rio Verde)','65':'MT (Cuiabá)','66':'MT (Rondonópolis)','67':'MS (Campo Grande)','68':'AC (Rio Branco)','69':'RO (Porto Velho)',
-    '71':'BA (Salvador)','73':'BA (Ilhéus/Itabuna)','74':'BA (Juazeiro)','75':'BA (Feira de Santana)','77':'BA (Vitória da Conquista)','79':'SE (Aracaju)',
-    '81':'PE (Recife)','82':'AL (Maceió)','83':'PB (João Pessoa)','84':'RN (Natal)','85':'CE (Fortaleza)','86':'PI (Teresina)','87':'PE (Petrolina)','88':'CE (Juazeiro do Norte)','89':'PI (Picos)',
-    '91':'PA (Belém)','92':'AM (Manaus)','93':'PA (Santarém)','94':'PA (Marabá)','95':'RR (Boa Vista)','96':'AP (Macapá)','97':'AM (Interior)','98':'MA (São Luís)','99':'MA (Imperatriz)'
-  };
 
   const PORTAIS_VEICULARES = [
     { nome: 'Situação do Veículo (DETRAN-MG)', desc: 'Restrições, débitos e cadastro MG', icone: 'fact_check', cor: 'linear-gradient(135deg,#0A84FF,#0055D4)', url: 'https://detran.mg.gov.br/veiculos/situacao-do-veiculo/consulta-de-situacao-do-veiculo' },
@@ -420,7 +399,7 @@
   let lastResultData = null;
   let lastModuleId = 'osint';
   let historyCache = [];
-  try { historyCache = JSON.parse(localStorage.getItem('kiik_v3_history') || '[]'); } catch { historyCache = []; }
+  try { historyCache = JSON.parse(localStorage.getItem('kiik_v4_history') || '[]'); } catch { historyCache = []; }
 
   function escapeHtml(str) {
     return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -437,14 +416,14 @@
 
   const ICON_MAP = {
     cnpj:'badge', cpf:'fingerprint', email:'mail', emails:'mail', nome:'person', name:'person',
-    razao:'domain', fantasia:'storefront', uf:'map', estado:'map', pais:'public',
-    municipio:'location_city', cidade:'location_city', cep:'markunread_mailbox',
-    logradouro:'signpost', bairro:'holiday_village', data:'calendar_today', abertura:'event',
+    proprietario:'person_check', titular:'person_check', documento:'badge', responsavel:'manage_accounts',
+    registrador:'storefront', razao:'domain', fantasia:'storefront', uf:'map', estado:'map', pais:'public',
+    municipio:'location_city', cidade:'location_city', cep:'markunread_mailbox', logradouro:'signpost',
+    bairro:'holiday_village', data:'calendar_today', abertura:'event', registro:'event', expiracao:'event_busy',
     situacao:'info', status:'check_circle', cnae:'category', capital:'payments', ip:'router',
-    isp:'dns', asn:'lan', latitude:'location_on', longitude:'location_on', ddd:'call',
-    regiao:'explore', url:'link', links:'link', placa:'directions_car', renavam:'pin',
-    titulo:'title', descricao:'description', idioma:'translate', tecnologia:'memory',
-    imagens:'image', fonte:'cloud_done', padrao:'verified'
+    isp:'dns', asn:'lan', latitude:'location_on', longitude:'location_on', regiao:'explore',
+    url:'link', links:'link', placa:'directions_car', renavam:'pin', titulo:'title',
+    descricao:'description', idioma:'translate', tecnologia:'memory', imagens:'image', dominio:'language'
   };
 
   function getIcon(key) {
@@ -475,21 +454,17 @@
     } finally { clearTimeout(timer); }
   }
 
-  // Motor de Redundância: tenta cada API em ordem e informa qual respondeu
   async function tryFallback(providers) {
     let lastErr;
     for (const p of providers) {
       try {
         const data = await p.run();
         if (data) return { data, provider: p.name };
-      } catch (e) {
-        lastErr = e;
-      }
+      } catch (e) { lastErr = e; }
     }
     throw new Error(lastErr?.message || 'Todas as APIs configuradas falharam no momento.');
   }
 
-  // Proxy com Fallback (AllOrigins -> CodeTabs)
   async function fetchHtmlWithFallback(targetUrl) {
     return tryFallback([
       {
@@ -516,8 +491,8 @@
     historyCache.unshift({ moduleId, query, ts: Date.now() });
     historyCache = historyCache.slice(0, 15);
     try {
-      localStorage.setItem('kiik_v3_history', JSON.stringify(historyCache));
-      localStorage.setItem('kiik_v3_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
+      localStorage.setItem('kiik_v4_history', JSON.stringify(historyCache));
+      localStorage.setItem('kiik_v4_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
     } catch {}
   }
 
@@ -525,108 +500,63 @@
     return historyCache.filter(i => i.moduleId === moduleId).slice(0, 5);
   }
 
-  async function checkViaProxy(url, notFoundPatterns = []) {
-    try {
-      const { data } = await fetchHtmlWithFallback(url);
-      const html = (data.html || '').toLowerCase();
-      if (data.code === 404 || data.code === 410) return { status: 'notfound', label: 'Não encontrado' };
-      if (html.includes('cf-browser-verification') || html.includes('just a moment')) return { status: 'manual', label: 'Verificar' };
-      if (notFoundPatterns.some(p => html.includes(p.toLowerCase()))) return { status: 'notfound', label: 'Não encontrado' };
-      return { status: 'found', label: 'Encontrado' };
-    } catch {
-      return { status: 'manual', label: 'Verificar' };
+  // Extrator de Proprietário/Titular no padrão RDAP (Registro.br e Global)
+  function extractRdapOwner(rdap) {
+    const out = {
+      proprietario: 'Protegido por privacidade / Não divulgado',
+      documento_titular: '-',
+      email_contato: '-',
+      registrador: '-'
+    };
+    if (!rdap || !Array.isArray(rdap.entities)) return out;
+
+    const getVcardField = (entity, fieldName) => {
+      const vcard = entity?.vcardArray?.[1];
+      if (!Array.isArray(vcard)) return null;
+      const row = vcard.find(item => item[0] === fieldName);
+      return row ? (Array.isArray(row[3]) ? row[3].filter(Boolean).join(' ') : String(row[3] || '')) : null;
+    };
+
+    const registrant = rdap.entities.find(e => (e.roles || []).includes('registrant'));
+    const admin = rdap.entities.find(e => (e.roles || []).includes('administrative'));
+    const registrar = rdap.entities.find(e => (e.roles || []).includes('registrar'));
+
+    const ownerEntity = registrant || admin;
+    if (ownerEntity) {
+      const fn = getVcardField(ownerEntity, 'fn') || getVcardField(ownerEntity, 'org');
+      if (fn) out.proprietario = fn;
+
+      const pubId = ownerEntity.publicIds?.[0]?.identifier || ownerEntity.handle;
+      if (pubId) out.documento_titular = pubId;
+
+      const email = getVcardField(ownerEntity, 'email');
+      if (email) out.email_contato = email;
     }
-  }
 
-  function buildOsintTargets(alvo) {
-    const enc = encodeURIComponent(alvo);
-    const q = (dork) => `https://www.google.com/search?q=${encodeURIComponent(dork)}`;
-    return [
-      {
-        titulo: 'Redes Sociais', icone: 'groups',
-        dorkGeral: q(`"${alvo}" (site:instagram.com OR site:tiktok.com OR site:x.com OR site:facebook.com OR site:linkedin.com OR site:reddit.com)`),
-        itens: [
-          {
-            id: 'github', nome: 'GitHub', url: `https://github.com/${enc}`,
-            check: async () => {
-              try {
-                const r = await fetch(`https://api.github.com/users/${enc}`);
-                if (r.status === 404) return { status: 'notfound', label: 'Não encontrado' };
-                if (r.ok) { const d = await r.json(); return { status: 'found', label: 'Encontrado', info: `${d.public_repos} repos` }; }
-              } catch {}
-              return checkViaProxy(`https://github.com/${enc}`, ['not found']);
-            }
-          },
-          {
-            id: 'gitlab', nome: 'GitLab', url: `https://gitlab.com/${enc}`,
-            check: async () => {
-              try {
-                const arr = await fetchJson(`https://gitlab.com/api/v4/users?username=${enc}`);
-                return arr.length ? { status: 'found', label: 'Encontrado' } : { status: 'notfound', label: 'Não encontrado' };
-              } catch { return checkViaProxy(`https://gitlab.com/${enc}`, ['404']); }
-            }
-          },
-          {
-            id: 'reddit', nome: 'Reddit', url: `https://www.reddit.com/user/${enc}`,
-            check: async () => {
-              try {
-                const r = await fetch(`https://www.reddit.com/user/${enc}/about.json`);
-                if (r.status === 404) return { status: 'notfound', label: 'Não encontrado' };
-                if (r.ok) return { status: 'found', label: 'Encontrado' };
-              } catch {}
-              return checkViaProxy(`https://www.reddit.com/user/${enc}`, ['page not found']);
-            }
-          },
-          { id: 'instagram', nome: 'Instagram', url: `https://www.instagram.com/${enc}/`, check: () => checkViaProxy(`https://www.instagram.com/${enc}/`, ["page isn't available", 'página não está disponível']) },
-          { id: 'tiktok', nome: 'TikTok', url: `https://www.tiktok.com/@${enc}`, check: () => checkViaProxy(`https://www.tiktok.com/@${enc}`, ["couldn't find this account"]) },
-          { id: 'x', nome: 'X (Twitter)', url: `https://x.com/${enc}`, check: () => checkViaProxy(`https://x.com/${enc}`, ['this account doesn’t exist']) },
-          { id: 'youtube', nome: 'YouTube', url: `https://www.youtube.com/@${enc}`, check: () => checkViaProxy(`https://www.youtube.com/@${enc}`, ["this page isn't available"]) },
-          { id: 'facebook', nome: 'Facebook', url: q(`site:facebook.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Busca Google' }) }
-        ]
-      },
-      {
-        titulo: 'Sites Adultos', icone: 'visibility_off',
-        dorkGeral: q(`"${alvo}" (site:onlyfans.com OR site:privacy.com.br OR site:fansly.com OR site:pornhub.com OR site:xvideos.com OR site:chaturbate.com)`),
-        itens: [
-          { id: 'onlyfans', nome: 'OnlyFans', url: `https://onlyfans.com/${enc}`, check: () => checkViaProxy(`https://onlyfans.com/${enc}`, ['sorry this page is not available']) },
-          { id: 'privacy', nome: 'Privacy', url: `https://privacy.com.br/profile/${enc}`, check: () => checkViaProxy(`https://privacy.com.br/profile/${enc}`, ['não encontrado', '404']) },
-          { id: 'fansly', nome: 'Fansly', url: `https://fansly.com/${enc}`, check: () => checkViaProxy(`https://fansly.com/${enc}`, ['page not found']) },
-          { id: 'pornhub', nome: 'Pornhub', url: `https://www.pornhub.com/users/${enc}`, check: () => checkViaProxy(`https://www.pornhub.com/users/${enc}`, ['error 404', 'page not found']) },
-          { id: 'xvideos', nome: 'XVideos', url: `https://www.xvideos.com/profiles/${enc}`, check: () => checkViaProxy(`https://www.xvideos.com/profiles/${enc}`, ['404', 'not found']) }
-        ]
-      },
-      {
-        titulo: 'Sites de Namoro & Apostas', icone: 'casino',
-        dorkGeral: q(`"${alvo}" (site:tinder.com OR site:badoo.com OR site:betano.com OR site:bet365.com OR site:blaze.com OR site:stake.com)`),
-        itens: [
-          { id: 'tinder', nome: 'Tinder', url: q(`site:tinder.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Dork Google' }) },
-          { id: 'badoo', nome: 'Badoo', url: q(`site:badoo.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Dork Google' }) },
-          { id: 'betano', nome: 'Betano', url: q(`site:betano.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Dork Google' }) },
-          { id: 'bet365', nome: 'Bet365', url: q(`site:bet365.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Dork Google' }) },
-          { id: 'blaze', nome: 'Blaze', url: q(`site:blaze.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Dork Google' }) },
-          { id: 'stake', nome: 'Stake', url: q(`site:stake.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Dork Google' }) }
-        ]
-      }
-    ];
+    if (registrar) {
+      const regName = getVcardField(registrar, 'fn') || registrar.handle;
+      if (regName) out.registrador = regName;
+    }
+
+    return out;
   }
 
   // ==========================================================
-  // 4. MÓDULOS COM API PRINCIPAL + ALTERNATIVA ESPECIFICADAS
+  // 4. SETORES & MÓDULOS (ORGANIZADOS SEM BAGUNÇA)
   // ==========================================================
+  const SECTORS = [
+    { id: 'docs', title: 'Documentos & Veículos', icon: 'badge' },
+    { id: 'osint', title: 'Investigação, Dorks & Vazamentos', icon: 'travel_explore' },
+    { id: 'web', title: 'Sites, Proprietário & Infraestrutura', icon: 'language' }
+  ];
+
   const MODULES = [
-    {
-      id: 'atpv',
-      name: 'Central Veicular (MG)',
-      desc: 'Placa, Titular (CPF/CNPJ), FIPE e Portais DETRAN-MG / SENATRAN / PBH.',
-      apisLabel: '4 Portais + 2 FIPE',
-      icon: 'directions_car',
-      gradient: 'linear-gradient(135deg, #0A84FF 0%, #0055D4 100%)',
-      customView: 'atpv'
-    },
+    // --- SETOR 1: DOCUMENTOS & VEÍCULOS ---
     {
       id: 'cpf',
+      sector: 'docs',
       name: 'Consulta CPF',
-      desc: 'Dados cadastrais via CPFHub.io com fallback automático de validação fiscal.',
+      desc: 'Dados cadastrais via CPFHub.io com fallback local de validação fiscal.',
       apisLabel: 'CPFHub + Local',
       icon: 'fingerprint',
       gradient: 'linear-gradient(135deg, #FF375F 0%, #C91D42 100%)',
@@ -682,6 +612,7 @@
     },
     {
       id: 'cnpj',
+      sector: 'docs',
       name: 'Consulta CNPJ',
       desc: 'Razão social, situação, CNAE e sócios (QSA) com 3 APIs em cascata.',
       apisLabel: '3 APIs BR',
@@ -719,21 +650,198 @@
       }
     },
     {
-      id: 'username',
-      name: 'Varredura OSINT',
-      desc: 'Busca perfis em redes sociais, adultos, namoro e apostas com proxy duplo.',
-      apisLabel: 'APIs + 2 Proxies',
+      id: 'atpv',
+      sector: 'docs',
+      name: 'Central Veicular (MG)',
+      desc: 'Placa, titular automático, FIPE e portais DETRAN-MG, SENATRAN e PBH.',
+      apisLabel: '4 Portais + FIPE',
+      icon: 'directions_car',
+      gradient: 'linear-gradient(135deg, #0A84FF 0%, #0055D4 100%)',
+      customView: 'atpv'
+    },
+    {
+      id: 'cep',
+      sector: 'docs',
+      name: 'Consulta CEP',
+      desc: 'Endereço completo e coordenadas via BrasilAPI, ViaCEP e AwesomeAPI.',
+      apisLabel: '3 APIs BR',
+      icon: 'location_on',
+      gradient: 'linear-gradient(135deg, #FF9F0A 0%, #D97706 100%)',
+      placeholder: 'CEP (8 dígitos)',
+      max: 9,
+      digits: true,
+      fetchApi: async (v) => {
+        const clean = v.replace(/\D/g, '');
+        if (clean.length !== 8) throw new Error('Informe um CEP com 8 dígitos.');
+        const { data, provider } = await tryFallback([
+          { name: 'BrasilAPI v2 (Principal)', run: () => fetchJson(`https://brasilapi.com.br/api/cep/v2/${clean}`) },
+          { name: 'ViaCEP (Alternativa 1)', run: async () => { const r = await fetchJson(`https://viacep.com.br/ws/${clean}/json/`); if (r.erro) throw new Error('Não encontrado'); return r; } },
+          { name: 'AwesomeAPI (Alternativa 2)', run: () => fetchJson(`https://cep.awesomeapi.com.br/json/${clean}`) }
+        ]);
+        return {
+          provider,
+          resumo: {
+            cep: data.cep || clean,
+            logradouro: data.street || data.logradouro || data.address || '-',
+            bairro: data.neighborhood || data.bairro || data.district || '-',
+            cidade: data.city || data.localidade || '-',
+            uf: data.state || data.uf || '-',
+            latitude: data.location?.coordinates?.latitude || data.lat || '-',
+            longitude: data.location?.coordinates?.longitude || data.lng || '-'
+          },
+          raw: data
+        };
+      }
+    },
+
+    // --- SETOR 2: INVESTIGAÇÃO, DORKS & VAZAMENTOS ---
+    {
+      id: 'osint',
+      sector: 'osint',
+      name: 'OSINT Direto (APIs)',
+      desc: 'Verifica username em 11 plataformas 100% compatíveis com retorno real.',
+      apisLabel: '11 APIs Diretas',
       icon: 'travel_explore',
       gradient: 'linear-gradient(135deg, #5E5CE6 0%, #3634A3 100%)',
-      placeholder: 'Username ou nome',
+      placeholder: 'Username (ex: torvalds)',
       max: 60,
       digits: false,
-      progressive: true
+      customSearch: 'osint_api'
+    },
+    {
+      id: 'dork',
+      sector: 'osint',
+      name: 'Central de Dorks',
+      desc: 'Buscas avançadas no Google para Redes Sociais, Adultos, Namoro e Apostas.',
+      apisLabel: 'Google Dorks',
+      icon: 'manage_search',
+      gradient: 'linear-gradient(135deg, #FF9F0A 0%, #EA580C 100%)',
+      placeholder: 'Nome, @user ou e-mail',
+      max: 80,
+      digits: false,
+      customSearch: 'dork_only'
+    },
+    {
+      id: 'breach',
+      sector: 'osint',
+      name: 'Vazamentos (E-mail)',
+      desc: 'Checa exposição em bases vazadas + validação alternativa de servidor MX.',
+      apisLabel: '2 APIs Sec',
+      icon: 'security',
+      gradient: 'linear-gradient(135deg, #FF453A 0%, #C62828 100%)',
+      placeholder: 'Ex: nome@dominio.com',
+      max: 80,
+      digits: false,
+      fetchApi: async (v) => {
+        const email = v.trim();
+        if (!email.includes('@')) throw new Error('Informe um e-mail válido.');
+        const domain = email.split('@')[1];
+        const { data, provider } = await tryFallback([
+          {
+            name: 'XposedOrNot (Principal)',
+            run: async () => {
+              const r = await fetch(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
+              if (r.status === 404) return { resumo: { email, status: 'Nenhum vazamento encontrado' }, raw: { email, breaches: [] } };
+              if (!r.ok) throw new Error(`HTTP ${r.status}`);
+              const d = await r.json();
+              const list = Array.isArray(d.breaches?.[0]) ? d.breaches[0] : (d.breaches || []);
+              return {
+                resumo: { email, status: list.length ? 'Exposto em vazamentos' : 'Seguro', total_vazamentos: list.length },
+                listas: list.length ? [{ titulo: 'Bases vazadas', itens: list }] : [],
+                raw: d
+              };
+            }
+          },
+          {
+            name: 'DNS MX Check (Alternativa)',
+            run: async () => {
+              const mx = await fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=MX`);
+              const servers = (mx?.Answer || []).map(a => a.data);
+              return {
+                resumo: { email, dominio: domain, servidor_email: servers.length ? 'Ativo (MX válido)' : 'Sem registro MX' },
+                listas: servers.length ? [{ titulo: 'Servidores MX', itens: servers }] : [],
+                raw: mx
+              };
+            }
+          }
+        ]);
+        return { ...data, provider };
+      }
+    },
+
+    // --- SETOR 3: SITES, PROPRIETÁRIO & INFRAESTRUTURA ---
+    {
+      id: 'domain',
+      sector: 'web',
+      name: 'Proprietário de Site',
+      desc: 'Retorna titular (dono), CNPJ/CPF (.br), registrador, datas e DNS do domínio.',
+      apisLabel: 'RDAP + 2 DNS',
+      icon: 'language',
+      gradient: 'linear-gradient(135deg, #64D2FF 0%, #0A84FF 100%)',
+      placeholder: 'Ex: uol.com.br ou site.com',
+      max: 80,
+      digits: false,
+      fetchApi: async (v) => {
+        const domain = v.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+        if (!domain || !domain.includes('.')) throw new Error('Informe um domínio válido (ex: exemplo.com.br).');
+
+        const resolveDns = async (type) => {
+          const { data } = await tryFallback([
+            { name: 'Google DoH', run: () => fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=${type}`) },
+            { name: 'Cloudflare DoH', run: () => fetchJson(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${type}`, { headers: { Accept: 'application/dns-json' } }) }
+          ]);
+          return (data?.Answer || []).map(a => a.data);
+        };
+
+        const rdapResult = await tryFallback([
+          {
+            name: domain.endsWith('.br') ? 'RDAP Registro.br (Oficial)' : 'RDAP.org (Global)',
+            run: () => fetchJson(domain.endsWith('.br') ? `https://rdap.registro.br/domain/${encodeURIComponent(domain)}` : `https://rdap.org/domain/${encodeURIComponent(domain)}`)
+          },
+          {
+            name: 'RDAP Verisign / Fallback',
+            run: () => fetchJson(`https://rdap.verisign.com/com/v1/domain/${encodeURIComponent(domain)}`)
+          }
+        ]).catch(() => ({ data: null, provider: 'DNS Only (RDAP indisponível)' }));
+
+        const [aRec, mxRec, nsRec, txtRec] = await Promise.all([
+          resolveDns('A').catch(() => []),
+          resolveDns('MX').catch(() => []),
+          resolveDns('NS').catch(() => []),
+          resolveDns('TXT').catch(() => [])
+        ]);
+
+        const rdap = rdapResult.data;
+        const owner = extractRdapOwner(rdap);
+        const events = (rdap?.events || []).reduce((acc, ev) => { acc[ev.eventAction] = ev.eventDate?.split('T')[0]; return acc; }, {});
+
+        return {
+          provider: `${rdapResult.provider} + DNS`,
+          resumo: {
+            dominio: domain,
+            proprietario: owner.proprietario,
+            documento_titular: owner.documento_titular,
+            email_contato: owner.email_contato,
+            registrador: owner.registrador,
+            status_rdap: (rdap?.status || []).join(', ') || 'Não retornado',
+            registro: events.registration || '-',
+            expiracao: events.expiration || '-'
+          },
+          listas: [
+            { titulo: 'IPs do Servidor (A)', itens: aRec },
+            { titulo: 'Servidores de E-mail (MX)', itens: mxRec },
+            { titulo: 'Nameservers (NS)', itens: nsRec },
+            { titulo: 'Registros TXT', itens: txtRec }
+          ].filter(l => l.itens.length > 0),
+          raw: { domain, owner, rdap, dns: { aRec, mxRec, nsRec, txtRec } }
+        };
+      }
     },
     {
       id: 'scraping',
+      sector: 'web',
       name: 'Web Scraper',
-      desc: 'Extrai metadados, e-mails, telefones e links usando 2 proxies alternativos.',
+      desc: 'Extrai metadados, e-mails, telefones e links públicos com 2 proxies CORS.',
       apisLabel: '2 Proxies CORS',
       icon: 'code',
       gradient: 'linear-gradient(135deg, #32ADE6 0%, #007AFF 100%)',
@@ -779,40 +887,8 @@
       }
     },
     {
-      id: 'cep',
-      name: 'Consulta CEP',
-      desc: 'Logradouro, bairro, cidade e coordenadas via BrasilAPI, ViaCEP e AwesomeAPI.',
-      apisLabel: '3 APIs BR',
-      icon: 'location_on',
-      gradient: 'linear-gradient(135deg, #FF9F0A 0%, #D97706 100%)',
-      placeholder: 'CEP (8 dígitos)',
-      max: 9,
-      digits: true,
-      fetchApi: async (v) => {
-        const clean = v.replace(/\D/g, '');
-        if (clean.length !== 8) throw new Error('Informe um CEP com 8 dígitos.');
-        const { data, provider } = await tryFallback([
-          { name: 'BrasilAPI v2 (Principal)', run: () => fetchJson(`https://brasilapi.com.br/api/cep/v2/${clean}`) },
-          { name: 'ViaCEP (Alternativa 1)', run: async () => { const r = await fetchJson(`https://viacep.com.br/ws/${clean}/json/`); if (r.erro) throw new Error('Não encontrado'); return r; } },
-          { name: 'AwesomeAPI (Alternativa 2)', run: () => fetchJson(`https://cep.awesomeapi.com.br/json/${clean}`) }
-        ]);
-        return {
-          provider,
-          resumo: {
-            cep: data.cep || clean,
-            logradouro: data.street || data.logradouro || data.address || '-',
-            bairro: data.neighborhood || data.bairro || data.district || '-',
-            cidade: data.city || data.localidade || '-',
-            uf: data.state || data.uf || '-',
-            latitude: data.location?.coordinates?.latitude || data.lat || '-',
-            longitude: data.location?.coordinates?.longitude || data.lng || '-'
-          },
-          raw: data
-        };
-      }
-    },
-    {
       id: 'ip',
+      sector: 'web',
       name: 'IP & Geolocalização',
       desc: 'Operadora, ASN e coordenadas com 3 provedores globais de redundância.',
       apisLabel: '3 APIs Geo',
@@ -844,143 +920,185 @@
           raw: data
         };
       }
-    },
-    {
-      id: 'breach',
-      name: 'Vazamentos (E-mail)',
-      desc: 'Checa exposição em bases vazadas + validação DNS MX alternativa.',
-      apisLabel: '2 APIs Sec',
-      icon: 'security',
-      gradient: 'linear-gradient(135deg, #FF453A 0%, #C62828 100%)',
-      placeholder: 'Ex: nome@dominio.com',
-      max: 80,
-      digits: false,
-      fetchApi: async (v) => {
-        const email = v.trim();
-        if (!email.includes('@')) throw new Error('Informe um e-mail válido.');
-        const domain = email.split('@')[1];
-        const { data, provider } = await tryFallback([
-          {
-            name: 'XposedOrNot (Principal)',
-            run: async () => {
-              const r = await fetch(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
-              if (r.status === 404) return { resumo: { email, status: 'Nenhum vazamento encontrado' }, raw: { email, breaches: [] } };
-              if (!r.ok) throw new Error(`HTTP ${r.status}`);
-              const d = await r.json();
-              const list = Array.isArray(d.breaches?.[0]) ? d.breaches[0] : (d.breaches || []);
-              return {
-                resumo: { email, status: list.length ? 'Exposto em vazamentos' : 'Seguro', total_vazamentos: list.length },
-                listas: list.length ? [{ titulo: 'Bases vazadas', itens: list }] : [],
-                raw: d
-              };
-            }
-          },
-          {
-            name: 'DNS MX Check (Alternativa)',
-            run: async () => {
-              const mx = await fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=MX`);
-              const servers = (mx?.Answer || []).map(a => a.data);
-              return {
-                resumo: { email, dominio: domain, servidor_email: servers.length ? 'Ativo (MX válido)' : 'Sem registro MX' },
-                listas: servers.length ? [{ titulo: 'Servidores MX', itens: servers }] : [],
-                raw: mx
-              };
-            }
-          }
-        ]);
-        return { ...data, provider };
-      }
-    },
-    {
-      id: 'domain',
-      name: 'Domínio & DNS',
-      desc: 'Registros A, MX, NS, TXT e RDAP com fallback Google DoH → Cloudflare DoH.',
-      apisLabel: 'Google + CF DoH',
-      icon: 'language',
-      gradient: 'linear-gradient(135deg, #64D2FF 0%, #0A84FF 100%)',
-      placeholder: 'Ex: exemplo.com.br',
-      max: 80,
-      digits: false,
-      fetchApi: async (v) => {
-        const domain = v.trim().toLowerCase().replace(/^https?:\/\//, '').split('/')[0];
-        if (!domain || !domain.includes('.')) throw new Error('Informe um domínio válido.');
-
-        const resolveDns = async (type) => {
-          const { data } = await tryFallback([
-            { name: 'Google DoH', run: () => fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=${type}`) },
-            { name: 'Cloudflare DoH', run: () => fetchJson(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${type}`, { headers: { Accept: 'application/dns-json' } }) }
-          ]);
-          return (data?.Answer || []).map(a => a.data);
-        };
-
-        const [aRec, mxRec, nsRec, txtRec, rdap] = await Promise.all([
-          resolveDns('A').catch(() => []),
-          resolveDns('MX').catch(() => []),
-          resolveDns('NS').catch(() => []),
-          resolveDns('TXT').catch(() => []),
-          fetchJson(domain.endsWith('.br') ? `https://rdap.registro.br/domain/${encodeURIComponent(domain)}` : `https://rdap.org/domain/${encodeURIComponent(domain)}`).catch(() => null)
-        ]);
-
-        const events = (rdap?.events || []).reduce((acc, ev) => { acc[ev.eventAction] = ev.eventDate?.split('T')[0]; return acc; }, {});
-        return {
-          provider: 'Google / Cloudflare DoH + RDAP',
-          resumo: {
-            dominio: domain,
-            status_rdap: (rdap?.status || []).join(', ') || 'Não retornado',
-            registro: events.registration || '-',
-            expiracao: events.expiration || '-'
-          },
-          listas: [
-            { titulo: 'Registros A (IPv4)', itens: aRec },
-            { titulo: 'Servidores MX', itens: mxRec },
-            { titulo: 'Nameservers (NS)', itens: nsRec },
-            { titulo: 'Registros TXT', itens: txtRec }
-          ].filter(l => l.itens.length > 0),
-          raw: { domain, aRec, mxRec, nsRec, txtRec, rdap }
-        };
-      }
-    },
-    {
-      id: 'ddd',
-      name: 'DDD Brasil',
-      desc: 'Estado e municípios via BrasilAPI com base local completa (100% offline).',
-      apisLabel: 'BrasilAPI + Local',
-      icon: 'call',
-      gradient: 'linear-gradient(135deg, #30D158 0%, #0D9488 100%)',
-      placeholder: 'DDD (2 dígitos)',
-      max: 2,
-      digits: true,
-      fetchApi: async (v) => {
-        const ddd = v.replace(/\D/g, '');
-        if (ddd.length !== 2) throw new Error('Informe um DDD com 2 dígitos.');
-        const { data, provider } = await tryFallback([
-          {
-            name: 'BrasilAPI DDD (Principal)',
-            run: async () => {
-              const d = await fetchJson(`https://brasilapi.com.br/api/ddd/v1/${ddd}`);
-              return { resumo: { ddd, estado: d.state, total_cidades: d.cities?.length || 0 }, listas: [{ titulo: 'Municípios atendidos', itens: d.cities || [] }], raw: d };
-            }
-          },
-          {
-            name: 'Base Nacional Local (Alternativa)',
-            run: async () => {
-              const info = DDD_LOCAL[ddd];
-              if (!info) throw new Error('DDD não encontrado.');
-              return { resumo: { ddd, regiao: info }, raw: { ddd, regiao: info } };
-            }
-          }
-        ]);
-        return { ...data, provider };
-      }
     }
   ];
 
   // ==========================================================
-  // 5. CENTRAL VEICULAR (PLACA + TITULAR + PORTAIS + FIPE)
+  // 5. OSINT DIRETO (11 APIS) & CENTRAL DE DORKS
   // ==========================================================
-  function navigate(id) {
-    window.location.hash = id ? '#' + id : '';
+  function getCompatibleOsintApis(alvo) {
+    const enc = encodeURIComponent(alvo);
+    return [
+      { id: 'github', nome: 'GitHub', url: `https://github.com/${enc}`, check: async () => { const r = await fetch(`https://api.github.com/users/${enc}`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); const d = await r.json(); return { status: 'found', info: `${d.public_repos ?? 0} repos públicos` }; } },
+      { id: 'gitlab', nome: 'GitLab', url: `https://gitlab.com/${enc}`, check: async () => { const arr = await fetchJson(`https://gitlab.com/api/v4/users?username=${enc}`); return arr.length ? { status: 'found', info: arr[0].name || 'Perfil ativo' } : { status: 'notfound' }; } },
+      { id: 'devto', nome: 'Dev.to', url: `https://dev.to/${enc}`, check: async () => { const r = await fetch(`https://dev.to/api/users/by_username?url=${enc}`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); const d = await r.json(); return { status: 'found', info: d.name || 'Perfil ativo' }; } },
+      { id: 'reddit', nome: 'Reddit', url: `https://www.reddit.com/user/${enc}`, check: async () => { const r = await fetch(`https://www.reddit.com/user/${enc}/about.json`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); const d = await r.json(); return d?.data?.name ? { status: 'found', info: `Karma: ${d.data.total_karma ?? 0}` } : { status: 'notfound' }; } },
+      { id: 'hackernews', nome: 'Hacker News', url: `https://news.ycombinator.com/user?id=${enc}`, check: async () => { const d = await fetchJson(`https://hacker-news.firebaseio.com/v0/user/${enc}.json`); return d ? { status: 'found', info: `Karma: ${d.karma ?? 0}` } : { status: 'notfound' }; } },
+      { id: 'chess', nome: 'Chess.com', url: `https://www.chess.com/member/${enc}`, check: async () => { const r = await fetch(`https://api.chess.com/pub/player/${enc.toLowerCase()}`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); return { status: 'found', info: 'Jogador localizado' }; } },
+      { id: 'lichess', nome: 'Lichess', url: `https://lichess.org/@/${enc}`, check: async () => { const r = await fetch(`https://lichess.org/api/user/${enc}`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); return { status: 'found', info: 'Jogador localizado' }; } },
+      { id: 'codeforces', nome: 'Codeforces', url: `https://codeforces.com/profile/${enc}`, check: async () => { const r = await fetch(`https://codeforces.com/api/user.info?handles=${enc}`); if (r.status === 400) return { status: 'notfound' }; if (!r.ok) throw new Error(); const d = await r.json(); const u = d?.result?.[0]; return u ? { status: 'found', info: `Rating: ${u.rating ?? 'N/A'}` } : { status: 'notfound' }; } },
+      { id: 'npm', nome: 'npm', url: `https://www.npmjs.com/~${enc}`, check: async () => { const d = await fetchJson(`https://registry.npmjs.org/-/v1/search?text=maintainer:${enc}&size=1`); return d?.total > 0 ? { status: 'found', info: `${d.total} pacote(s)` } : { status: 'notfound' }; } },
+      { id: 'wikipedia', nome: 'Wikipédia (PT)', url: `https://pt.wikipedia.org/wiki/Usu%C3%A1rio:${enc}`, check: async () => { const d = await fetchJson(`https://pt.wikipedia.org/w/api.php?action=query&list=users&ususers=${enc}&usprop=editcount&format=json&origin=*`); const u = d?.query?.users?.[0]; return u && !('missing' in u) ? { status: 'found', info: `${u.editcount ?? 0} edições` } : { status: 'notfound' }; } },
+      { id: 'scratch', nome: 'Scratch', url: `https://scratch.mit.edu/users/${enc}/`, check: async () => { const r = await fetch(`https://api.scratch.mit.edu/users/${enc}`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); return { status: 'found', info: 'Perfil localizado' }; } }
+    ];
   }
+
+  function getDorkCategories(alvo) {
+    const q = (dork) => `https://www.google.com/search?q=${encodeURIComponent(dork)}`;
+    return [
+      {
+        titulo: 'Redes Sociais', icone: 'groups',
+        dorkGeral: q(`"${alvo}" (site:instagram.com OR site:tiktok.com OR site:x.com OR site:facebook.com OR site:linkedin.com OR site:youtube.com OR site:threads.net)`),
+        itens: [
+          { nome: 'Instagram', url: q(`site:instagram.com "${alvo}"`) },
+          { nome: 'TikTok', url: q(`site:tiktok.com "${alvo}"`) },
+          { nome: 'X (Twitter)', url: q(`site:x.com "${alvo}"`) },
+          { nome: 'Facebook', url: q(`site:facebook.com "${alvo}"`) },
+          { nome: 'LinkedIn', url: q(`site:linkedin.com "${alvo}"`) },
+          { nome: 'YouTube', url: q(`site:youtube.com "${alvo}"`) },
+          { nome: 'Threads', url: q(`site:threads.net "${alvo}"`) }
+        ]
+      },
+      {
+        titulo: 'Sites Adultos', icone: 'visibility_off',
+        dorkGeral: q(`"${alvo}" (site:onlyfans.com OR site:privacy.com.br OR site:fansly.com OR site:pornhub.com OR site:xvideos.com OR site:chaturbate.com OR site:fatalmodel.com)`),
+        itens: [
+          { nome: 'OnlyFans', url: q(`site:onlyfans.com "${alvo}"`) },
+          { nome: 'Privacy', url: q(`site:privacy.com.br "${alvo}"`) },
+          { nome: 'Fansly', url: q(`site:fansly.com "${alvo}"`) },
+          { nome: 'Pornhub', url: q(`site:pornhub.com "${alvo}"`) },
+          { nome: 'XVideos', url: q(`site:xvideos.com "${alvo}"`) },
+          { nome: 'Chaturbate', url: q(`site:chaturbate.com "${alvo}"`) },
+          { nome: 'Fatal Model', url: q(`site:fatalmodel.com "${alvo}"`) }
+        ]
+      },
+      {
+        titulo: 'Namoro & Apostas', icone: 'casino',
+        dorkGeral: q(`"${alvo}" (site:tinder.com OR site:badoo.com OR site:bumble.com OR site:betano.com OR site:bet365.com OR site:blaze.com OR site:stake.com)`),
+        itens: [
+          { nome: 'Tinder', url: q(`site:tinder.com "${alvo}"`) },
+          { nome: 'Badoo', url: q(`site:badoo.com "${alvo}"`) },
+          { nome: 'Bumble', url: q(`site:bumble.com "${alvo}"`) },
+          { nome: 'Betano', url: q(`site:betano.com "${alvo}"`) },
+          { nome: 'Bet365', url: q(`site:bet365.com "${alvo}"`) },
+          { nome: 'Blaze', url: q(`site:blaze.com "${alvo}"`) },
+          { nome: 'Stake', url: q(`site:stake.com "${alvo}"`) }
+        ]
+      }
+    ];
+  }
+
+  async function runOsintApis(alvo, resDiv, btn) {
+    await saveHistory('osint', alvo);
+    lastModuleId = 'osint';
+    const apis = getCompatibleOsintApis(alvo);
+    const report = { alvo, resultados: [] };
+    let found = 0, notFound = 0;
+
+    resDiv.className = 'min-h-[300px] liquid-card p-6 text-left';
+    resDiv.innerHTML = `
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-white/10">
+        <div>
+          <h3 class="font-bold text-lg">OSINT Direto: <span class="text-[#0A84FF]">${escapeHtml(alvo)}</span></h3>
+          <p id="osintCounter" class="text-xs text-[var(--text-secondary)] mt-0.5">Consultando ${apis.length} APIs compatíveis...</p>
+        </div>
+        <div class="flex gap-2">
+          <button type="button" class="ios-chip" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button>
+          <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#0A84FF]">verified</span> Assinado</button>
+        </div>
+      </div>
+      <div class="ios-group">
+        ${apis.map(item => `
+          <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="ios-row">
+            <div class="flex flex-col min-w-0">
+              <span class="font-semibold text-sm text-white truncate">${escapeHtml(item.nome)}</span>
+              <span id="info-${escapeHtml(item.id)}" class="text-[11px] text-[var(--text-secondary)] truncate">Consultando API...</span>
+            </div>
+            <span id="status-${escapeHtml(item.id)}" class="pill-tag tag-info">
+              <span class="material-symbols-rounded text-xs spinner">refresh</span> Checando
+            </span>
+          </a>
+        `).join('')}
+      </div>
+    `;
+
+    const tasks = apis.map(item =>
+      item.check().then(res => ({ item, res })).catch(() => ({ item, res: { status: 'error' } })).then(({ item, res }) => {
+        const pill = document.getElementById(`status-${item.id}`);
+        const infoEl = document.getElementById(`info-${item.id}`);
+        if (!pill) return;
+        if (res.status === 'found') {
+          found++;
+          pill.className = 'pill-tag tag-ok';
+          pill.innerHTML = '<span class="material-symbols-rounded text-xs">check_circle</span> Encontrado';
+          infoEl.textContent = res.info || 'Perfil ativo';
+        } else if (res.status === 'notfound') {
+          notFound++;
+          pill.className = 'pill-tag tag-err';
+          pill.innerHTML = '<span class="material-symbols-rounded text-xs">cancel</span> Não encontrado';
+          infoEl.textContent = 'Sem conta registrada';
+        } else {
+          pill.className = 'pill-tag tag-warn';
+          pill.innerHTML = '<span class="material-symbols-rounded text-xs">warning</span> Indisponível';
+          infoEl.textContent = 'API temporariamente fora';
+        }
+        report.resultados.push({ site: item.nome, url: item.url, status: res.status, info: res.info || '' });
+        lastResultData = report;
+        const c = document.getElementById('osintCounter');
+        if (c) c.textContent = `${found} encontrado(s) • ${notFound} não encontrado(s) de ${apis.length} APIs`;
+      })
+    );
+
+    await Promise.allSettled(tasks);
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Consultar';
+  }
+
+  async function runDorks(alvo, resDiv, btn) {
+    await saveHistory('dork', alvo);
+    lastModuleId = 'dork';
+    const dorks = getDorkCategories(alvo);
+    lastResultData = { alvo, dorks };
+
+    resDiv.className = 'min-h-[300px] liquid-card p-6 text-left';
+    resDiv.innerHTML = `
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-white/10">
+        <div>
+          <h3 class="font-bold text-lg">Dorks para: <span class="text-[#FF9F0A]">${escapeHtml(alvo)}</span></h3>
+          <p class="text-xs text-[var(--text-secondary)] mt-0.5">Toque em qualquer plataforma para abrir a busca filtrada no Google.</p>
+        </div>
+        <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#0A84FF]">verified</span> Assinado</button>
+      </div>
+      ${dorks.map(cat => `
+        <div class="mb-5">
+          <div class="flex items-center justify-between gap-2 mb-2 px-1">
+            <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold flex items-center gap-1.5">
+              <span class="material-symbols-rounded text-base text-[#FF9F0A]">${escapeHtml(cat.icone)}</span> ${escapeHtml(cat.titulo)}
+            </h4>
+            <a href="${escapeHtml(cat.dorkGeral)}" target="_blank" rel="noopener noreferrer" class="ios-chip text-[11px] py-1 px-2.5">
+              <span class="material-symbols-rounded text-xs">manage_search</span> Dork Geral
+            </a>
+          </div>
+          <div class="ios-group">
+            ${cat.itens.map(item => `
+              <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="ios-row">
+                <span class="font-semibold text-sm text-white truncate">${escapeHtml(item.nome)}</span>
+                <span class="pill-tag tag-warn"><span class="material-symbols-rounded text-xs">open_in_new</span> Abrir Dork</span>
+              </a>
+            `).join('')}
+          </div>
+        </div>
+      `).join('')}
+    `;
+
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Gerar Dorks';
+  }
+
+  // ==========================================================
+  // 6. CENTRAL VEICULAR
+  // ==========================================================
+  function navigate(id) { window.location.hash = id ? '#' + id : ''; }
 
   function renderAtpvView(view) {
     const history = getHistory('atpv');
@@ -1083,8 +1201,6 @@
     ];
 
     let extrasHtml = '';
-
-    // 1. Consulta Titular automática (Multi-API)
     if (doc.length === 14) {
       try {
         const res = await MODULES.find(m => m.id === 'cnpj').fetchApi(doc);
@@ -1109,7 +1225,6 @@
       } catch {}
     }
 
-    // 2. Consulta FIPE (BrasilAPI -> Fallback)
     if (fipeCode) {
       try {
         const { data: fipeList, provider } = await tryFallback([
@@ -1173,45 +1288,47 @@
   }
 
   // ==========================================================
-  // 6. HOME SCREEN (WIDGETS AMIGÁVEIS iOS + MATERIAL)
+  // 7. HOME SCREEN SETORIZADA
   // ==========================================================
   function render() {
     const view = document.getElementById('view');
     const hash = window.location.hash.replace('#', '');
 
     if (!hash) {
-      const cards = MODULES.map(m => `
-        <div class="liquid-card app-widget p-5 flex flex-col justify-between gap-4" data-nav="${escapeHtml(m.id)}">
-          <div class="flex items-start justify-between gap-3">
-            <div class="squircle" style="background: ${m.gradient};">
-              <span class="material-symbols-rounded">${escapeHtml(m.icon)}</span>
+      const sectorsHtml = SECTORS.map(sec => {
+        const items = MODULES.filter(m => m.sector === sec.id);
+        return `
+          <section class="mb-9">
+            <div class="section-header">
+              <span class="material-symbols-rounded text-base text-[#0A84FF]">${escapeHtml(sec.icon)}</span>
+              <h2>${escapeHtml(sec.title)}</h2>
             </div>
-            <span class="pill-tag tag-info">${escapeHtml(m.apisLabel)}</span>
-          </div>
-          <div>
-            <h3 class="text-base font-bold text-white leading-snug mb-1">${escapeHtml(m.name)}</h3>
-            <p class="text-xs text-[var(--text-secondary)] leading-relaxed">${escapeHtml(m.desc)}</p>
-          </div>
-        </div>
-      `).join('');
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              ${items.map(m => `
+                <div class="liquid-card app-widget p-5 flex flex-col justify-between gap-4" data-nav="${escapeHtml(m.id)}">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="squircle" style="background: ${m.gradient};">
+                      <span class="material-symbols-rounded">${escapeHtml(m.icon)}</span>
+                    </div>
+                    <span class="pill-tag tag-info">${escapeHtml(m.apisLabel)}</span>
+                  </div>
+                  <div>
+                    <h3 class="text-base font-bold text-white leading-snug mb-1">${escapeHtml(m.name)}</h3>
+                    <p class="text-xs text-[var(--text-secondary)] leading-relaxed">${escapeHtml(m.desc)}</p>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </section>
+        `;
+      }).join('');
 
-      view.innerHTML = `
-        <div class="view-enter">
-          <div class="mb-7 px-1">
-            <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">Central de Consultas</h1>
-            <p class="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
-              Todas as ferramentas operam com API principal e fallback automático em caso de instabilidade.
-            </p>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">${cards}</div>
-        </div>
-      `;
+      view.innerHTML = `<div class="view-enter">${sectorsHtml}</div>`;
       return;
     }
 
     const m = MODULES.find(x => x.id === hash);
     if (!m) return navigate('');
-
     if (m.customView === 'atpv') { renderAtpvView(view); return; }
 
     const history = getHistory(m.id);
@@ -1232,7 +1349,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           <div class="lg:col-span-4 liquid-card p-6">
-            <div class="flex items-center gap-3.5 mb-5">
+            <div class="flex items-center gap-3.5 mb-4">
               <div class="squircle" style="background:${m.gradient};">
                 <span class="material-symbols-rounded">${escapeHtml(m.icon)}</span>
               </div>
@@ -1249,7 +1366,7 @@
                 <label for="searchInput" class="md-label">${escapeHtml(m.placeholder)}</label>
               </div>
               <button type="submit" class="ios-btn">
-                <span class="material-symbols-rounded text-lg">search</span> Consultar
+                <span class="material-symbols-rounded text-lg">search</span> ${m.customSearch === 'dork_only' ? 'Gerar Dorks' : 'Consultar'}
               </button>
             </form>
             ${historyHtml}
@@ -1270,86 +1387,6 @@
     document.getElementById('searchForm').addEventListener('submit', (e) => handleSearch(e, m.id));
   }
 
-  async function runProgressiveOsint(alvo, resDiv, btn) {
-    await saveHistory('username', alvo);
-    lastModuleId = 'osint';
-    const categorias = buildOsintTargets(alvo);
-    const report = { alvo, resultados: [] };
-    let found = 0, notFound = 0;
-
-    resDiv.className = 'min-h-[300px] liquid-card p-6 text-left';
-    resDiv.innerHTML = `
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-white/10">
-        <div>
-          <h3 class="font-bold text-lg">Alvo: <span class="text-[#0A84FF]">${escapeHtml(alvo)}</span></h3>
-          <p id="osintCounter" class="text-xs text-[var(--text-secondary)] mt-0.5">Verificando com redundância de proxy...</p>
-        </div>
-        <div class="flex gap-2">
-          <button type="button" class="ios-chip" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button>
-          <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#0A84FF]">verified</span> Assinado</button>
-        </div>
-      </div>
-      ${categorias.map(cat => `
-        <div class="mb-5">
-          <div class="flex items-center justify-between gap-2 mb-2 px-1">
-            <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold flex items-center gap-1.5">
-              <span class="material-symbols-rounded text-base text-[#0A84FF]">${escapeHtml(cat.icone)}</span> ${escapeHtml(cat.titulo)}
-            </h4>
-            <a href="${escapeHtml(cat.dorkGeral)}" target="_blank" rel="noopener noreferrer" class="ios-chip text-[11px] py-1 px-2.5">
-              <span class="material-symbols-rounded text-xs">manage_search</span> Dork Geral
-            </a>
-          </div>
-          <div class="ios-group">
-            ${cat.itens.map(item => `
-              <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="ios-row">
-                <div class="flex flex-col min-w-0">
-                  <span class="font-semibold text-sm text-white truncate">${escapeHtml(item.nome)}</span>
-                  <span id="info-${escapeHtml(item.id)}" class="text-[11px] text-[var(--text-secondary)] truncate">Checando...</span>
-                </div>
-                <span id="status-${escapeHtml(item.id)}" class="pill-tag tag-info">
-                  <span class="material-symbols-rounded text-xs spinner">refresh</span> Checando
-                </span>
-              </a>
-            `).join('')}
-          </div>
-        </div>
-      `).join('')}
-    `;
-
-    const tasks = [];
-    for (const cat of categorias) {
-      for (const item of cat.itens) {
-        tasks.push(item.check().then(res => {
-          const pill = document.getElementById(`status-${item.id}`);
-          const infoEl = document.getElementById(`info-${item.id}`);
-          if (!pill) return;
-          if (res.status === 'found') {
-            found++;
-            pill.className = 'pill-tag tag-ok';
-            pill.innerHTML = '<span class="material-symbols-rounded text-xs">check_circle</span> Encontrado';
-            infoEl.textContent = res.info || 'Perfil localizado';
-          } else if (res.status === 'notfound') {
-            notFound++;
-            pill.className = 'pill-tag tag-err';
-            pill.innerHTML = '<span class="material-symbols-rounded text-xs">cancel</span> Não encontrado';
-            infoEl.textContent = 'Sem conta pública';
-          } else {
-            pill.className = 'pill-tag tag-warn';
-            pill.innerHTML = `<span class="material-symbols-rounded text-xs">open_in_new</span> ${escapeHtml(res.label || 'Verificar')}`;
-            infoEl.textContent = 'Toque para abrir';
-          }
-          report.resultados.push({ categoria: cat.titulo, site: item.nome, url: item.url, status: res.status });
-          lastResultData = report;
-          const c = document.getElementById('osintCounter');
-          if (c) c.textContent = `${found} encontrado(s) • ${notFound} não encontrado(s)`;
-        }));
-      }
-    }
-    await Promise.allSettled(tasks);
-    btn.disabled = false;
-    btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Consultar';
-  }
-
   async function handleSearch(e, id) {
     e.preventDefault();
     const m = MODULES.find(x => x.id === id);
@@ -1358,9 +1395,10 @@
     const resDiv = document.getElementById('result');
 
     btn.disabled = true;
-    btn.innerHTML = '<span class="material-symbols-rounded spinner text-lg">refresh</span> Consultando...';
+    btn.innerHTML = '<span class="material-symbols-rounded spinner text-lg">refresh</span> Processando...';
 
-    if (m.progressive) { await runProgressiveOsint(val, resDiv, btn); return; }
+    if (m.customSearch === 'osint_api') { await runOsintApis(val, resDiv, btn); return; }
+    if (m.customSearch === 'dork_only') { await runDorks(val, resDiv, btn); return; }
 
     resDiv.className = 'min-h-[300px] liquid-card p-6 flex flex-col justify-center items-center text-center';
     resDiv.innerHTML = `
@@ -1441,7 +1479,7 @@
   }
 
   // ==========================================================
-  // 7. EVENTOS CENTRALIZADOS
+  // 8. EVENTOS CENTRALIZADOS
   // ==========================================================
   document.addEventListener('click', async (e) => {
     const navEl = e.target.closest('[data-nav]');
