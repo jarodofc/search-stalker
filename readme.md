@@ -1,64 +1,79 @@
-# GlassOSINT • iOS Liquid Edition (Assinado por KIIK HACKING)
+# GlassOSINT • iOS Material Edition (KIIK HACKING)
 
-[![Design](https://img.shields.io/badge/UI-iOS%20Liquid%20Glass%20%7C%20Dynamic%20Island-0A84FF?style=for-the-badge&logo=apple)](#)
+[![Design](https://img.shields.io/badge/UI-iOS%20Liquid%20Glass%20%7C%20Material%203-0A84FF?style=for-the-badge&logo=apple)](#)
 [![Security](https://img.shields.io/badge/Security-P2P%20E2EE%20%7C%20KIIK%20HACKING-30D158?style=for-the-badge&logo=shield)](#)
 [![Stack](https://img.shields.io/badge/Stack-HTML5%20%7C%20CSS3%20%7C%20Web%20Crypto%20API-5E5CE6?style=for-the-badge&logo=javascript)](#)
 
-> Painel de investigação digital (OSINT), web scraping e central veicular com interface inspirada no **iOS Liquid Glass** (Dynamic Island, ícones Squircle, listas agrupadas translúcidas e animações spring), protegido por criptografia P2P silenciosa e assinado por **KIIK HACKING**.
+> Painel OSINT, Central de Proxy, Web Scraping e Central Veicular em arquivo HTML único. Construído com design **iOS Liquid Glass + Material Design 3**, setorização limpa, fallback automático de APIs e camada silenciosa de criptografia P2P assinada por **KIIK HACKING**.
 
 ---
 
 ## 📑 Sumário
-1. [Interface iOS Liquid Glass](#1-interface-ios-liquid-glass)
-2. [Criptografia P2P & Assinatura (KIIK HACKING)](#2-criptografia-p2p--assinatura-kiik-hacking)
-3. [Aplicativos Disponíveis](#3-aplicativos-disponíveis)
-4. [Segurança e Blindagem](#4-segurança-e-blindagem)
+1. [Setores e Módulos](#1-setores-e-módulos)
+2. [Central de Proxy (Gateway + Listas Live)](#2-central-de-proxy-gateway--listas-live)
+3. [Redundância de APIs (Fallback)](#3-redundância-de-apis-fallback)
+4. [Segurança e Criptografia P2P (KIIK HACKING)](#4-segurança-e-criptografia-p2p-kiik-hacking)
 5. [Como Publicar](#5-como-publicar)
 
 ---
 
-## 1. Interface iOS Liquid Glass
+## 1. Setores e Módulos
 
-- **Home Screen com Ícones Squircle:** Grade responsiva estilo iPhone com ícones arredondados (`border-radius` proporcional), brilho especular interno e feedback tátil (`scale` spring).
-- **Dynamic Island:** Barra superior flutuante com status em tempo real e indicador de sessão criptografada.
-- **Inset Grouped Lists:** Resultados e formulários organizados em blocos translúcidos (`backdrop-filter: blur(36px) saturate(210%)`) com tipografia nativa Apple (`-apple-system` / `SF Pro`).
-- **100% Responsivo (Mobile & Desktop):** Otimizado para Safari no iOS (`viewport-fit=cover`, `apple-mobile-web-app-capable`) e navegadores desktop sem bloqueios falsos por zoom ou barra lateral.
+### Setor 1 — Documentos & Veículos
+- **Consulta CPF:** Integração com `CPFHub.io` e fallback local (validação matemática e Região Fiscal).
+- **Consulta CNPJ:** Razão social, situação cadastral, CNAE, endereço e Quadro Societário (QSA).
+- **Central Veicular (MG):** Organização de Placa (detecção automática Mercosul/Cinza), RENAVAM, consulta automática do titular (CPF/CNPJ), Tabela FIPE e atalhos para **DETRAN-MG (Situação e ATPV-e), SENATRAN (SERPRO) e Multas PBH**.
+- **Consulta CEP:** Endereço completo e coordenadas geográficas.
 
----
+### Setor 2 — Investigação, Dorks & Vazamentos
+- **OSINT Direto (APIs):** Varredura paralela em **11 plataformas 100% compatíveis** com retorno real via API (GitHub, GitLab, Dev.to, Reddit, Hacker News, Chess.com, Lichess, Codeforces, npm, Wikipédia PT e Scratch).
+- **Central de Dorks:** Buscas filtradas no Google organizadas por categoria (Redes Sociais, Sites Adultos, Namoro e Apostas).
+- **Vazamentos (E-mail):** Verificação de exposição em bases vazadas (`XposedOrNot`) + fallback de validação MX.
 
-## 2. Criptografia P2P & Assinatura (KIIK HACKING)
-
-A criptografia P2P opera de forma transparente em segundo plano via **Web Crypto API** (sem botões ou telas extras na interface):
-
-- **Sessão E2EE (ECDH P-256 + AES-256-GCM):** Deriva chaves efêmeras para selar o armazenamento local (`localStorage`) da sessão.
-- **Assinatura Criptográfica (`KIIK HACKING`):** Todo relatório copiado ou exportado em `.json` recebe automaticamente o envelope assinado com `signed_by: "KIIK HACKING"`, timestamp ISO e assinatura **HMAC-SHA256**.
-
----
-
-## 3. Aplicativos Disponíveis
-
-1. **Veículos MG:** Organização de Placa, RENAVAM, CPF/CNPJ e Chassi/CRV com cópia em 1 toque, consulta automática do titular (CPF/CNPJ) e acesso direto a **DETRAN-MG (Situação e ATPV-e), SENATRAN (SERPRO) e Multas PBH**.
-2. **OSINT Web:** Varredura progressiva em **Redes Sociais, Sites Adultos, Sites de Namoro e Sites de Aposta** com status em tempo real e Google Dorks.
-3. **Scraper:** Extração de metadados (`title`, `description`, `generator`), e-mails públicos, telefones BR, redes sociais, títulos (`H1/H2`) e links externos.
-4. **CPF:** Consulta via `CPFHub.io` com fallback local para validação matemática e Região Fiscal.
-5. **CNPJ:** Consulta cadastral e Quadro Societário (`BrasilAPI` → `MinhaReceita` → `CNPJ.ws`).
-6. **Vazamentos:** Checagem de exposição de e-mail via `XposedOrNot API`.
-7. **CEP:** Endereço completo e coordenadas (`BrasilAPI v2` → `ViaCEP`).
-8. **IP / Geo:** Geolocalização, operadora (ISP) e ASN (`ipwho.is` → `ipapi.co`).
-9. **Domínio:** Registros DNS (`A`, `MX`, `NS`, `TXT` via Google DoH) e dados RDAP (`Registro.br` / `RDAP.org`).
-10. **DDD Brasil:** Estado e lista de municípios atendidos (`BrasilAPI`).
+### Setor 3 — Sites, Proxy & Infraestrutura
+- **Central de Proxy:** Gateway CORS multi-rota e coletor de proxies HTTP/SOCKS ativos em tempo real.
+- **Proprietário de Site:** Extração de **Titular (Proprietário)**, **Documento (CNPJ/CPF em `.br`)**, e-mail de contato, registrador, datas e registros DNS (`A`, `MX`, `NS`, `TXT`) via RDAP + DoH.
+- **Web Scraper:** Extração de metadados, e-mails públicos, telefones (padrão BR), redes sociais e links externos usando o motor multi-proxy.
+- **IP & Geolocalização:** Operadora (ISP), ASN, país, cidade e coordenadas.
 
 ---
 
-## 4. Segurança e Blindagem
+## 2. Central de Proxy (Gateway + Listas Live)
 
-- **Bloqueio de Atalhos de Inspeção:** Intercepta `F12`, `Ctrl+Shift+I/J/C/K`, `Cmd+Option+I/J/C`, `Ctrl+U`, `Ctrl+S` e clique direito (`contextmenu`) sem disparar falsos positivos no iPhone ou em telas com barra lateral.
-- **Isolamento em IIFE:** Todo o código roda fechado em `(() => { 'use strict'; ... })()`, sem expor funções ou chaves no escopo global `window`.
-- **Sanitização XSS:** Todos os dados dinâmicos passam por `escapeHtml()` antes de entrar no DOM.
+O módulo **Central de Proxy** reúne duas funções principais em abas:
+
+1. **Gateway URL (CORS Bypass):** Roteia requisições GET para qualquer URL pública através de 3 gateways com fallback automático (`AllOrigins` → `CodeTabs` → `CorsProxy.io`), exibindo rota utilizada, status HTTP, latência (ms), tamanho em KB e prévia da resposta com cópia e exportação assinada.
+2. **Lista de Proxies (Live):** Busca servidores proxy ativos filtráveis por protocolo (`HTTP/HTTPS`, `SOCKS4`, `SOCKS5`) e país (`Global`, `BR`, `US`, `DE`), com cópia individual (`IP:Porta`), cópia em lote e exportação em JSON assinado.
+
+---
+
+## 3. Redundância de APIs (Fallback)
+
+| Módulo | Fonte Principal | Alternativas (Fallback) |
+| :--- | :--- | :--- |
+| **Central de Proxy (Gateway)** | AllOrigins Proxy | CodeTabs Proxy → CorsProxy.io |
+| **Central de Proxy (Listas)** | ProxyScrape v2 | GeoNode API → GitHub SpeedX List |
+| **Consulta CPF** | CPFHub.io | Motor Fiscal Local |
+| **Consulta CNPJ** | BrasilAPI | MinhaReceita → CNPJ.ws |
+| **Consulta CEP** | BrasilAPI v2 | ViaCEP → AwesomeAPI |
+| **Proprietário de Site** | RDAP Registro.br / RDAP.org + Google DoH | RDAP Verisign + Cloudflare DoH |
+| **Web Scraper** | AllOrigins Proxy | CodeTabs Proxy → CorsProxy.io |
+| **IP & Geolocalização** | ipwho.is | ipapi.co → FreeIPAPI |
+| **Vazamentos (E-mail)** | XposedOrNot | Google DoH (MX Check) |
+
+---
+
+## 4. Segurança e Criptografia P2P (KIIK HACKING)
+
+- **Criptografia P2P Silenciosa:** Implementada via **Web Crypto API** (`ECDH P-256` + `AES-256-GCM`) para selar o armazenamento local sem poluir a interface.
+- **Assinatura Criptográfica:** Todo relatório copiado ou baixado em `.json` inclui assinatura **HMAC-SHA256** vinculada a `signed_by: "KIIK HACKING"`.
+- **Proteção Anti-Inspeção:** Bloqueio de `F12`, `Ctrl+Shift+I/J/C/K`, `Cmd+Option+I/J/C`, `Ctrl+U`, `Ctrl+S`, clique direito e arraste, sem falsos positivos em dispositivos móveis ou navegadores com barra lateral.
+- **Encapsulamento Total:** Código isolado em IIFE (`'use strict'`) com sanitização `escapeHtml()` contra XSS.
 
 ---
 
 ## 5. Como Publicar
 
-1. Substitua o arquivo `index.html` no seu repositório GitHub / Vercel.
-2. Aguarde o deploy concluir e abra o link no Safari ou navegador desktop.
+1. Substitua os arquivos `index.html` e `README.md` na raiz do repositório.
+2. Envie via `.\deploy.ps1` (ou `git add . ; git commit -m "update" ; git push`).
+3. O deploy na Vercel / GitHub Pages / Cloudflare Pages entra no ar automaticamente.
