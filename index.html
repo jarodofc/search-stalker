@@ -8,7 +8,7 @@
 <meta name="theme-color" content="#000000">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="no-referrer">
-<title>GlassOSINT • iOS Material Edition</title>
+<title>GlassOSINT • Proxy Remoto</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230A84FF'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0">
@@ -33,7 +33,7 @@
     user-select: none;
     -webkit-user-select: none;
   }
-  input, textarea, select, pre { user-select: text; -webkit-user-select: text; }
+  input, textarea, select { user-select: text; -webkit-user-select: text; }
 
   html, body {
     margin: 0;
@@ -104,7 +104,7 @@
   .squircle .material-symbols-rounded { font-size: 26px; color: #FFFFFF; }
 
   .md-field { position: relative; margin-bottom: 14px; }
-  .md-input, .md-select {
+  .md-input {
     width: 100%;
     padding: 22px 16px 8px;
     background: rgba(118, 118, 128, 0.20);
@@ -115,9 +115,7 @@
     outline: none;
     transition: all 0.2s ease;
   }
-  .md-select { padding: 14px 16px; appearance: none; cursor: pointer; }
-  .md-select option { background: #14141a; color: #ffffff; }
-  .md-input:focus, .md-select:focus {
+  .md-input:focus {
     background: rgba(118, 118, 128, 0.30);
     border-color: var(--ios-blue);
     box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.25);
@@ -228,21 +226,6 @@
     color: var(--text-secondary);
   }
 
-  .code-preview {
-    background: rgba(0, 0, 0, 0.48);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 16px;
-    padding: 14px;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 11.5px;
-    line-height: 1.5;
-    color: #cbd5e1;
-    max-height: 300px;
-    overflow: auto;
-    white-space: pre-wrap;
-    word-break: break-word;
-  }
-
   .view-enter { animation: iosEnter 0.26s var(--spring) forwards; }
   @keyframes iosEnter {
     from { opacity: 0; transform: scale(0.97) translateY(8px); }
@@ -286,11 +269,11 @@
 </div>
 
 <div class="max-w-5xl mx-auto px-4 pt-4 sm:pt-6">
-  <header class="flex items-center justify-between mb-7">
+  <header class="flex flex-wrap items-center justify-between gap-2 mb-7">
     <button type="button" data-nav="" class="dynamic-island cursor-pointer">
-      <span class="w-2.5 h-2.5 rounded-full bg-[#30D158] shadow-[0_0_8px_#30D158]"></span>
+      <span id="proxyDot" class="w-2.5 h-2.5 rounded-full bg-[#FF9F0A] shadow-[0_0_8px_#FF9F0A]"></span>
       <span class="font-semibold text-sm tracking-tight text-white">GlassOSINT</span>
-      <span class="text-[11px] text-[var(--text-secondary)] font-medium hidden sm:inline">• Multi-Proxy</span>
+      <span id="proxyLabel" class="text-[11px] text-[var(--text-secondary)] font-medium">• Conectando Proxy...</span>
     </button>
 
     <div class="dynamic-island text-[11px] font-semibold text-[var(--text-secondary)]">
@@ -304,7 +287,7 @@
   <footer class="mt-12 flex justify-center">
     <div class="liquid-card px-5 py-2.5 rounded-full inline-flex items-center gap-2 text-[11px] text-[var(--text-secondary)]">
       <span class="material-symbols-rounded text-sm text-[#30D158]">verified_user</span>
-      <span>Assinado por <strong class="text-white">KIIK HACKING</strong> • Criptografia P2P (ECDH + AES-256-GCM)</span>
+      <span>Assinado por <strong class="text-white">KIIK HACKING</strong> • Túnel Proxy Remoto + P2P E2EE</span>
     </div>
   </footer>
 </div>
@@ -361,7 +344,7 @@
         { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
       );
       const hmac = await crypto.subtle.importKey(
-        'raw', enc.encode(`${AUTHOR_SIGNATURE}::P2P::V5`),
+        'raw', enc.encode(`${AUTHOR_SIGNATURE}::P2P::V6`),
         { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
       );
       ctx = { aes, hmac };
@@ -391,6 +374,7 @@
       return {
         signed_by: AUTHOR_SIGNATURE,
         protocol: 'P2P-ECDH-P256-AES256GCM',
+        proxy_transport: RemoteProxy.getModeLabel(),
         timestamp: ts,
         hmac_sha256: sig,
         data: payload
@@ -401,7 +385,170 @@
   })();
 
   // ==========================================================
-  // 3. UTILITÁRIOS & MOTOR MULTI-PROXY / MULTI-API
+  // 3. CAMADA NATIVA DE CONEXÃO VIA PROXY REMOTO (BOOT DO SITE)
+  // ==========================================================
+  const RemoteProxy = (() => {
+    let mode = 'initializing'; // 'vercel' | 'public-remote'
+    let modeLabel = 'Conectando Proxy...';
+    let initPromise = null;
+
+    const updateIndicator = (color, label) => {
+      modeLabel = label;
+      const dot = document.getElementById('proxyDot');
+      const txt = document.getElementById('proxyLabel');
+      if (dot) {
+        dot.style.backgroundColor = color;
+        dot.style.boxShadow = `0 0 8px ${color}`;
+      }
+      if (txt) txt.textContent = `• ${label}`;
+    };
+
+    async function rawTimeoutFetch(url, options = {}, timeoutMs = 10000) {
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+      try {
+        return await fetch(url, { ...options, signal: ctrl.signal });
+      } finally {
+        clearTimeout(timer);
+      }
+    }
+
+    // Inicializa o site conectado ao Proxy Remoto automaticamente
+    async function init() {
+      if (initPromise) return initPromise;
+      initPromise = (async () => {
+        // 1. Tenta o Proxy Remoto dedicado da Vercel (/api/proxy)
+        if (location.protocol === 'http:' || location.protocol === 'https:') {
+          try {
+            const r = await rawTimeoutFetch('/api/proxy?ping=1', {}, 3000);
+            if (r.ok) {
+              const info = await r.json();
+              if (info?.ok) {
+                mode = 'vercel';
+                updateIndicator('#30D158', `Proxy Remoto (${info.region || 'Edge'})`);
+                return mode;
+              }
+            }
+          } catch {}
+        }
+
+        // 2. Fallback automático: Gateways de Proxy Remoto Públicos (AllOrigins / CorsProxy / CodeTabs)
+        mode = 'public-remote';
+        updateIndicator('#30D158', 'Proxy Remoto Ativo');
+        return mode;
+      })();
+      return initPromise;
+    }
+
+    // Requisição via Proxy Remoto retornando { ok, status, text, json }
+    async function request(targetUrl, options = {}, timeoutMs = 10500) {
+      await init();
+
+      // Rota 1: Proxy Remoto próprio (/api/proxy) — suporta headers customizados e preserva HTTP status real
+      if (mode === 'vercel') {
+        const proxyHeaders = {};
+        if (options.headers && Object.keys(options.headers).length) {
+          proxyHeaders['X-Proxy-Headers'] = JSON.stringify(options.headers);
+        }
+        const r = await rawTimeoutFetch(
+          `/api/proxy?url=${encodeURIComponent(targetUrl)}`,
+          { headers: proxyHeaders },
+          timeoutMs
+        );
+        const bodyText = await r.text();
+        return {
+          ok: r.ok,
+          status: r.status,
+          text: () => Promise.resolve(bodyText),
+          json: () => Promise.resolve(JSON.parse(bodyText)),
+          via: 'Proxy Remoto (Vercel)'
+        };
+      }
+
+      // Rota 2: Gateways de Proxy Remoto Públicos (sem /api/proxy)
+      const hasAuthHeaders = Boolean(options.headers && Object.keys(options.headers).some(h => h.toLowerCase() === 'x-api-key'));
+
+      if (!hasAuthHeaders) {
+        // Tenta AllOrigins (preserva status HTTP real do destino)
+        try {
+          const r = await rawTimeoutFetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
+          if (r.ok) {
+            const env = await r.json();
+            const code = env?.status?.http_code || 200;
+            const contents = env?.contents ?? '';
+            return {
+              ok: code >= 200 && code < 300,
+              status: code,
+              text: () => Promise.resolve(contents),
+              json: () => Promise.resolve(JSON.parse(contents)),
+              via: 'Proxy Remoto (AllOrigins)'
+            };
+          }
+        } catch {}
+
+        // Alternativa: CorsProxy.io
+        try {
+          const r = await rawTimeoutFetch(`https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
+          const bodyText = await r.text();
+          return {
+            ok: r.ok,
+            status: r.status,
+            text: () => Promise.resolve(bodyText),
+            json: () => Promise.resolve(JSON.parse(bodyText)),
+            via: 'Proxy Remoto (CorsProxy)'
+          };
+        } catch {}
+
+        // Alternativa: CodeTabs
+        try {
+          const r = await rawTimeoutFetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
+          const bodyText = await r.text();
+          return {
+            ok: r.ok,
+            status: r.status,
+            text: () => Promise.resolve(bodyText),
+            json: () => Promise.resolve(JSON.parse(bodyText)),
+            via: 'Proxy Remoto (CodeTabs)'
+          };
+        } catch {}
+      }
+
+      // Último recurso (para APIs que exigem x-api-key quando /api/proxy ainda não foi publicado)
+      const direct = await rawTimeoutFetch(targetUrl, options, timeoutMs);
+      const bodyText = await direct.text();
+      return {
+        ok: direct.ok,
+        status: direct.status,
+        text: () => Promise.resolve(bodyText),
+        json: () => Promise.resolve(JSON.parse(bodyText)),
+        via: 'Fallback Direto'
+      };
+    }
+
+    async function fetchJson(url, options = {}, timeoutMs = 10500) {
+      const r = await request(url, options, timeoutMs);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return await r.json();
+    }
+
+    async function fetchHtml(url, timeoutMs = 11000) {
+      const r = await request(url, {}, timeoutMs);
+      const html = await r.text();
+      if (!html) throw new Error('Sem HTML retornado pelo proxy remoto.');
+      return { html, code: r.status, via: r.via };
+    }
+
+    return {
+      init,
+      request,
+      fetchJson,
+      fetchHtml,
+      getModeLabel: () => modeLabel
+    };
+  })();
+
+  // ==========================================================
+  // 4. UTILITÁRIOS & CONFIGURAÇÃO ENCAPSULADA
   // ==========================================================
   const _vault = ['Nzc4NDMzZTEyNDQ2OGIxYWE2MGYyNjgxOTE5Y2Q5MThmODUyYWZlMTc2MTA1Njk4NTgxMzg4MWNiNzJhNTUwZg=='];
   const getCpfKey = () => atob(_vault[0]);
@@ -416,7 +563,7 @@
   let lastResultData = null;
   let lastModuleId = 'osint';
   let historyCache = [];
-  try { historyCache = JSON.parse(localStorage.getItem('kiik_v5_history') || '[]'); } catch { historyCache = []; }
+  try { historyCache = JSON.parse(localStorage.getItem('kiik_v6_history') || '[]'); } catch { historyCache = []; }
 
   function escapeHtml(str) {
     return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -440,8 +587,7 @@
     situacao:'info', status:'check_circle', cnae:'category', capital:'payments', ip:'router',
     isp:'dns', asn:'lan', latitude:'location_on', longitude:'location_on', regiao:'explore',
     url:'link', links:'link', placa:'directions_car', renavam:'pin', titulo:'title',
-    descricao:'description', idioma:'translate', tecnologia:'memory', imagens:'image',
-    dominio:'language', proxy:'vpn_lock', latencia:'speed', tamanho:'data_usage', protocolo:'hub'
+    descricao:'description', idioma:'translate', tecnologia:'memory', imagens:'image', dominio:'language'
   };
 
   function getIcon(key) {
@@ -450,26 +596,6 @@
       if (k.includes(term)) return icon;
     }
     return 'data_object';
-  }
-
-  async function fetchJson(url, options = {}, timeoutMs = 10000) {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
-    try {
-      const r = await fetch(url, { ...options, signal: ctrl.signal });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return await r.json();
-    } finally { clearTimeout(timer); }
-  }
-
-  async function fetchText(url, timeoutMs = 10000) {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
-    try {
-      const r = await fetch(url, { signal: ctrl.signal });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return await r.text();
-    } finally { clearTimeout(timer); }
   }
 
   async function tryFallback(providers) {
@@ -483,107 +609,13 @@
     throw new Error(lastErr?.message || 'Todas as APIs configuradas falharam no momento.');
   }
 
-  // Motor Multi-Proxy (AllOrigins -> CodeTabs -> CorsProxy.io)
-  const PROXY_GATEWAYS = {
-    allorigins: {
-      name: 'AllOrigins Proxy',
-      run: async (targetUrl) => {
-        const t0 = performance.now();
-        const res = await fetchJson(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, {}, 11000);
-        if (!res?.contents) throw new Error('AllOrigins não retornou conteúdo.');
-        return {
-          html: res.contents,
-          code: res?.status?.http_code || 200,
-          contentType: res?.status?.content_type || 'text/html',
-          latencyMs: Math.round(performance.now() - t0)
-        };
-      }
-    },
-    codetabs: {
-      name: 'CodeTabs Proxy',
-      run: async (targetUrl) => {
-        const t0 = performance.now();
-        const html = await fetchText(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(targetUrl)}`, 11000);
-        if (!html) throw new Error('CodeTabs não retornou conteúdo.');
-        return { html, code: 200, contentType: 'text/plain / html', latencyMs: Math.round(performance.now() - t0) };
-      }
-    },
-    corsproxy: {
-      name: 'CorsProxy.io',
-      run: async (targetUrl) => {
-        const t0 = performance.now();
-        const html = await fetchText(`https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`, 11000);
-        if (!html) throw new Error('CorsProxy.io não retornou conteúdo.');
-        return { html, code: 200, contentType: 'text/plain / html', latencyMs: Math.round(performance.now() - t0) };
-      }
-    }
-  };
-
-  async function fetchViaProxy(targetUrl, gatewayMode = 'auto') {
-    if (gatewayMode !== 'auto' && PROXY_GATEWAYS[gatewayMode]) {
-      const gw = PROXY_GATEWAYS[gatewayMode];
-      const data = await gw.run(targetUrl);
-      return { data, provider: gw.name };
-    }
-    return tryFallback([
-      { name: PROXY_GATEWAYS.allorigins.name, run: () => PROXY_GATEWAYS.allorigins.run(targetUrl) },
-      { name: PROXY_GATEWAYS.codetabs.name, run: () => PROXY_GATEWAYS.codetabs.run(targetUrl) },
-      { name: PROXY_GATEWAYS.corsproxy.name, run: () => PROXY_GATEWAYS.corsproxy.run(targetUrl) }
-    ]);
-  }
-
-  // Busca de Lista de Proxies Públicos Ativos (ProxyScrape -> GeoNode -> GitHub Raw)
-  async function fetchLiveProxyList(protocol = 'http', country = 'all') {
-    const proto = ['http', 'socks4', 'socks5'].includes(protocol) ? protocol : 'http';
-    const ctry = country.toUpperCase() === 'ALL' ? 'all' : country.toUpperCase();
-
-    return tryFallback([
-      {
-        name: 'ProxyScrape v2 (Principal)',
-        run: async () => {
-          const url = `https://api.proxyscrape.com/v2/?request=displayproxies&protocol=${proto}&timeout=10000&country=${ctry}&ssl=all&anonymity=all`;
-          const raw = await fetchText(url, 10000);
-          const list = raw.split(/\r?\n/).map(s => s.trim()).filter(s => /^\d{1,3}(\.\d{1,3}){3}:\d+$/.test(s)).slice(0, 60);
-          if (!list.length) throw new Error('Nenhum proxy retornado para este filtro.');
-          return list.map(addr => ({ addr, protocol: proto.toUpperCase(), country: ctry === 'all' ? 'Global' : ctry, latency: '-' }));
-        }
-      },
-      {
-        name: 'GeoNode API (Alternativa 1)',
-        run: async () => {
-          const countryParam = ctry !== 'all' ? `&country=${ctry}` : '';
-          const url = `https://proxylist.geonode.com/api/proxy-list?limit=50&page=1&sort_by=lastChecked&sort_type=desc&protocols=${proto}${countryParam}`;
-          const json = await fetchJson(url, {}, 10000);
-          const rows = json?.data || [];
-          if (!rows.length) throw new Error('GeoNode sem proxies para o filtro.');
-          return rows.map(r => ({
-            addr: `${r.ip}:${r.port}`,
-            protocol: (r.protocols?.[0] || proto).toUpperCase(),
-            country: r.country || '-',
-            latency: r.latency ? `${Math.round(r.latency)} ms` : '-'
-          }));
-        }
-      },
-      {
-        name: 'GitHub SpeedX List (Alternativa 2)',
-        run: async () => {
-          const url = `https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/${proto}.txt`;
-          const raw = await fetchText(url, 10000);
-          const list = raw.split(/\r?\n/).map(s => s.trim()).filter(s => /^\d{1,3}(\.\d{1,3}){3}:\d+$/.test(s)).slice(0, 60);
-          if (!list.length) throw new Error('Lista GitHub vazia.');
-          return list.map(addr => ({ addr, protocol: proto.toUpperCase(), country: 'Global', latency: '-' }));
-        }
-      }
-    ]);
-  }
-
   async function saveHistory(moduleId, query) {
     historyCache = historyCache.filter(i => !(i.moduleId === moduleId && i.query === query));
     historyCache.unshift({ moduleId, query, ts: Date.now() });
     historyCache = historyCache.slice(0, 15);
     try {
-      localStorage.setItem('kiik_v5_history', JSON.stringify(historyCache));
-      localStorage.setItem('kiik_v5_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
+      localStorage.setItem('kiik_v6_history', JSON.stringify(historyCache));
+      localStorage.setItem('kiik_v6_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
     } catch {}
   }
 
@@ -629,12 +661,12 @@
   }
 
   // ==========================================================
-  // 4. SETORES & MÓDULOS
+  // 5. SETORES & MÓDULOS (TODOS ROTEADOS PELO PROXY REMOTO)
   // ==========================================================
   const SECTORS = [
     { id: 'docs', title: 'Documentos & Veículos', icon: 'badge' },
     { id: 'osint', title: 'Investigação, Dorks & Vazamentos', icon: 'travel_explore' },
-    { id: 'web', title: 'Sites, Proxy & Infraestrutura', icon: 'language' }
+    { id: 'web', title: 'Sites, Proprietário & Infraestrutura', icon: 'language' }
   ];
 
   const MODULES = [
@@ -643,7 +675,7 @@
       id: 'cpf',
       sector: 'docs',
       name: 'Consulta CPF',
-      desc: 'Dados cadastrais via CPFHub.io com fallback local de validação fiscal.',
+      desc: 'Dados cadastrais via CPFHub.io (roteado por proxy remoto) + fallback fiscal.',
       apisLabel: 'CPFHub + Local',
       icon: 'fingerprint',
       gradient: 'linear-gradient(135deg, #FF375F 0%, #C91D42 100%)',
@@ -655,9 +687,9 @@
         if (cpf.length !== 11) throw new Error('Informe um CPF com 11 dígitos.');
         const { data, provider } = await tryFallback([
           {
-            name: 'CPFHub.io (Principal)',
+            name: 'CPFHub.io via Proxy Remoto',
             run: async () => {
-              const raw = await fetchJson(`https://api.cpfhub.io/cpf/${cpf}`, {
+              const raw = await RemoteProxy.fetchJson(`https://api.cpfhub.io/cpf/${cpf}`, {
                 headers: { 'x-api-key': getCpfKey(), 'Accept': 'application/json' }
               });
               const info = raw.data || raw.result || raw;
@@ -701,7 +733,7 @@
       id: 'cnpj',
       sector: 'docs',
       name: 'Consulta CNPJ',
-      desc: 'Razão social, situação, CNAE e sócios (QSA) com 3 APIs em cascata.',
+      desc: 'Razão social, situação, CNAE e sócios (QSA) com 3 APIs via proxy remoto.',
       apisLabel: '3 APIs BR',
       icon: 'domain',
       gradient: 'linear-gradient(135deg, #30D158 0%, #1E9E3E 100%)',
@@ -712,9 +744,9 @@
         const clean = v.replace(/\D/g, '');
         if (clean.length !== 14) throw new Error('Informe um CNPJ válido com 14 dígitos.');
         const { data, provider } = await tryFallback([
-          { name: 'BrasilAPI (Principal)', run: () => fetchJson(`https://brasilapi.com.br/api/cnpj/v1/${clean}`) },
-          { name: 'MinhaReceita (Alternativa 1)', run: () => fetchJson(`https://minhareceita.org/${clean}`) },
-          { name: 'CNPJ.ws (Alternativa 2)', run: () => fetchJson(`https://publica.cnpj.ws/cnpj/${clean}`) }
+          { name: 'BrasilAPI via Proxy', run: () => RemoteProxy.fetchJson(`https://brasilapi.com.br/api/cnpj/v1/${clean}`) },
+          { name: 'MinhaReceita via Proxy', run: () => RemoteProxy.fetchJson(`https://minhareceita.org/${clean}`) },
+          { name: 'CNPJ.ws via Proxy', run: () => RemoteProxy.fetchJson(`https://publica.cnpj.ws/cnpj/${clean}`) }
         ]);
         const socios = (data.qsa || data.socios || []).map(s => `${s.nome_socio || s.nome || '-'} — ${s.qualificacao_socio || s.qualificacao?.descricao || '-'}`);
         return {
@@ -761,9 +793,9 @@
         const clean = v.replace(/\D/g, '');
         if (clean.length !== 8) throw new Error('Informe um CEP com 8 dígitos.');
         const { data, provider } = await tryFallback([
-          { name: 'BrasilAPI v2 (Principal)', run: () => fetchJson(`https://brasilapi.com.br/api/cep/v2/${clean}`) },
-          { name: 'ViaCEP (Alternativa 1)', run: async () => { const r = await fetchJson(`https://viacep.com.br/ws/${clean}/json/`); if (r.erro) throw new Error('Não encontrado'); return r; } },
-          { name: 'AwesomeAPI (Alternativa 2)', run: () => fetchJson(`https://cep.awesomeapi.com.br/json/${clean}`) }
+          { name: 'BrasilAPI v2 via Proxy', run: () => RemoteProxy.fetchJson(`https://brasilapi.com.br/api/cep/v2/${clean}`) },
+          { name: 'ViaCEP via Proxy', run: async () => { const r = await RemoteProxy.fetchJson(`https://viacep.com.br/ws/${clean}/json/`); if (r.erro) throw new Error('Não encontrado'); return r; } },
+          { name: 'AwesomeAPI via Proxy', run: () => RemoteProxy.fetchJson(`https://cep.awesomeapi.com.br/json/${clean}`) }
         ]);
         return {
           provider,
@@ -786,7 +818,7 @@
       id: 'osint',
       sector: 'osint',
       name: 'OSINT Direto (APIs)',
-      desc: 'Verifica username em 11 plataformas 100% compatíveis com retorno real.',
+      desc: 'Verifica username em 11 plataformas compatíveis roteadas pelo proxy remoto.',
       apisLabel: '11 APIs Diretas',
       icon: 'travel_explore',
       gradient: 'linear-gradient(135deg, #5E5CE6 0%, #3634A3 100%)',
@@ -825,9 +857,9 @@
         const domain = email.split('@')[1];
         const { data, provider } = await tryFallback([
           {
-            name: 'XposedOrNot (Principal)',
+            name: 'XposedOrNot via Proxy',
             run: async () => {
-              const r = await fetch(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
+              const r = await RemoteProxy.request(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
               if (r.status === 404) return { resumo: { email, status: 'Nenhum vazamento encontrado' }, raw: { email, breaches: [] } };
               if (!r.ok) throw new Error(`HTTP ${r.status}`);
               const d = await r.json();
@@ -840,9 +872,9 @@
             }
           },
           {
-            name: 'DNS MX Check (Alternativa)',
+            name: 'DNS MX Check via Proxy',
             run: async () => {
-              const mx = await fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=MX`);
+              const mx = await RemoteProxy.fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=MX`);
               const servers = (mx?.Answer || []).map(a => a.data);
               return {
                 resumo: { email, dominio: domain, servidor_email: servers.length ? 'Ativo (MX válido)' : 'Sem registro MX' },
@@ -856,17 +888,7 @@
       }
     },
 
-    // --- SETOR 3: SITES, PROXY & INFRAESTRUTURA ---
-    {
-      id: 'proxy',
-      sector: 'web',
-      name: 'Central de Proxy',
-      desc: 'Gateway CORS multi-proxy (3 rotas) + lista ao vivo de proxies HTTP/SOCKS.',
-      apisLabel: '3 Gateways + 3 Listas',
-      icon: 'vpn_lock',
-      gradient: 'linear-gradient(135deg, #00C7BE 0%, #0A84FF 100%)',
-      customView: 'proxy'
-    },
+    // --- SETOR 3: SITES, PROPRIETÁRIO & INFRAESTRUTURA ---
     {
       id: 'domain',
       sector: 'web',
@@ -884,20 +906,20 @@
 
         const resolveDns = async (type) => {
           const { data } = await tryFallback([
-            { name: 'Google DoH', run: () => fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=${type}`) },
-            { name: 'Cloudflare DoH', run: () => fetchJson(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${type}`, { headers: { Accept: 'application/dns-json' } }) }
+            { name: 'Google DoH', run: () => RemoteProxy.fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=${type}`) },
+            { name: 'Cloudflare DoH', run: () => RemoteProxy.fetchJson(`https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${type}`, { headers: { Accept: 'application/dns-json' } }) }
           ]);
           return (data?.Answer || []).map(a => a.data);
         };
 
         const rdapResult = await tryFallback([
           {
-            name: domain.endsWith('.br') ? 'RDAP Registro.br (Oficial)' : 'RDAP.org (Global)',
-            run: () => fetchJson(domain.endsWith('.br') ? `https://rdap.registro.br/domain/${encodeURIComponent(domain)}` : `https://rdap.org/domain/${encodeURIComponent(domain)}`)
+            name: domain.endsWith('.br') ? 'RDAP Registro.br via Proxy' : 'RDAP.org via Proxy',
+            run: () => RemoteProxy.fetchJson(domain.endsWith('.br') ? `https://rdap.registro.br/domain/${encodeURIComponent(domain)}` : `https://rdap.org/domain/${encodeURIComponent(domain)}`)
           },
           {
-            name: 'RDAP Verisign / Fallback',
-            run: () => fetchJson(`https://rdap.verisign.com/com/v1/domain/${encodeURIComponent(domain)}`)
+            name: 'RDAP Verisign via Proxy',
+            run: () => RemoteProxy.fetchJson(`https://rdap.verisign.com/com/v1/domain/${encodeURIComponent(domain)}`)
           }
         ]).catch(() => ({ data: null, provider: 'DNS Only (RDAP indisponível)' }));
 
@@ -938,8 +960,8 @@
       id: 'scraping',
       sector: 'web',
       name: 'Web Scraper',
-      desc: 'Extrai metadados, e-mails, telefones e links públicos via 3 proxies CORS.',
-      apisLabel: '3 Proxies CORS',
+      desc: 'Extrai metadados, e-mails, telefones e links públicos pelo proxy remoto.',
+      apisLabel: 'Proxy Remoto',
       icon: 'code',
       gradient: 'linear-gradient(135deg, #32ADE6 0%, #007AFF 100%)',
       placeholder: 'Ex: https://site.com.br',
@@ -952,15 +974,15 @@
         let parsedUrl;
         try { parsedUrl = new URL(target); } catch { throw new Error('URL inválida.'); }
 
-        const { data, provider } = await fetchViaProxy(parsedUrl.href, 'auto');
-        const doc = new DOMParser().parseFromString(data.html, 'text/html');
+        const { html, via } = await RemoteProxy.fetchHtml(parsedUrl.href);
+        const doc = new DOMParser().parseFromString(html, 'text/html');
         const textContent = doc.body?.innerText || doc.body?.textContent || '';
 
         const title = doc.querySelector('title')?.textContent?.trim() || '-';
         const description = doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim() || '-';
         const generator = doc.querySelector('meta[name="generator"]')?.getAttribute('content')?.trim() || '-';
 
-        const emails = [...new Set((data.html.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || []).filter(e => !/\.(png|jpg|jpeg|gif|svg|webp|css|js)$/i.test(e)))].slice(0, 30);
+        const emails = [...new Set((html.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g) || []).filter(e => !/\.(png|jpg|jpeg|gif|svg|webp|css|js)$/i.test(e)))].slice(0, 30);
         const telefones = [...new Set((textContent.match(/(?:\+55\s?)?(?:\(?\d{2}\)?\s?)(?:9\d{4}|\d{4})-?\d{4}/g) || []).map(t => t.trim()))].slice(0, 20);
         const uniqueLinks = [...new Set([...doc.querySelectorAll('a[href]')].map(a => a.getAttribute('href')?.trim()).filter(h => h && /^https?:\/\//i.test(h)))];
         const socialRx = /(instagram\.com|facebook\.com|linkedin\.com|x\.com|twitter\.com|youtube\.com|tiktok\.com|wa\.me|whatsapp\.com|t\.me|github\.com)/i;
@@ -968,7 +990,7 @@
         const externos = uniqueLinks.filter(l => !l.includes(parsedUrl.hostname) && !socialRx.test(l)).slice(0, 20);
 
         return {
-          provider,
+          provider: via,
           resumo: {
             url: parsedUrl.href, titulo: title, descricao: description, tecnologia: generator,
             total_links: uniqueLinks.length, total_imagens: doc.querySelectorAll('img').length, emails_encontrados: emails.length
@@ -987,20 +1009,20 @@
       id: 'ip',
       sector: 'web',
       name: 'IP & Geolocalização',
-      desc: 'Operadora, ASN e coordenadas com 3 provedores globais de redundância.',
+      desc: 'Operadora, ASN e coordenadas (vazio retorna o IP do Proxy Remoto ativo).',
       apisLabel: '3 APIs Geo',
       icon: 'router',
       gradient: 'linear-gradient(135deg, #BF5AF2 0%, #892CDC 100%)',
-      placeholder: 'IP (ou vazio para o seu)',
+      placeholder: 'IP alvo (vazio = IP do Proxy)',
       max: 45,
       digits: false,
       optional: true,
       fetchApi: async (v) => {
         const target = v.trim();
         const { data, provider } = await tryFallback([
-          { name: 'ipwho.is (Principal)', run: async () => { const r = await fetchJson(`https://ipwho.is/${encodeURIComponent(target)}`); if (r.success === false) throw new Error(r.message); return r; } },
-          { name: 'ipapi.co (Alternativa 1)', run: () => fetchJson(target ? `https://ipapi.co/${encodeURIComponent(target)}/json/` : 'https://ipapi.co/json/') },
-          { name: 'FreeIPAPI (Alternativa 2)', run: () => fetchJson(`https://freeipapi.com/api/json/${encodeURIComponent(target)}`) }
+          { name: 'ipwho.is via Proxy', run: async () => { const r = await RemoteProxy.fetchJson(`https://ipwho.is/${encodeURIComponent(target)}`); if (r.success === false) throw new Error(r.message); return r; } },
+          { name: 'ipapi.co via Proxy', run: () => RemoteProxy.fetchJson(target ? `https://ipapi.co/${encodeURIComponent(target)}/json/` : 'https://ipapi.co/json/') },
+          { name: 'FreeIPAPI via Proxy', run: () => RemoteProxy.fetchJson(`https://freeipapi.com/api/json/${encodeURIComponent(target)}`) }
         ]);
         return {
           provider,
@@ -1021,22 +1043,22 @@
   ];
 
   // ==========================================================
-  // 5. OSINT DIRETO (11 APIS) & CENTRAL DE DORKS
+  // 6. OSINT DIRETO (11 APIS VIA PROXY REMOTO) & CENTRAL DORKS
   // ==========================================================
   function getCompatibleOsintApis(alvo) {
     const enc = encodeURIComponent(alvo);
     return [
-      { id: 'github', nome: 'GitHub', url: `https://github.com/${enc}`, check: async () => { const r = await fetch(`https://api.github.com/users/${enc}`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); const d = await r.json(); return { status: 'found', info: `${d.public_repos ?? 0} repos públicos` }; } },
-      { id: 'gitlab', nome: 'GitLab', url: `https://gitlab.com/${enc}`, check: async () => { const arr = await fetchJson(`https://gitlab.com/api/v4/users?username=${enc}`); return arr.length ? { status: 'found', info: arr[0].name || 'Perfil ativo' } : { status: 'notfound' }; } },
-      { id: 'devto', nome: 'Dev.to', url: `https://dev.to/${enc}`, check: async () => { const r = await fetch(`https://dev.to/api/users/by_username?url=${enc}`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); const d = await r.json(); return { status: 'found', info: d.name || 'Perfil ativo' }; } },
-      { id: 'reddit', nome: 'Reddit', url: `https://www.reddit.com/user/${enc}`, check: async () => { const r = await fetch(`https://www.reddit.com/user/${enc}/about.json`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); const d = await r.json(); return d?.data?.name ? { status: 'found', info: `Karma: ${d.data.total_karma ?? 0}` } : { status: 'notfound' }; } },
-      { id: 'hackernews', nome: 'Hacker News', url: `https://news.ycombinator.com/user?id=${enc}`, check: async () => { const d = await fetchJson(`https://hacker-news.firebaseio.com/v0/user/${enc}.json`); return d ? { status: 'found', info: `Karma: ${d.karma ?? 0}` } : { status: 'notfound' }; } },
-      { id: 'chess', nome: 'Chess.com', url: `https://www.chess.com/member/${enc}`, check: async () => { const r = await fetch(`https://api.chess.com/pub/player/${enc.toLowerCase()}`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); return { status: 'found', info: 'Jogador localizado' }; } },
-      { id: 'lichess', nome: 'Lichess', url: `https://lichess.org/@/${enc}`, check: async () => { const r = await fetch(`https://lichess.org/api/user/${enc}`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); return { status: 'found', info: 'Jogador localizado' }; } },
-      { id: 'codeforces', nome: 'Codeforces', url: `https://codeforces.com/profile/${enc}`, check: async () => { const r = await fetch(`https://codeforces.com/api/user.info?handles=${enc}`); if (r.status === 400) return { status: 'notfound' }; if (!r.ok) throw new Error(); const d = await r.json(); const u = d?.result?.[0]; return u ? { status: 'found', info: `Rating: ${u.rating ?? 'N/A'}` } : { status: 'notfound' }; } },
-      { id: 'npm', nome: 'npm', url: `https://www.npmjs.com/~${enc}`, check: async () => { const d = await fetchJson(`https://registry.npmjs.org/-/v1/search?text=maintainer:${enc}&size=1`); return d?.total > 0 ? { status: 'found', info: `${d.total} pacote(s)` } : { status: 'notfound' }; } },
-      { id: 'wikipedia', nome: 'Wikipédia (PT)', url: `https://pt.wikipedia.org/wiki/Usu%C3%A1rio:${enc}`, check: async () => { const d = await fetchJson(`https://pt.wikipedia.org/w/api.php?action=query&list=users&ususers=${enc}&usprop=editcount&format=json&origin=*`); const u = d?.query?.users?.[0]; return u && !('missing' in u) ? { status: 'found', info: `${u.editcount ?? 0} edições` } : { status: 'notfound' }; } },
-      { id: 'scratch', nome: 'Scratch', url: `https://scratch.mit.edu/users/${enc}/`, check: async () => { const r = await fetch(`https://api.scratch.mit.edu/users/${enc}`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); return { status: 'found', info: 'Perfil localizado' }; } }
+      { id: 'github', nome: 'GitHub', url: `https://github.com/${enc}`, check: async () => { const r = await RemoteProxy.request(`https://api.github.com/users/${enc}`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); const d = await r.json(); return { status: 'found', info: `${d.public_repos ?? 0} repos públicos` }; } },
+      { id: 'gitlab', nome: 'GitLab', url: `https://gitlab.com/${enc}`, check: async () => { const arr = await RemoteProxy.fetchJson(`https://gitlab.com/api/v4/users?username=${enc}`); return arr.length ? { status: 'found', info: arr[0].name || 'Perfil ativo' } : { status: 'notfound' }; } },
+      { id: 'devto', nome: 'Dev.to', url: `https://dev.to/${enc}`, check: async () => { const r = await RemoteProxy.request(`https://dev.to/api/users/by_username?url=${enc}`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); const d = await r.json(); return { status: 'found', info: d.name || 'Perfil ativo' }; } },
+      { id: 'reddit', nome: 'Reddit', url: `https://www.reddit.com/user/${enc}`, check: async () => { const r = await RemoteProxy.request(`https://www.reddit.com/user/${enc}/about.json`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); const d = await r.json(); return d?.data?.name ? { status: 'found', info: `Karma: ${d.data.total_karma ?? 0}` } : { status: 'notfound' }; } },
+      { id: 'hackernews', nome: 'Hacker News', url: `https://news.ycombinator.com/user?id=${enc}`, check: async () => { const d = await RemoteProxy.fetchJson(`https://hacker-news.firebaseio.com/v0/user/${enc}.json`); return d ? { status: 'found', info: `Karma: ${d.karma ?? 0}` } : { status: 'notfound' }; } },
+      { id: 'chess', nome: 'Chess.com', url: `https://www.chess.com/member/${enc}`, check: async () => { const r = await RemoteProxy.request(`https://api.chess.com/pub/player/${enc.toLowerCase()}`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); return { status: 'found', info: 'Jogador localizado' }; } },
+      { id: 'lichess', nome: 'Lichess', url: `https://lichess.org/@/${enc}`, check: async () => { const r = await RemoteProxy.request(`https://lichess.org/api/user/${enc}`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); return { status: 'found', info: 'Jogador localizado' }; } },
+      { id: 'codeforces', nome: 'Codeforces', url: `https://codeforces.com/profile/${enc}`, check: async () => { const r = await RemoteProxy.request(`https://codeforces.com/api/user.info?handles=${enc}`); if (r.status === 400) return { status: 'notfound' }; if (!r.ok) throw new Error(); const d = await r.json(); const u = d?.result?.[0]; return u ? { status: 'found', info: `Rating: ${u.rating ?? 'N/A'}` } : { status: 'notfound' }; } },
+      { id: 'npm', nome: 'npm', url: `https://www.npmjs.com/~${enc}`, check: async () => { const d = await RemoteProxy.fetchJson(`https://registry.npmjs.org/-/v1/search?text=maintainer:${enc}&size=1`); return d?.total > 0 ? { status: 'found', info: `${d.total} pacote(s)` } : { status: 'notfound' }; } },
+      { id: 'wikipedia', nome: 'Wikipédia (PT)', url: `https://pt.wikipedia.org/wiki/Usu%C3%A1rio:${enc}`, check: async () => { const d = await RemoteProxy.fetchJson(`https://pt.wikipedia.org/w/api.php?action=query&list=users&ususers=${enc}&usprop=editcount&format=json&origin=*`); const u = d?.query?.users?.[0]; return u && !('missing' in u) ? { status: 'found', info: `${u.editcount ?? 0} edições` } : { status: 'notfound' }; } },
+      { id: 'scratch', nome: 'Scratch', url: `https://scratch.mit.edu/users/${enc}/`, check: async () => { const r = await RemoteProxy.request(`https://api.scratch.mit.edu/users/${enc}`); if (r.status === 404) return { status: 'notfound' }; if (!r.ok) throw new Error(); return { status: 'found', info: 'Perfil localizado' }; } }
     ];
   }
 
@@ -1097,7 +1119,7 @@
       <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-white/10">
         <div>
           <h3 class="font-bold text-lg">OSINT Direto: <span class="text-[#0A84FF]">${escapeHtml(alvo)}</span></h3>
-          <p id="osintCounter" class="text-xs text-[var(--text-secondary)] mt-0.5">Consultando ${apis.length} APIs compatíveis...</p>
+          <p id="osintCounter" class="text-xs text-[var(--text-secondary)] mt-0.5">Consultando ${apis.length} APIs via ${escapeHtml(RemoteProxy.getModeLabel())}...</p>
         </div>
         <div class="flex gap-2">
           <button type="button" class="ios-chip" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button>
@@ -1109,7 +1131,7 @@
           <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="ios-row">
             <div class="flex flex-col min-w-0">
               <span class="font-semibold text-sm text-white truncate">${escapeHtml(item.nome)}</span>
-              <span id="info-${escapeHtml(item.id)}" class="text-[11px] text-[var(--text-secondary)] truncate">Consultando API...</span>
+              <span id="info-${escapeHtml(item.id)}" class="text-[11px] text-[var(--text-secondary)] truncate">Consultando via proxy...</span>
             </div>
             <span id="status-${escapeHtml(item.id)}" class="pill-tag tag-info">
               <span class="material-symbols-rounded text-xs spinner">refresh</span> Checando
@@ -1190,260 +1212,6 @@
 
     btn.disabled = false;
     btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Gerar Dorks';
-  }
-
-  // ==========================================================
-  // 6. CENTRAL DE PROXY (GATEWAY CORS + LISTA LIVE HTTP/SOCKS)
-  // ==========================================================
-  function renderProxyView(view) {
-    const history = getHistory('proxy');
-    const historyHtml = history.length ? `
-      <div class="mt-4 pt-4 border-t border-white/10">
-        <span class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold block mb-2">URLs Recentes</span>
-        <div class="flex flex-wrap gap-2">
-          ${history.map(h => `<button type="button" class="ios-chip text-xs py-1 px-3" data-fill-proxy="${escapeHtml(h.query)}">${escapeHtml(h.query)}</button>`).join('')}
-        </div>
-      </div>
-    ` : '';
-
-    view.innerHTML = `
-      <div class="view-enter">
-        <button type="button" data-nav="" class="ios-chip mb-5">
-          <span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Início
-        </button>
-
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-          <div class="lg:col-span-5 liquid-card p-6">
-            <div class="flex items-center gap-3.5 mb-5">
-              <div class="squircle" style="background:linear-gradient(135deg,#00C7BE,#0A84FF)">
-                <span class="material-symbols-rounded">vpn_lock</span>
-              </div>
-              <div>
-                <h2 class="text-lg font-bold leading-tight">Central de Proxy</h2>
-                <p class="text-xs text-[var(--text-secondary)]">Gateway CORS + Servidores HTTP/SOCKS</p>
-              </div>
-            </div>
-
-            <!-- Abas iOS Segmented -->
-            <div class="grid grid-cols-2 gap-1.5 p-1 rounded-2xl bg-white/5 border border-white/10 mb-5">
-              <button type="button" id="proxyTabGw" class="py-2 px-3 rounded-xl text-xs font-semibold bg-[#0A84FF] text-white transition">
-                Gateway URL
-              </button>
-              <button type="button" id="proxyTabList" class="py-2 px-3 rounded-xl text-xs font-semibold text-[var(--text-secondary)] hover:text-white transition">
-                Lista de Proxies
-              </button>
-            </div>
-
-            <!-- Form 1: Gateway Proxy CORS -->
-            <form id="proxyGwForm">
-              <div class="md-field">
-                <input type="text" id="proxyUrl" class="md-input" placeholder=" " maxlength="200" required autocomplete="off">
-                <label for="proxyUrl" class="md-label">URL pública (ex: https://api.ipify.org?format=json)</label>
-              </div>
-              <div class="mb-4">
-                <label class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold block mb-1.5 pl-1">Rota de Proxy</label>
-                <select id="proxyRoute" class="md-select">
-                  <option value="auto">Automático (AllOrigins → CodeTabs → CorsProxy)</option>
-                  <option value="allorigins">AllOrigins Proxy</option>
-                  <option value="codetabs">CodeTabs Proxy</option>
-                  <option value="corsproxy">CorsProxy.io</option>
-                </select>
-              </div>
-              <button type="submit" class="ios-btn">
-                <span class="material-symbols-rounded text-lg">bolt</span> Requisitar via Proxy
-              </button>
-              ${historyHtml}
-            </form>
-
-            <!-- Form 2: Lista de Proxies Ativos -->
-            <form id="proxyListForm" class="hidden">
-              <div class="mb-3">
-                <label class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold block mb-1.5 pl-1">Protocolo</label>
-                <select id="proxyProto" class="md-select">
-                  <option value="http">HTTP / HTTPS</option>
-                  <option value="socks4">SOCKS4</option>
-                  <option value="socks5">SOCKS5</option>
-                </select>
-              </div>
-              <div class="mb-4">
-                <label class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold block mb-1.5 pl-1">País</label>
-                <select id="proxyCountry" class="md-select">
-                  <option value="all">Global (Todos os países)</option>
-                  <option value="BR">Brasil (BR)</option>
-                  <option value="US">Estados Unidos (US)</option>
-                  <option value="DE">Alemanha (DE)</option>
-                </select>
-              </div>
-              <button type="submit" class="ios-btn">
-                <span class="material-symbols-rounded text-lg">dns</span> Buscar Proxies Ativos
-              </button>
-            </form>
-          </div>
-
-          <div class="lg:col-span-7">
-            <div id="proxyResult" class="min-h-[320px] liquid-card p-6 flex flex-col justify-center items-center text-center">
-              <span class="material-symbols-rounded text-5xl text-white/15 mb-2">vpn_lock</span>
-              <p class="text-sm text-[var(--text-secondary)] max-w-sm">
-                Use o <strong>Gateway URL</strong> para consultar endpoints contornando CORS ou abra <strong>Lista de Proxies</strong> para obter servidores HTTP/SOCKS atualizados.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    const tabGw = document.getElementById('proxyTabGw');
-    const tabList = document.getElementById('proxyTabList');
-    const gwForm = document.getElementById('proxyGwForm');
-    const listForm = document.getElementById('proxyListForm');
-
-    tabGw.addEventListener('click', () => {
-      gwForm.classList.remove('hidden');
-      listForm.classList.add('hidden');
-      tabGw.className = 'py-2 px-3 rounded-xl text-xs font-semibold bg-[#0A84FF] text-white transition';
-      tabList.className = 'py-2 px-3 rounded-xl text-xs font-semibold text-[var(--text-secondary)] hover:text-white transition';
-    });
-
-    tabList.addEventListener('click', () => {
-      listForm.classList.remove('hidden');
-      gwForm.classList.add('hidden');
-      tabList.className = 'py-2 px-3 rounded-xl text-xs font-semibold bg-[#0A84FF] text-white transition';
-      tabGw.className = 'py-2 px-3 rounded-xl text-xs font-semibold text-[var(--text-secondary)] hover:text-white transition';
-    });
-
-    gwForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      let target = document.getElementById('proxyUrl').value.trim();
-      const route = document.getElementById('proxyRoute').value;
-      const btn = gwForm.querySelector('button[type="submit"]');
-      const box = document.getElementById('proxyResult');
-
-      if (!/^https?:\/\//i.test(target)) target = 'https://' + target;
-      try { new URL(target); } catch {
-        box.className = 'min-h-[320px] liquid-card p-6 flex flex-col justify-center items-center text-center';
-        box.innerHTML = `<span class="material-symbols-rounded text-5xl mb-2 text-[#FF453A]">error</span><p class="text-sm text-[var(--text-secondary)]">URL inválida.</p>`;
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="material-symbols-rounded spinner text-lg">refresh</span> Conectando...';
-      box.className = 'min-h-[320px] liquid-card p-6 flex flex-col justify-center items-center text-center';
-      box.innerHTML = `<span class="material-symbols-rounded spinner text-4xl mb-2 text-[#0A84FF]">refresh</span><p class="text-sm text-[var(--text-secondary)]">Roteando requisição via proxy...</p>`;
-
-      try {
-        const { data, provider } = await fetchViaProxy(target, route);
-        await saveHistory('proxy', target);
-        lastModuleId = 'proxy-gateway';
-        const kb = (new Blob([data.html]).size / 1024).toFixed(1);
-        const preview = data.html.slice(0, 6000);
-
-        lastResultData = { url: target, proxy: provider, http_code: data.code, latency_ms: data.latencyMs, size_kb: kb, content: data.html };
-
-        box.className = 'min-h-[320px] liquid-card p-6 text-left';
-        box.innerHTML = `
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="material-symbols-rounded text-[#30D158] text-2xl">check_circle</span>
-                <h3 class="font-bold text-lg">Resposta do Proxy</h3>
-              </div>
-              <span class="text-[11px] text-[#0A84FF] font-semibold">Rota: ${escapeHtml(provider)}</span>
-            </div>
-            <div class="flex gap-2">
-              <button type="button" class="ios-chip" id="btnCopyRawProxy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar Corpo</button>
-              <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#0A84FF]">verified</span> Assinado</button>
-            </div>
-          </div>
-          ${renderIosList({
-            url: target,
-            proxy_utilizado: provider,
-            status_http: data.code,
-            latencia: `${data.latencyMs} ms`,
-            tamanho: `${kb} KB`
-          })}
-          <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mt-5 mb-2 px-1">Prévia da Resposta (até 6.000 caracteres)</h4>
-          <pre class="code-preview">${escapeHtml(preview)}${data.html.length > 6000 ? '\n\n... [truncado na prévia — use Exportar para baixar completo]' : ''}</pre>
-        `;
-
-        document.getElementById('btnCopyRawProxy')?.addEventListener('click', (ev) => {
-          copyText(data.html, ev.currentTarget);
-        });
-      } catch (err) {
-        box.className = 'min-h-[320px] liquid-card p-6 flex flex-col justify-center items-center text-center';
-        box.innerHTML = `
-          <span class="material-symbols-rounded text-5xl mb-2 text-[#FF453A]">error</span>
-          <h3 class="font-bold text-base mb-1">Falha na rota proxy</h3>
-          <p class="text-xs text-[var(--text-secondary)] max-w-md">${escapeHtml(err.message)}</p>
-        `;
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span class="material-symbols-rounded text-lg">bolt</span> Requisitar via Proxy';
-      }
-    });
-
-    listForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const proto = document.getElementById('proxyProto').value;
-      const country = document.getElementById('proxyCountry').value;
-      const btn = listForm.querySelector('button[type="submit"]');
-      const box = document.getElementById('proxyResult');
-
-      btn.disabled = true;
-      btn.innerHTML = '<span class="material-symbols-rounded spinner text-lg">refresh</span> Buscando...';
-      box.className = 'min-h-[320px] liquid-card p-6 flex flex-col justify-center items-center text-center';
-      box.innerHTML = `<span class="material-symbols-rounded spinner text-4xl mb-2 text-[#0A84FF]">refresh</span><p class="text-sm text-[var(--text-secondary)]">Consultando servidores de proxy (com fallback)...</p>`;
-
-      try {
-        const { data: proxies, provider } = await fetchLiveProxyList(proto, country);
-        lastModuleId = `proxies-${proto}-${country}`;
-        lastResultData = { protocolo: proto.toUpperCase(), pais: country, fonte: provider, total: proxies.length, proxies };
-        const plainList = proxies.map(p => p.addr).join('\n');
-
-        box.className = 'min-h-[320px] liquid-card p-6 text-left';
-        box.innerHTML = `
-          <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="material-symbols-rounded text-[#30D158] text-2xl">check_circle</span>
-                <h3 class="font-bold text-lg">${proxies.length} Proxies (${escapeHtml(proto.toUpperCase())})</h3>
-              </div>
-              <span class="text-[11px] text-[#0A84FF] font-semibold">Fonte: ${escapeHtml(provider)}</span>
-            </div>
-            <div class="flex gap-2">
-              <button type="button" class="ios-chip" id="btnCopyAllProxies"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar Lista</button>
-              <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#0A84FF]">verified</span> Assinado</button>
-            </div>
-          </div>
-          <div class="ios-group max-h-[380px] overflow-y-auto">
-            ${proxies.map(p => `
-              <div class="ios-row">
-                <div class="flex flex-col min-w-0">
-                  <span class="font-mono text-sm font-semibold text-white truncate">${escapeHtml(p.addr)}</span>
-                  <span class="text-[11px] text-[var(--text-secondary)]">${escapeHtml(p.protocol)} • ${escapeHtml(p.country)}${p.latency !== '-' ? ' • ' + escapeHtml(p.latency) : ''}</span>
-                </div>
-                <button type="button" class="ios-chip text-[11px] py-1 px-2.5 shrink-0" data-copy-val="${escapeHtml(p.addr)}">
-                  <span class="material-symbols-rounded text-xs">content_copy</span> Copiar
-                </button>
-              </div>
-            `).join('')}
-          </div>
-        `;
-
-        document.getElementById('btnCopyAllProxies')?.addEventListener('click', (ev) => {
-          copyText(plainList, ev.currentTarget);
-        });
-      } catch (err) {
-        box.className = 'min-h-[320px] liquid-card p-6 flex flex-col justify-center items-center text-center';
-        box.innerHTML = `
-          <span class="material-symbols-rounded text-5xl mb-2 text-[#FF453A]">error</span>
-          <h3 class="font-bold text-base mb-1">Nenhum proxy encontrado</h3>
-          <p class="text-xs text-[var(--text-secondary)] max-w-md">${escapeHtml(err.message)}</p>
-        `;
-      } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<span class="material-symbols-rounded text-lg">dns</span> Buscar Proxies Ativos';
-      }
-    });
   }
 
   // ==========================================================
@@ -1579,7 +1347,7 @@
     if (fipeCode) {
       try {
         const { data: fipeList, provider } = await tryFallback([
-          { name: 'BrasilAPI FIPE', run: () => fetchJson(`https://brasilapi.com.br/api/fipe/preco/v1/${encodeURIComponent(fipeCode)}`) }
+          { name: 'BrasilAPI FIPE via Proxy', run: () => RemoteProxy.fetchJson(`https://brasilapi.com.br/api/fipe/preco/v1/${encodeURIComponent(fipeCode)}`) }
         ]);
         const item = Array.isArray(fipeList) ? fipeList[0] : fipeList;
         if (item) {
@@ -1681,7 +1449,6 @@
     const m = MODULES.find(x => x.id === hash);
     if (!m) return navigate('');
     if (m.customView === 'atpv') { renderAtpvView(view); return; }
-    if (m.customView === 'proxy') { renderProxyView(view); return; }
 
     const history = getHistory(m.id);
     const historyHtml = history.length ? `
@@ -1727,7 +1494,7 @@
           <div class="lg:col-span-8">
             <div id="result" class="min-h-[300px] liquid-card p-6 flex flex-col justify-center items-center text-center">
               <span class="material-symbols-rounded text-5xl text-white/15 mb-2">travel_explore</span>
-              <p class="text-sm text-[var(--text-secondary)]">Informe o dado ao lado para iniciar a consulta.</p>
+              <p class="text-sm text-[var(--text-secondary)]">Informe o dado ao lado para iniciar a consulta via proxy remoto.</p>
             </div>
           </div>
         </div>
@@ -1755,7 +1522,7 @@
     resDiv.className = 'min-h-[300px] liquid-card p-6 flex flex-col justify-center items-center text-center';
     resDiv.innerHTML = `
       <span class="material-symbols-rounded spinner text-4xl mb-2 text-[#0A84FF]">refresh</span>
-      <p class="text-sm font-medium text-[var(--text-secondary)]">Consultando APIs (com fallback automático)...</p>
+      <p class="text-sm font-medium text-[var(--text-secondary)]">Consultando via ${escapeHtml(RemoteProxy.getModeLabel())}...</p>
     `;
 
     try {
@@ -1831,7 +1598,7 @@
   }
 
   // ==========================================================
-  // 9. EVENTOS CENTRALIZADOS
+  // 9. EVENTOS & BOOT DO PROXY REMOTO
   // ==========================================================
   document.addEventListener('click', async (e) => {
     const navEl = e.target.closest('[data-nav]');
@@ -1848,13 +1615,6 @@
     if (fillAtpv) {
       const input = document.getElementById('atpvPlaca');
       if (input) input.value = fillAtpv.getAttribute('data-fill-atpv');
-      return;
-    }
-
-    const fillProxy = e.target.closest('[data-fill-proxy]');
-    if (fillProxy) {
-      const input = document.getElementById('proxyUrl');
-      if (input) input.value = fillProxy.getAttribute('data-fill-proxy');
       return;
     }
 
@@ -1880,7 +1640,10 @@
   });
 
   window.addEventListener('hashchange', render);
-  document.addEventListener('DOMContentLoaded', render);
+  document.addEventListener('DOMContentLoaded', () => {
+    RemoteProxy.init();
+    render();
+  });
 })();
 </script>
 </body>
