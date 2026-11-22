@@ -1,17 +1,17 @@
-# GlassOSINT — Painel de Investigação Digital
+# GlassOSINT — Painel de Investigação Digital & DETRAN-MG
 
 [![Design System](https://img.shields.io/badge/Design-Liquid%20Glass%20%2F%20Material%20UX-blueviolet?style=for-the-badge&logo=apple)](#)
 [![Category](https://img.shields.io/badge/Category-OSINT%20%2F%20Investigation-critical?style=for-the-badge&logo=shield)](#)
 [![Stack](https://img.shields.io/badge/Stack-HTML5%20%7C%20CSS3%20%7C%20Vanilla%20JS-important?style=for-the-badge&logo=javascript)](#)
 
-> Ferramenta de investigação digital (OSINT) construída para analistas, pesquisadores e consultores. Combina a estética **Liquid Glass** com APIs reais de correlação de dados, permitindo consultas de CPF, CNPJ, CEP, IP, Domínios (DNS + RDAP), Usernames, Vazamentos de E-mail e DDD em uma interface única e responsiva.
+> Ferramenta de investigação digital (OSINT) e utilitário veicular em arquivo HTML único. Combina estética **Liquid Glass**, varredura progressiva de contas na web, APIs públicas com fallback automático, integração com **CPFHub.io** e acesso rápido para puxar **ATPV-e no DETRAN-MG**.
 
 ---
 
 ## 📑 Sumário
 1. [Visão Geral](#1-visão-geral)
-2. [Módulos de Investigação](#2-módulos-de-investigação)
-3. [Design System](#3-design-system)
+2. [Módulos Disponíveis](#2-módulos-disponíveis)
+3. [Design System & Recursos](#3-design-system--recursos)
 4. [Arquitetura de Fallback e Segurança](#4-arquitetura-de-fallback-e-segurança)
 5. [Limitações e Considerações Técnicas](#5-limitações-e-considerações-técnicas)
 6. [Como Usar](#6-como-usar)
@@ -20,77 +20,77 @@
 
 ## 1. Visão Geral
 
-O **GlassOSINT** foi projetado para ser uma ferramenta de **investigação ativa** em fontes abertas (**OSINT — Open Source Intelligence**). Ele executa consultas em tempo real diretamente do navegador, estrutura os retornos em cartões visuais com ícones semânticos e permite copiar ou exportar os dados brutos em `.json`.
-
-O projeto roda em um **arquivo HTML único**, sem necessidade de build ou instalação de dependências, com suporte a histórico local (`localStorage`) por módulo.
+O **GlassOSINT** executa consultas ativas diretamente do navegador, sem necessidade de build ou backend. Todos os resultados são estruturados em cartões visuais com exportação em `.json` e histórico salvo localmente no `localStorage`.
 
 ---
 
-## 2. Módulos de Investigação
+## 2. Módulos Disponíveis
 
-### 2.1 CPF (CPFHub.io + Validador Local)
-- **Objetivo:** Consultar dados cadastrais vinculados a um CPF e validar a estrutura do documento.
-- **Implementação:** Consulta primária na API **CPFHub.io** (via header `x-api-key`). Caso a API esteja indisponível, ativa automaticamente o fallback local com validação matemática dos dígitos verificadores e identificação da **Região Fiscal** emissora.
+### 2.1 Puxar ATPV-e (DETRAN-MG)
+- **Objetivo:** Agilizar a consulta e o download de uma **ATPV-e já existente** no portal oficial do DETRAN-MG.
+- **Funcionamento:** Organiza **Placa, RENAVAM, CPF/CNPJ e CRV/Código de Segurança** com botões de cópia em 1 clique, salva placas recentes no histórico e abre diretamente a página oficial de emissão/consulta do DETRAN-MG.
 
-### 2.2 CNPJ (Empresas e Quadro Societário)
-- **Objetivo:** Obter situação cadastral, atividade principal (CNAE), capital social, endereço e **QSA (Quadro Societário)**.
-- **Fontes:** `BrasilAPI` → fallback para `MinhaReceita` → fallback para `CNPJ.ws`.
+### 2.2 Varredura OSINT (Web)
+- **Objetivo:** Verificar a presença de um username ou nome em 4 categorias: **Redes Sociais, Sites Adultos, Sites de Namoro e Sites de Aposta**.
+- **Funcionamento:** Verificação progressiva em tempo real via APIs públicas (GitHub, GitLab, Dev.to, Reddit) e proxy CORS (`allorigins.win`) para status HTTP, exibindo indicadores visuais:
+  - 🟢 **Encontrado**
+  - 🔴 **Não encontrado**
+  - 🟡 **Protegido / Busca Google (Dork)** para plataformas fechadas (Tinder, Bet365, Betano, etc.).
 
-### 2.3 CEP / Endereço
-- **Objetivo:** Localizar logradouro, bairro, município, UF e coordenadas geográficas (latitude/longitude).
-- **Fontes:** `BrasilAPI v2` → fallback para `ViaCEP`.
+### 2.3 CPF (CPFHub.io + Validador Local)
+- **Objetivo:** Consultar dados cadastrais via **CPFHub.io** (`x-api-key`).
+- **Fallback:** Caso a API esteja indisponível, executa validação matemática dos dígitos verificadores e identifica a **Região Fiscal**.
 
-### 2.4 IP / Geolocalização
-- **Objetivo:** Identificar país, região, cidade, provedor (ISP), ASN, fuso horário e coordenadas de um endereço IP (ou do próprio IP atual se o campo ficar vazio).
-- **Fontes:** `ipwho.is` → fallback para `ipapi.co`.
+### 2.4 CNPJ
+- **Objetivo:** Consultar situação cadastral, CNAE principal, capital social, endereço e **Quadro Societário (QSA)**.
+- **Fontes:** `BrasilAPI` → `MinhaReceita` → `CNPJ.ws`.
 
-### 2.5 Domínio (DNS + RDAP)
-- **Objetivo:** Mapear a infraestrutura técnica e o registro de um domínio.
-- **Implementação:** Consultas paralelas via **Google DNS-over-HTTPS** (`A`, `MX`, `NS`, `TXT`) combinadas com protocolo **RDAP** (`rdap.registro.br` para domínios `.br` e `rdap.org` para domínios globais).
+### 2.5 Vazamentos (E-mail)
+- **Objetivo:** Verificar exposição de e-mail em bases de vazamentos conhecidos.
+- **Fonte:** `XposedOrNot API`.
 
-### 2.6 Username (OSINT em Plataformas)
-- **Objetivo:** Rastrear a existência de perfis públicos a partir de um nome de usuário.
-- **Fontes:** Consultas simultâneas nas APIs públicas do **GitHub**, **GitLab**, **Dev.to** e **Hacker News**.
+### 2.6 CEP / Endereço
+- **Objetivo:** Consultar logradouro, bairro, município, UF e coordenadas geográficas.
+- **Fontes:** `BrasilAPI v2` → `ViaCEP`.
 
-### 2.7 Vazamentos (E-mail)
-- **Objetivo:** Verificar se um endereço de e-mail apareceu em bases de vazamentos conhecidos (*data breaches*).
-- **Fonte:** API pública **XposedOrNot**.
+### 2.7 IP / Geolocalização
+- **Objetivo:** Identificar país, região, cidade, ISP, ASN, fuso horário e coordenadas.
+- **Fontes:** `ipwho.is` → `ipapi.co`.
 
-### 2.8 DDD (Brasil)
-- **Objetivo:** Identificar o estado e listar todos os municípios atendidos por um código DDD brasileiro.
+### 2.8 Domínio (DNS + RDAP)
+- **Objetivo:** Mapear registros `A`, `MX`, `NS`, `TXT` e dados de registro de domínio.
+- **Fontes:** `Google DNS-over-HTTPS` + `rdap.registro.br` / `rdap.org`.
+
+### 2.9 DDD (Brasil)
+- **Objetivo:** Listar estado e municípios atendidos por um DDD brasileiro.
 - **Fonte:** `BrasilAPI (DDD v1)`.
 
 ---
 
-## 3. Design System
+## 3. Design System & Recursos
 
-- **Estética Liquid Glass:** Superfícies translúcidas com `backdrop-filter: blur(24px) saturate(180%)`, bordas sutis de alto contraste e fundo escuro (`#050508`) com gradientes radiais suaves.
-- **Iconografia Semântica:** Ícones do **Material Symbols Rounded** mapeados automaticamente conforme o nome de cada campo retornado pelas APIs.
-- **Recursos de Produtividade:**
-  - Navegação SPA baseada em *hash* (`#cpf`, `#cnpj`, `#domain`, etc.).
-  - Histórico das últimas consultas salvas no `localStorage` com preenchimento rápido em 1 clique.
-  - Botões de **Copiar JSON** e **Exportar `.json`** em todos os resultados.
+- **Liquid Glass:** Superfícies translúcidas (`backdrop-filter: blur(24px)`) em tema escuro (`#050508`) com ícones **Material Symbols Rounded**.
+- **Produtividade:** Histórico local por módulo, cópia rápida por campo, cópia de JSON completo e download em `.json`.
 
 ---
 
 ## 4. Arquitetura de Fallback e Segurança
 
-- **Função `tryFallback()`:** Executa uma lista ordenada de provedores com *timeout* controlado (`AbortController` de 10s). Se uma API falhar por *rate limit* ou instabilidade, a próxima assume automaticamente.
-- **Proteção contra XSS:** Todos os dados dinâmicos retornados por APIs externas passam pela função `escapeHtml()` antes de serem injetados no DOM.
-- **Links Externos Seguros:** Todos os links de perfis abrem em nova aba com `rel="noopener noreferrer"`.
+- **`tryFallback()` + `AbortController`:** Timeout de 9 segundos por requisição com troca automática de provedor em caso de falha.
+- **Proteção XSS:** Todos os dados dinâmicos passam por `escapeHtml()` antes de serem renderizados no DOM.
+- **Links Seguros:** Links externos abrem com `rel="noopener noreferrer"`.
 
 ---
 
 ## 5. Limitações e Considerações Técnicas
 
-- **CORS no Navegador:** Algumas APIs externas podem aplicar restrições de CORS ou limites de requisições por IP (*rate limiting*). Em ambientes de produção, recomenda-se rotear as chamadas por um proxy backend leve.
-- **Chave de API no Front-end:** A `x-api-key` da CPFHub.io está configurada diretamente no cliente para facilitar o uso em arquivo único. Caso hospede o projeto publicamente, mova a chave para variáveis de ambiente em um servidor/worker (ex.: Cloudflare Workers ou Netlify Functions).
-- **Uso Responsável:** Utilize a ferramenta apenas para fins legítimos de pesquisa, auditoria, validação cadastral e segurança da informação, respeitando a LGPD e os termos de uso de cada API.
+- **CORS e Cloudflare:** Sites de namoro, apostas e parte das redes sociais bloqueiam requisições diretas do navegador. Nesses casos, o painel sinaliza como verificação manual e fornece o **Google Dork** pronto.
+- **Chave de API no Front-end:** A chave da `CPFHub.io` está no cliente para uso em arquivo único. Em hospedagem pública, recomenda-se protegê-la via proxy/worker.
 
 ---
 
 ## 6. Como Usar
 
-1. Baixe ou salve o arquivo `index.html`.
-2. Abra diretamente em qualquer navegador moderno (Chrome, Edge, Brave, Firefox) ou hospede em serviços estáticos como **Cloudflare Pages**, **Netlify** ou **GitHub Pages**.
-3. Escolha um módulo no painel inicial, informe o alvo e clique em **Consultar**.
+1. Salve o arquivo como `index.html`.
+2. Abra diretamente em qualquer navegador moderno ou publique no **Cloudflare Pages**, **Netlify** ou **GitHub Pages**.
+3. Selecione o módulo desejado, preencha o alvo e execute a consulta.
