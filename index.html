@@ -205,13 +205,9 @@
 </div>
 
 <script>
-// ==========================================
-// CONFIGURAÇÃO
-// ==========================================
 const CONFIG = {
   cpfKey: '778433e124468b1aa60f2681919cd918f852afe1761056985813881cb72a550f',
-  detranAtpvUrl: 'https://detran.mg.gov.br/veiculos/transferencias/emitir-a-autorizacao-para-transferencia-de-propriedade-do-veiculo-atpv-e',
-  portalMgUrl: 'https://www.mg.gov.br/servico/transferir-propriedade-de-veiculo-vendedor'
+  detranAtpvUrl: 'https://detran.mg.gov.br/veiculos/transferencias/emitir-a-autorizacao-para-transferencia-de-propriedade-do-veiculo-atpv-e'
 };
 
 let lastResultData = null;
@@ -299,9 +295,6 @@ function getHistory(moduleId) {
   }
 }
 
-// ==========================================
-// VERIFICADOR DE CONTAS (OSINT PROGRESSIVO)
-// ==========================================
 async function checkViaProxy(url, notFoundPatterns = []) {
   try {
     const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
@@ -426,14 +419,11 @@ function buildOsintTargets(alvo) {
   ];
 }
 
-// ==========================================
-// MÓDULOS OSINT + DETRAN-MG
-// ==========================================
 const MODULES = [
   {
     id: 'atpv',
-    name: 'ATPV-e (DETRAN-MG)',
-    desc: 'Preparador + Acesso Oficial CET-MG',
+    name: 'Puxar ATPV-e (DETRAN-MG)',
+    desc: 'Consulta e 2ª via de ATPV-e existente',
     icon: 'directions_car',
     customView: 'atpv'
   },
@@ -677,14 +667,25 @@ const MODULES = [
   }
 ];
 
-// ==========================================
-// NAVEGAÇÃO E RENDERIZAÇÃO
-// ==========================================
 function navigate(id) {
   window.location.hash = id ? '#' + id : '';
 }
 
 function renderAtpvView(view) {
+  const history = getHistory('atpv');
+  const historyHtml = history.length ? `
+    <div class="mt-5 pt-4 border-t border-[var(--glass-border)]">
+      <span class="text-[11px] uppercase tracking-wider text-[var(--text-muted)] font-semibold block mb-2">Placas Recentes</span>
+      <div class="flex flex-wrap gap-2">
+        ${history.map(h => `
+          <button type="button" class="btn-ghost text-xs py-1 px-2.5" onclick="document.getElementById('atpvPlaca').value='${escapeHtml(h.query)}'">
+            ${escapeHtml(h.query)}
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
   view.innerHTML = `
     <button onclick="navigate('')" class="liquid-glass interactive inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6">
       <span class="material-symbols-rounded text-lg">arrow_back</span> Voltar
@@ -696,58 +697,46 @@ function renderAtpvView(view) {
             <span class="material-symbols-rounded text-2xl text-[var(--accent)]">directions_car</span>
           </div>
           <div>
-            <h2 class="text-lg font-bold leading-tight">ATPV-e (DETRAN-MG)</h2>
-            <p class="text-xs text-[var(--text-muted)]">Preparador de Transferência de Propriedade</p>
+            <h2 class="text-lg font-bold leading-tight">Puxar ATPV-e (DETRAN-MG)</h2>
+            <p class="text-xs text-[var(--text-muted)]">Dados rápidos para baixar ATPV-e já emitida</p>
           </div>
         </div>
         <form id="atpvForm" onsubmit="handleAtpvPrepare(event)">
           <div class="input-group">
-            <input type="text" id="atpvPlaca" class="input-glass uppercase" placeholder=" " maxlength="7" required>
-            <label for="atpvPlaca" class="input-label">Placa do Veículo (Ex: ABC1D23)</label>
+            <input type="text" id="atpvPlaca" class="input-glass uppercase" placeholder=" " maxlength="7" required autocomplete="off">
+            <label for="atpvPlaca" class="input-label">Placa (Ex: ABC1D23)</label>
           </div>
           <div class="input-group">
-            <input type="text" id="atpvRenavam" class="input-glass" placeholder=" " maxlength="11" required>
+            <input type="text" id="atpvRenavam" class="input-glass" placeholder=" " maxlength="11" required autocomplete="off">
             <label for="atpvRenavam" class="input-label">RENAVAM (11 dígitos)</label>
           </div>
           <div class="input-group">
-            <input type="text" id="atpvCompradorDoc" class="input-glass" placeholder=" " maxlength="18" required>
-            <label for="atpvCompradorDoc" class="input-label">CPF ou CNPJ do Comprador</label>
+            <input type="text" id="atpvDoc" class="input-glass" placeholder=" " maxlength="18" required autocomplete="off">
+            <label for="atpvDoc" class="input-label">CPF / CNPJ do Proprietário</label>
           </div>
           <div class="input-group">
-            <input type="text" id="atpvCompradorNome" class="input-glass" placeholder=" " maxlength="80" required>
-            <label for="atpvCompradorNome" class="input-label">Nome Completo / Razão Social</label>
-          </div>
-          <div class="input-group">
-            <input type="email" id="atpvEmail" class="input-glass" placeholder=" " maxlength="80">
-            <label for="atpvEmail" class="input-label">E-mail do Comprador</label>
-          </div>
-          <div class="input-group">
-            <input type="text" id="atpvValor" class="input-glass" placeholder=" " maxlength="20" required>
-            <label for="atpvValor" class="input-label">Valor da Venda (Ex: 45.000,00)</label>
+            <input type="text" id="atpvCrv" class="input-glass" placeholder=" " maxlength="20" autocomplete="off">
+            <label for="atpvCrv" class="input-label">Nº do CRV / Código Segurança (opcional)</label>
           </div>
           <button type="submit" class="btn-primary w-full">
-            <span class="material-symbols-rounded text-lg">fact_check</span> Preparar Dados da ATPV-e
+            <span class="material-symbols-rounded text-lg">content_paste_go</span> Preparar e Abrir DETRAN-MG
           </button>
         </form>
+        ${historyHtml}
       </div>
 
       <div class="lg:col-span-7 space-y-4">
         <div id="atpvResult" class="liquid-glass p-6">
           <div class="flex items-center gap-2 mb-3">
-            <span class="material-symbols-rounded text-[var(--accent)]">info</span>
-            <h3 class="font-bold text-base">Acesso Oficial DETRAN-MG / CET-MG</h3>
+            <span class="material-symbols-rounded text-[var(--accent)]">description</span>
+            <h3 class="font-bold text-base">Consulta de ATPV-e Existente</h3>
           </div>
           <p class="text-sm text-[var(--text-muted)] mb-5">
-            A emissão oficial da ATPV-e em Minas Gerais exige autenticação via <strong>Gov.br (Prata ou Ouro)</strong> no Portal Cidadão, MGApp ou CDT. Preencha os dados ao lado para gerar o painel de cópia rápida em 1 clique e clique abaixo para abrir o serviço oficial.
+            Como o DETRAN-MG possui validação anti-robô (CAPTCHA/Gov.br), o painel organiza <strong>Placa, RENAVAM e CPF/CNPJ</strong> com cópia em 1 clique para você colar direto na tela oficial e baixar o PDF.
           </p>
-          <div class="flex flex-wrap gap-3">
-            <a href="${CONFIG.detranAtpvUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary">
-              <span class="material-symbols-rounded text-lg">open_in_new</span> Emitir ATPV-e no DETRAN-MG
-            </a>
-            <a href="${CONFIG.portalMgUrl}" target="_blank" rel="noopener noreferrer" class="btn-ghost">
-              <span class="material-symbols-rounded text-base">account_balance</span> Portal MG (Vendedor)
-            </a>
-          </div>
+          <a href="${CONFIG.detranAtpvUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary">
+            <span class="material-symbols-rounded text-lg">open_in_new</span> Ir Direto para o DETRAN-MG
+          </a>
         </div>
       </div>
     </div>
@@ -756,23 +745,20 @@ function renderAtpvView(view) {
 
 function handleAtpvPrepare(e) {
   e.preventDefault();
-  const dados = {
-    placa: document.getElementById('atpvPlaca').value.trim().toUpperCase(),
-    renavam: document.getElementById('atpvRenavam').value.replace(/\D/g, ''),
-    documento_comprador: document.getElementById('atpvCompradorDoc').value.trim(),
-    nome_comprador: document.getElementById('atpvCompradorNome').value.trim(),
-    email_comprador: document.getElementById('atpvEmail').value.trim() || '-',
-    valor_venda: document.getElementById('atpvValor').value.trim()
-  };
+  const placa = document.getElementById('atpvPlaca').value.trim().toUpperCase();
+  const renavam = document.getElementById('atpvRenavam').value.replace(/\D/g, '');
+  const doc = document.getElementById('atpvDoc').value.replace(/\D/g, '');
+  const crv = document.getElementById('atpvCrv').value.trim();
+
+  const dados = { placa, renavam, cpf_cnpj: doc, crv_codigo: crv || '-' };
   lastResultData = dados;
+  saveHistory('atpv', placa);
 
   const campos = [
-    { label: 'Placa', val: dados.placa },
-    { label: 'RENAVAM', val: dados.renavam },
-    { label: 'CPF / CNPJ Comprador', val: dados.documento_comprador },
-    { label: 'Nome do Comprador', val: dados.nome_comprador },
-    { label: 'E-mail Comprador', val: dados.email_comprador },
-    { label: 'Valor da Venda', val: `R$ ${dados.valor_venda}` }
+    { label: 'Placa', val: placa },
+    { label: 'RENAVAM', val: renavam },
+    { label: 'CPF / CNPJ', val: doc },
+    ...(crv ? [{ label: 'CRV / Cód. Segurança', val: crv }] : [])
   ];
 
   const box = document.getElementById('atpvResult');
@@ -780,13 +766,11 @@ function handleAtpvPrepare(e) {
     <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-[var(--glass-border)]">
       <div class="flex items-center gap-2">
         <span class="material-symbols-rounded text-[var(--success)] text-2xl">check_circle</span>
-        <h3 class="font-bold text-lg">Dados Prontos para ATPV-e</h3>
+        <h3 class="font-bold text-lg">Pronto para Puxar ATPV-e (${escapeHtml(placa)})</h3>
       </div>
-      <div class="flex gap-2">
-        <button type="button" class="btn-ghost" onclick="downloadJson('atpv-${escapeHtml(dados.placa)}')">
-          <span class="material-symbols-rounded text-base">download</span> Salvar JSON
-        </button>
-      </div>
+      <button type="button" class="btn-ghost" onclick="downloadJson('atpv-${escapeHtml(placa)}')">
+        <span class="material-symbols-rounded text-base">download</span> JSON
+      </button>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
       ${campos.map(c => `
@@ -801,15 +785,12 @@ function handleAtpvPrepare(e) {
         </div>
       `).join('')}
     </div>
-    <div class="flex flex-wrap gap-3">
-      <a href="${CONFIG.detranAtpvUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary">
-        <span class="material-symbols-rounded text-lg">open_in_new</span> Abrir Emissão ATPV-e (DETRAN-MG)
-      </a>
-      <a href="${CONFIG.portalMgUrl}" target="_blank" rel="noopener noreferrer" class="btn-ghost">
-        <span class="material-symbols-rounded text-base">account_balance</span> Portal MG (Vendedor)
-      </a>
-    </div>
+    <a href="${CONFIG.detranAtpvUrl}" target="_blank" rel="noopener noreferrer" class="btn-primary">
+      <span class="material-symbols-rounded text-lg">open_in_new</span> Abrir DETRAN-MG (Puxar ATPV-e)
+    </a>
   `;
+
+  window.open(CONFIG.detranAtpvUrl, '_blank', 'noopener,noreferrer');
 }
 
 function render() {
