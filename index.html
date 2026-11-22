@@ -116,11 +116,10 @@
 
 <script>
 // ==========================================
-// CONFIGURAÇÃO E FALLBACKS
+// CONFIGURAÇÃO
 // ==========================================
 const CONFIG = {
-  cpfKey: '778433e124468b1aa60f2681919cd918f852afe1761056985813881cb72a550f',
-  corsProxy: 'https://api.allorigins.win/raw?url='
+  cpfKey: '778433e124468b1aa60f2681919cd918f852afe1761056985813881cb72a550f'
 };
 
 const ICON_MAP = {
@@ -130,10 +129,8 @@ const ICON_MAP = {
   'data': 'calendar_today', 'nascimento': 'cake', 'abertura': 'event', 'situacao': 'info',
   'status': 'check_circle', 'cnae': 'category', 'natureza': 'gavel', 'marca': 'local_offer',
   'modelo': 'commute', 'ano': 'update', 'cor': 'palette', 'chassi': 'tag', 'combustivel': 'local_gas_station',
-  'carrier': 'cell_tower', 'type': 'category', 'breach': 'security', 'leak': 'warning',
-  'processo': 'gavel', 'tribunal': 'account_balance', 'karma': 'star', 'repos': 'folder',
   'platform': 'apps', 'url': 'link', 'username': 'alternate_email', 'adult': 'visibility_off',
-  'dating': 'favorite'
+  'dating': 'favorite', 'breach': 'security'
 };
 
 function getIcon(key) {
@@ -154,7 +151,7 @@ async function tryFallback(sources) {
 
 const MODULES = [
   { 
-    id: 'sherlock', name: 'Sherlock (Username)', desc: 'Redes Sociais & Fóruns', icon: 'search', placeholder: 'Ex: johndoe', max: 30, digits: false,
+    id: 'sherlock', name: 'Sherlock (Username)', desc: 'Redes Sociais (GitHub, Reddit)', icon: 'search', placeholder: 'Ex: johndoe', max: 30, digits: false,
     fetchApi: async (v) => {
       const username = v.trim(); const results = [];
       try { 
@@ -162,15 +159,32 @@ const MODULES = [
         if (gh.ok) { const d = await gh.json(); if (d.login) results.push({ platform: 'GitHub', found: true, url: d.html_url, name: d.name, repos: d.public_repos }); } 
       } catch(e) {}
       try { 
-        const rd = await fetch(`${CONFIG.corsProxy}${encodeURIComponent(`https://www.reddit.com/user/${username}/about.json`)}`); 
+        const rd = await fetch(`https://www.reddit.com/user/${username}/about.json`); 
         if (rd.ok) { const d = await rd.json(); if (d.data && !d.data.error) results.push({ platform: 'Reddit', found: true, url: `https://reddit.com/user/${username}`, name: d.data.name, karma: d.data.link_karma }); } 
       } catch(e) {}
-      if (results.length === 0) return { message: `Nenhum perfil público encontrado para "${username}".`, checked: ['GitHub', 'Reddit'] };
+      if (results.length === 0) return { message: `Nenhum perfil público encontrado para "${username}" no GitHub ou Reddit.`, checked: ['GitHub', 'Reddit'] };
       return { username: username, profiles: results };
     }
   },
   { 
-    id: 'email', name: 'Holehe (Email/Telefone)', desc: 'Vazamentos & Contas', icon: 'mail', placeholder: 'exemplo@email.com', max: 50, digits: false,
+    id: 'account_check', name: 'Verificar Conta (E-mail)', desc: 'Holehe / socialscan', icon: 'person_search', placeholder: 'exemplo@email.com', max: 50, digits: false,
+    fetchApi: async (v) => {
+      // Esta função NÃO consulta uma API pública porque não existe uma que retorne "conta sim/não" de forma gratuita via browser.
+      // Em vez disso, retorna instruções e links para as ferramentas que realmente fazem isso.
+      const email = v.trim();
+      return {
+        email: email,
+        aviso: 'Para verificar se um e-mail tem conta em plataformas como Tinder, OnlyFans, etc., é necessário usar uma ferramenta de backend (Holehe ou socialscan). APIs públicas gratuitas não expõem essa informação diretamente no navegador.',
+        ferramentas: [
+          { nome: 'Holehe (CLI)', desc: 'Verifica 120+ sites via fluxo de reset de senha', url: 'https://github.com/megadose/holehe' },
+          { nome: 'socialscan (CLI)', desc: 'Verifica disponibilidade de e-mail/username em plataformas', url: 'https://github.com/iojw/socialscan' },
+          { nome: 'omniscan (CLI)', desc: 'Agrega Sherlock + Holehe em um comando', url: 'https://pypi.org/project/omniscan/' }
+        ]
+      };
+    }
+  },
+  { 
+    id: 'breach_check', name: 'Vazamentos (E-mail)', desc: 'XposedOrNot (Breaches)', icon: 'security', placeholder: 'exemplo@email.com', max: 50, digits: false,
     fetchApi: async (v) => {
       const email = v.trim();
       const r = await fetch(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
@@ -180,39 +194,6 @@ const MODULES = [
       }
       const data = await r.json();
       return { email: email, ...data };
-    }
-  },
-  { 
-    id: 'adult_dating', name: 'Adult & Dating (Dork)', desc: 'Busca via Google (OSINT)', icon: 'visibility_off', placeholder: 'Ex: username ou email', max: 50, digits: false,
-    fetchApi: async (v) => {
-      const query = v.trim();
-      // Técnica OSINT: Google Dork para sites adultos e de namoro
-      const dorks = [
-        `site:tinder.com "${query}"`,
-        `site:ashleymadison.com "${query}"`,
-        `site:adultfriendfinder.com "${query}"`,
-        `site:onlyfans.com "${query}"`,
-        `site:fetlife.com "${query}"`,
-        `site:grindr.com "${query}"`,
-        `site:bumble.com "${query}"`,
-        `site:okcupid.com "${query}"`
-      ];
-      
-      // Gera links de busca para o investigador
-      const links = dorks.map((dork, index) => {
-        const names = ['Tinder', 'Ashley Madison', 'AdultFriendFinder', 'OnlyFans', 'FetLife', 'Grindr', 'Bumble', 'OkCupid'];
-        return {
-          platform: names[index],
-          url: `https://www.google.com/search?q=${encodeURIComponent(dork)}`,
-          dork: dork
-        };
-      });
-      
-      return { 
-        query: query, 
-        message: 'Clique nos links abaixo para verificar manualmente cada plataforma.', 
-        links: links 
-      };
     }
   },
   { 
@@ -341,19 +322,20 @@ async function handleSearch(e, id) {
           </div>
         `).join('');
       } else htmlResult = `<p class="text-[var(--text-muted)]">${data.message || 'Nenhum dado.'}</p>`;
-    } else if (id === 'adult_dating') {
+    } else if (id === 'account_check') {
       htmlResult = `
         <div class="mb-4 p-4 rounded-xl bg-[var(--warning)] bg-opacity-10 border border-[var(--warning)] border-opacity-30">
-          <p class="text-sm text-[var(--warning)]"><strong>⚠️ Aviso:</strong> Não há API pública gratuita para consulta direta. Use os links abaixo (Google Dorks) para verificar manualmente.</p>
+          <p class="text-sm text-[var(--warning)]"><strong>⚠️ Limitação Técnica:</strong> ${data.aviso}</p>
         </div>
+        <h4 class="text-sm font-bold mb-3 text-[var(--accent)]">Ferramentas Recomendadas (Backend):</h4>
         <div class="data-grid">
-          ${data.links.map(l => `
+          ${data.ferramentas.map(f => `
             <div class="data-item">
-              <span class="material-symbols-rounded data-icon">${getIcon('adult')}</span>
+              <span class="material-symbols-rounded data-icon">terminal</span>
               <div class="flex flex-col">
-                <span class="data-label">${l.platform}</span>
-                <a href="${l.url}" target="_blank" class="data-value text-[var(--accent)] underline">Abrir Busca</a>
-                <span class="text-[10px] text-[var(--text-muted)] mt-1 font-mono">${l.dork}</span>
+                <span class="data-label">${f.nome}</span>
+                <a href="${f.url}" target="_blank" class="data-value text-[var(--accent)] underline">${f.url}</a>
+                <span class="text-xs text-[var(--text-muted)] mt-1">${f.desc}</span>
               </div>
             </div>
           `).join('')}
@@ -383,7 +365,7 @@ async function handleSearch(e, id) {
 
 function renderDataGrid(data) {
   if (!data || typeof data !== 'object') return '';
-  const ignoreKeys = ['raw', 'json', 'html', 'response', 'message'];
+  const ignoreKeys = ['raw', 'json', 'html', 'response', 'message', 'aviso', 'ferramentas'];
   const keys = Object.keys(data).filter(k => !ignoreKeys.includes(k.toLowerCase()) && (typeof data[k] !== 'object' || data[k] === null) && data[k] !== '');
   if (keys.length === 0) return '<p class="text-sm text-[var(--text-muted)]">Nenhum campo para exibir.</p>';
   return `
