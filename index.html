@@ -3,130 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GlassOSINT | Painel de Consultas</title>
-<!-- Ícone do Site: Impressão Digital Branca -->
+<title>GlassOSINT | Investigação Digital</title>
+<!-- Ícone: Impressão Digital Branca -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M17.81 4.47c-.08 0-.16-.02-.23-.06C15.66 3.42 14 3 12.01 3c-1.98 0-3.86.47-5.57 1.41-.24.13-.54.04-.68-.2-.13-.24-.04-.55.2-.68C7.82 2.52 9.86 2 12.01 2c2.13 0 3.99.47 6.03 1.52.25.13.34.43.21.67-.09.18-.26.28-.44.28zM3.5 9.72c-.1 0-.2-.03-.29-.09-.23-.16-.28-.47-.12-.7.99-1.4 2.25-2.5 3.75-3.27C9.98 4.04 14 4.03 17.15 5.65c1.5.77 2.76 1.86 3.75 3.25.16.22.11.54-.12.7-.23.16-.54.11-.7-.12-.9-1.26-2.04-2.25-3.39-2.94-2.87-1.47-6.54-1.47-9.4.01-1.36.7-2.5 1.7-3.4 2.96-.08.14-.23.21-.39.21zm6.25 12.07c-.13 0-.26-.05-.35-.15-.87-.87-1.34-1.43-2.01-2.64-.69-1.23-1.05-2.73-1.05-4.34 0-2.97 2.54-5.39 5.66-5.39s5.66 2.42 5.66 5.39c0 .28-.22.5-.5.5s-.5-.22-.5-.5c0-2.42-2.09-4.39-4.66-4.39-2.57 0-4.66 1.97-4.66 4.39 0 1.44.32 2.77.93 3.85.64 1.15 1.08 1.64 1.85 2.42.19.2.19.51 0 .71-.11.1-.24.15-.37.15zm7.17-1.85c-1.19 0-2.24-.3-3.1-.89-1.49-1.01-2.38-2.65-2.38-4.39 0-.28.22-.5.5-.5s.5.22.5.5c0 1.41.72 2.74 1.94 3.56.71.48 1.54.71 2.54.71.24 0 .64-.03 1.04-.1.27-.05.53.13.58.41.05.27-.13.53-.41.58-.57.11-1.07.12-1.21.12zM14.91 22c-.04 0-.09-.01-.13-.02-1.59-.44-2.63-1.03-3.72-2.1-1.4-1.39-2.17-3.24-2.17-5.22 0-1.62 1.38-2.94 3.08-2.94 1.7 0 3.08 1.32 3.08 2.94 0 1.07.93 1.94 2.08 1.94s2.08-.87 2.08-1.94c0-3.77-3.25-6.83-7.25-6.83-2.84 0-5.44 1.58-6.61 4.03-.39.81-.59 1.76-.59 2.8 0 .78.07 2.01.67 3.61.1.26-.03.55-.29.64-.26.1-.55-.04-.64-.29-.49-1.31-.73-2.61-.73-3.96 0-1.2.23-2.29.68-3.24 1.33-2.79 4.28-4.6 7.51-4.6 4.55 0 8.25 3.51 8.25 7.83 0 1.62-1.38 2.94-3.08 2.94s-3.08-1.32-3.08-2.94c0-1.07-.93-1.94-2.08-1.94s-2.08.87-2.08 1.94c0 1.71.66 3.31 1.87 4.51.95.94 1.86 1.46 3.27 1.85.27.07.42.35.35.61-.05.23-.26.38-.47.38z'/%3E%3C/svg%3E">
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0">
 <style>
-  /* =========================================
-     DESIGN TOKENS (Material UX + Liquid Glass)
-     ========================================= */
   :root {
     --bg-base: #050508;
     --glass-bg: rgba(255, 255, 255, 0.03);
     --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-highlight: rgba(255, 255, 255, 0.15);
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
     --accent: #0A84FF;
     --accent-glow: rgba(10, 132, 255, 0.4);
     --success: #30D158;
     --danger: #FF453A;
+    --warning: #FF9F0A;
     --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
-
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  
   body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: var(--bg-base);
-    color: var(--text-main);
+    background-color: var(--bg-base); color: var(--text-main);
     margin: 0; min-height: 100vh; overflow-x: hidden;
-    /* Fundo com gradientes radiais para dar profundidade ao vidro */
-    background-image: 
-      radial-gradient(circle at 15% 20%, rgba(10, 132, 255, 0.15), transparent 40%),
-      radial-gradient(circle at 85% 80%, rgba(191, 90, 242, 0.1), transparent 40%),
-      radial-gradient(circle at 50% 50%, rgba(48, 209, 88, 0.05), transparent 50%);
+    background-image: radial-gradient(circle at 15% 20%, rgba(10, 132, 255, 0.15), transparent 40%),
+                      radial-gradient(circle at 85% 80%, rgba(191, 90, 242, 0.1), transparent 40%),
+                      radial-gradient(circle at 50% 50%, rgba(48, 209, 88, 0.05), transparent 50%);
     background-attachment: fixed;
   }
-
-  /* =========================================
-     LIQUID GLASS (Efeito iOS)
-     ========================================= */
   .liquid-glass {
     background: var(--glass-bg);
     backdrop-filter: blur(24px) saturate(180%);
     -webkit-backdrop-filter: blur(24px) saturate(180%);
     border: 1px solid var(--glass-border);
     border-radius: 24px;
-    box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.4), 
-      inset 0 0 0 1px rgba(255, 255, 255, 0.05),
-      inset 0 20px 40px rgba(255, 255, 255, 0.02);
-    position: relative;
-    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05), inset 0 20px 40px rgba(255, 255, 255, 0.02);
+    position: relative; overflow: hidden;
     transition: transform 0.3s var(--ease-spring), box-shadow 0.3s ease;
   }
-
-  /* Borda especular (Luz batendo no vidro) */
   .liquid-glass::before {
-    content: '';
-    position: absolute; inset: 0; border-radius: inherit; padding: 1px;
+    content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
     background: linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.05) 100%);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
+    -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
   }
-
   .liquid-glass.interactive { cursor: pointer; }
-  .liquid-glass.interactive:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-  }
+  .liquid-glass.interactive:hover { transform: translateY(-4px) scale(1.02); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 0 0 1px rgba(255, 255, 255, 0.1); }
   .liquid-glass.interactive:active { transform: scale(0.98); }
-
-  /* =========================================
-     FORMULÁRIOS E BOTÕES (Material UX)
-     ========================================= */
   .input-group { position: relative; margin-bottom: 24px; }
   .input-glass {
-    width: 100%; padding: 18px 16px 12px;
-    background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border);
-    border-radius: 16px; color: var(--text-main); outline: none;
-    font-size: 16px; transition: all 0.2s ease;
+    width: 100%; padding: 18px 16px 12px; background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--glass-border); border-radius: 16px; color: var(--text-main);
+    outline: none; font-size: 16px; transition: all 0.2s ease;
   }
-  .input-glass:focus { 
-    border-color: var(--accent); 
-    background: rgba(0, 0, 0, 0.4);
-    box-shadow: 0 0 0 4px var(--accent-glow); 
-  }
+  .input-glass:focus { border-color: var(--accent); background: rgba(0, 0, 0, 0.4); box-shadow: 0 0 0 4px var(--accent-glow); }
   .input-label {
     position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
-    color: var(--text-muted); font-size: 15px; pointer-events: none;
-    transition: all 0.2s ease;
+    color: var(--text-muted); font-size: 15px; pointer-events: none; transition: all 0.2s ease;
   }
-  .input-glass:focus ~ .input-label,
-  .input-glass:not(:placeholder-shown) ~ .input-label {
+  .input-glass:focus ~ .input-label, .input-glass:not(:placeholder-shown) ~ .input-label {
     top: 8px; font-size: 11px; color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
   }
-
   .btn-primary {
     background: var(--accent); color: #fff; font-weight: 600; font-size: 16px;
     padding: 16px 24px; border-radius: 16px; border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: all 0.2s var(--ease-spring);
-    position: relative; overflow: hidden;
+    transition: all 0.2s var(--ease-spring); position: relative; overflow: hidden;
   }
   .btn-primary::after {
     content: ''; position: absolute; top: 50%; left: 50%; width: 5px; height: 5px;
     background: rgba(255, 255, 255, 0.5); opacity: 0; border-radius: 100%;
-    transform: scale(1, 1) translate(-50%);
-    transform-origin: 50% 50%;
+    transform: scale(1, 1) translate(-50%); transform-origin: 50% 50%;
   }
   .btn-primary:active::after { animation: ripple 0.6s ease-out; }
-  @keyframes ripple {
-    0% { transform: scale(0, 0); opacity: 0.5; }
-    100% { transform: scale(40, 40); opacity: 0; }
-  }
+  @keyframes ripple { 0% { transform: scale(0, 0); opacity: 0.5; } 100% { transform: scale(40, 40); opacity: 0; } }
   .btn-primary:hover { background: #0070e0; box-shadow: 0 8px 24px var(--accent-glow); }
   .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
-
-  /* =========================================
-     RESULTADOS
-     ========================================= */
   .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
   .data-item {
     display: flex; align-items: flex-start; gap: 16px; padding: 16px;
@@ -137,12 +91,8 @@
   .data-icon { color: var(--accent); font-size: 24px; }
   .data-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; }
   .data-value { font-size: 15px; font-weight: 500; color: var(--text-main); word-break: break-word; }
-
-  /* Loaders */
   .spinner { animation: spin 1s linear infinite; }
   @keyframes spin { 100% { transform: rotate(360deg); } }
-  
-  /* Scrollbar */
   ::-webkit-scrollbar { width: 8px; }
   ::-webkit-scrollbar-track { background: var(--bg-base); }
   ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
@@ -150,9 +100,7 @@
 </style>
 </head>
 <body class="p-4 md:p-8">
-
 <div class="max-w-6xl mx-auto">
-  <!-- Header (Liquid Glass) -->
   <header class="liquid-glass p-4 flex items-center justify-between mb-8 sticky top-4 z-50">
     <div class="flex items-center gap-4 cursor-pointer" onclick="navigate('')">
       <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center border border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
@@ -160,12 +108,10 @@
       </div>
       <div>
         <span class="font-bold text-2xl tracking-tight block leading-none">Glass<span class="text-[var(--accent)]">OSINT</span></span>
-        <span class="text-xs text-[var(--text-muted)] font-medium tracking-wider uppercase">Intelligence Panel</span>
+        <span class="text-xs text-[var(--text-muted)] font-medium tracking-wider uppercase">Investigação Digital</span>
       </div>
     </div>
   </header>
-
-  <!-- Main View -->
   <main id="view" class="w-full"></main>
 </div>
 
@@ -179,16 +125,15 @@ const CONFIG = {
 };
 
 const ICON_MAP = {
-  'cnpj': 'badge', 'cpf': 'fingerprint', 'placa': 'directions_car',
-  'nome': 'person', 'email': 'mail', 'telefone': 'call', 'celular': 'smartphone',
-  'uf': 'map', 'pais': 'public', 'municipio': 'location_city', 'cep': 'markunread_mailbox',
-  'logradouro': 'signpost', 'numero': 'numbers', 'bairro': 'holiday_village',
-  'data': 'calendar_today', 'nascimento': 'cake', 'abertura': 'event',
-  'situacao': 'info', 'status': 'check_circle', 'cnae': 'category', 'natureza': 'gavel',
-  'marca': 'local_offer', 'modelo': 'commute', 'ano': 'update', 'cor': 'palette', 'chassi': 'tag',
-  'combustivel': 'local_gas_station', 'motor': 'settings', 'brand': 'local_offer', 'model': 'commute',
-  'color': 'palette', 'fuel': 'local_gas_station', 'year': 'update', 'city': 'location_city', 'state': 'map',
-  'username': 'alternate_email', 'profile': 'account_circle', 'url': 'link', 'repos': 'folder'
+  'cnpj': 'badge', 'cpf': 'fingerprint', 'placa': 'directions_car', 'telefone': 'call',
+  'email': 'mail', 'nome': 'person', 'uf': 'map', 'pais': 'public', 'municipio': 'location_city',
+  'cep': 'markunread_mailbox', 'logradouro': 'signpost', 'numero': 'numbers', 'bairro': 'holiday_village',
+  'data': 'calendar_today', 'nascimento': 'cake', 'abertura': 'event', 'situacao': 'info',
+  'status': 'check_circle', 'cnae': 'category', 'natureza': 'gavel', 'marca': 'local_offer',
+  'modelo': 'commute', 'ano': 'update', 'cor': 'palette', 'chassi': 'tag', 'combustivel': 'local_gas_station',
+  'carrier': 'cell_tower', 'type': 'category', 'breach': 'security', 'leak': 'warning',
+  'processo': 'gavel', 'tribunal': 'account_balance', 'karma': 'star', 'repos': 'folder',
+  'platform': 'apps', 'url': 'link', 'username': 'alternate_email'
 };
 
 function getIcon(key) {
@@ -202,20 +147,68 @@ function getIcon(key) {
 async function tryFallback(sources) {
   let lastError;
   for (const source of sources) {
-    try {
-      const result = await source();
-      if (result) return result;
-    } catch (e) {
-      lastError = e;
-      console.warn('Fonte falhou, tentando próxima...', e);
-    }
+    try { const result = await source(); if (result) return result; } catch (e) { lastError = e; console.warn('Fonte falhou:', e); }
   }
-  throw new Error(lastError?.message || 'Todas as fontes de dados falharam.');
+  throw new Error(lastError?.message || 'Todas as fontes falharam.');
 }
 
 const MODULES = [
   { 
-    id: 'cnpj', name: 'CNPJ', desc: 'Consulta de Empresas', icon: 'domain', placeholder: 'Apenas números', max: 14, digits: true,
+    id: 'sherlock', name: 'Sherlock (Username)', desc: 'Busca em Redes Sociais', icon: 'search', placeholder: 'Ex: johndoe', max: 30, digits: false,
+    fetchApi: async (v) => {
+      const username = v.trim(); const results = [];
+      // GitHub (API pública, CORS habilitado)
+      try { 
+        const gh = await fetch(`https://api.github.com/users/${username}`); 
+        if (gh.ok) { const d = await gh.json(); if (d.login) results.push({ platform: 'GitHub', found: true, url: d.html_url, name: d.name, repos: d.public_repos }); } 
+      } catch(e) {}
+      // Reddit (via proxy CORS)
+      try { 
+        const rd = await fetch(`${CONFIG.corsProxy}${encodeURIComponent(`https://www.reddit.com/user/${username}/about.json`)}`); 
+        if (rd.ok) { const d = await rd.json(); if (d.data && !d.data.error) results.push({ platform: 'Reddit', found: true, url: `https://reddit.com/user/${username}`, name: d.data.name, karma: d.data.link_karma }); } 
+      } catch(e) {}
+      if (results.length === 0) return { message: `Nenhum perfil público encontrado para "${username}".`, checked: ['GitHub', 'Reddit'] };
+      return { username: username, profiles: results };
+    }
+  },
+  { 
+    id: 'email', name: 'Email Breach', desc: 'Vazamentos (XposedOrNot)', icon: 'mail', placeholder: 'exemplo@email.com', max: 50, digits: false,
+    fetchApi: async (v) => {
+      const email = v.trim();
+      // API pública do XposedOrNot (sem chave) [citation:3]
+      const r = await fetch(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
+      if(!r.ok) {
+        if (r.status === 404) return { email: email, status: 'Seguro', message: 'Nenhum vazamento conhecido encontrado.' };
+        throw new Error('Erro ao consultar API de vazamentos.');
+      }
+      const data = await r.json();
+      return { email: email, ...data };
+    }
+  },
+  { 
+    id: 'telefone', name: 'Telefone (OSINT)', desc: 'Operadora e Região', icon: 'call', placeholder: 'DDD + Número', max: 11, digits: true,
+    fetchApi: async (v) => {
+      const clean = v.replace(/\D/g,'');
+      return await tryFallback([
+        async () => {
+          // BrasilAPI DDD (público, sem chave) [citation:12]
+          const r = await fetch(`https://brasilapi.com.br/api/ddd/v1/${clean.substring(0,2)}`);
+          if(!r.ok) throw new Error();
+          const dddData = await r.json();
+          return {
+            telefone: clean,
+            ddd: clean.substring(0,2),
+            estado: dddData.state,
+            cidades: dddData.cities ? dddData.cities.slice(0, 8).join(', ') : 'N/A',
+            tipo_linha: clean.length === 11 ? 'Celular (provável)' : 'Fixo (provável)'
+          };
+        },
+        async () => { return { telefone: clean, aviso: 'Consulta de DDD indisponível.' }; }
+      ]);
+    }
+  },
+  { 
+    id: 'cnpj', name: 'CNPJ', desc: 'Empresas', icon: 'domain', placeholder: 'Apenas números', max: 14, digits: true,
     fetchApi: async (v) => {
       const clean = v.replace(/\D/g,'');
       return await tryFallback([
@@ -226,38 +219,26 @@ const MODULES = [
     }
   },
   { 
-    id: 'cpf', name: 'CPF', desc: 'Consulta de Pessoas', icon: 'fingerprint', placeholder: 'Apenas números', max: 11, digits: true,
+    id: 'cpf', name: 'CPF', desc: 'Pessoas', icon: 'fingerprint', placeholder: 'Apenas números', max: 11, digits: true,
     fetchApi: async (v) => {
       const clean = v.replace(/\D/g,'');
       return await tryFallback([
         async () => {
           const r = await fetch(`https://api.cpfhub.io/cpf/${clean}`, { headers: { 'x-api-key': CONFIG.cpfKey, 'Accept': 'application/json' } });
-          if(!r.ok) throw new Error();
-          const raw = await r.json();
-          return raw.data || raw.result || raw;
+          if(!r.ok) throw new Error(); const raw = await r.json(); return raw.data || raw.result || raw;
         },
         async () => { return { aviso: 'API externa indisponível.', cpf: clean, formato_valido: clean.length === 11 }; }
       ]);
     }
   },
   { 
-    id: 'placa', name: 'Placa', desc: 'Consulta de Veículos (FIPE)', icon: 'directions_car', placeholder: 'ABC1D23', max: 7, digits: false,
+    id: 'placa', name: 'Placa', desc: 'Veículos (FIPE)', icon: 'directions_car', placeholder: 'ABC1D23', max: 7, digits: false,
     fetchApi: async (v) => {
       const placa = v.replace(/[^A-Za-z0-9]/g,'').toUpperCase();
       return await tryFallback([
         async () => { const r = await fetch(`https://fipe.parallelum.com.br/api/v2/plates/${placa}`); if(!r.ok) throw new Error(); return await r.json(); },
-        async () => { throw new Error('API FIPE indisponível. Tente novamente.'); }
+        async () => { throw new Error('API FIPE indisponível.'); }
       ]);
-    }
-  },
-  {
-    id: 'sherlock', name: 'Sherlock', desc: 'OSINT Username', icon: 'search', placeholder: 'Ex: johndoe', max: 30, digits: false,
-    fetchApi: async (v) => {
-      const username = v.trim(); const results = [];
-      try { const gh = await fetch(`${CONFIG.corsProxy}${encodeURIComponent(`https://api.github.com/users/${username}`)}`); if (gh.ok) { const d = await gh.json(); if (d.login) results.push({ platform: 'GitHub', found: true, url: d.html_url, name: d.name, repos: d.public_repos }); } } catch(e) {}
-      try { const rd = await fetch(`${CONFIG.corsProxy}${encodeURIComponent(`https://www.reddit.com/user/${username}/about.json`)}`); if (rd.ok) { const d = await rd.json(); if (d.data && !d.data.error) results.push({ platform: 'Reddit', found: true, url: `https://reddit.com/user/${username}`, name: d.data.name, karma: d.data.link_karma }); } } catch(e) {}
-      if (results.length === 0) return { message: `Nenhum perfil encontrado para "${username}".`, checked: ['GitHub', 'Reddit'] };
-      return { username: username, profiles: results };
     }
   }
 ];
@@ -273,67 +254,54 @@ function render() {
 
   if (!hash) {
     let cards = MODULES.map(m => `
-      <div class="liquid-glass interactive p-8 text-center" onclick="navigate('${m.id}')">
-        <div class="w-20 h-20 mx-auto rounded-3xl bg-[var(--accent-glow)] flex items-center justify-center mb-6 border border-[var(--accent)] border-opacity-30">
-          <span class="material-symbols-rounded text-5xl text-[var(--accent)]">${m.icon}</span>
+      <div class="liquid-glass interactive p-6 text-center" onclick="navigate('${m.id}')">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-[var(--accent-glow)] flex items-center justify-center mb-4 border border-[var(--accent)] border-opacity-30">
+          <span class="material-symbols-rounded text-4xl text-[var(--accent)]">${m.icon}</span>
         </div>
-        <h3 class="text-2xl font-bold mb-2">${m.name}</h3>
-        <p class="text-sm text-[var(--text-muted)] font-medium">${m.desc}</p>
+        <h3 class="text-xl font-bold mb-1">${m.name}</h3>
+        <p class="text-xs text-[var(--text-muted)]">${m.desc}</p>
       </div>
     `).join('');
-
     view.innerHTML = `
-      <div class="text-center mb-12 mt-4">
-        <h1 class="text-4xl md:text-5xl font-bold mb-4 tracking-tight">O que deseja <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent)] to-[#BF5AF2]">consultar?</span></h1>
-        <p class="text-[var(--text-muted)] text-lg">Selecione um dos módulos abaixo para iniciar.</p>
+      <div class="text-center mb-10 mt-4">
+        <h1 class="text-3xl md:text-4xl font-bold mb-2">Painel de <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent)] to-[#BF5AF2]">Investigação</span></h1>
+        <p class="text-[var(--text-muted)]">Ferramentas OSINT para detetives e investigadores.</p>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">${cards}</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">${cards}</div>
     `;
   } else {
     const m = MODULES.find(x => x.id === hash);
     if (!m) return navigate('');
-    
     view.innerHTML = `
-      <button onclick="navigate('')" class="liquid-glass interactive inline-flex items-center gap-2 px-5 py-3 rounded-full text-sm font-medium mb-8 hover:bg-white/10 transition">
-        <span class="material-symbols-rounded text-lg">arrow_back</span> Voltar ao Painel
+      <button onclick="navigate('')" class="liquid-glass interactive inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium mb-6 hover:bg-white/10 transition">
+        <span class="material-symbols-rounded text-lg">arrow_back</span> Voltar
       </button>
-      
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        <!-- Formulário (Coluna Esquerda) -->
-        <div class="lg:col-span-4 liquid-glass p-8">
-          <div class="text-center mb-8">
-            <div class="w-20 h-20 rounded-3xl bg-[var(--accent-glow)] flex items-center justify-center mx-auto mb-4 border border-[var(--accent)] border-opacity-30">
-              <span class="material-symbols-rounded text-4xl text-[var(--accent)]">${m.icon}</span>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div class="lg:col-span-4 liquid-glass p-6">
+          <div class="text-center mb-6">
+            <div class="w-16 h-16 rounded-2xl bg-[var(--accent-glow)] flex items-center justify-center mx-auto mb-4 border border-[var(--accent)] border-opacity-30">
+              <span class="material-symbols-rounded text-3xl text-[var(--accent)]">${m.icon}</span>
             </div>
-            <h2 class="text-2xl font-bold mb-1">${m.name}</h2>
-            <p class="text-sm text-[var(--text-muted)]">${m.desc}</p>
+            <h2 class="text-xl font-bold mb-1">${m.name}</h2>
+            <p class="text-xs text-[var(--text-muted)]">${m.desc}</p>
           </div>
-          
           <form id="searchForm" onsubmit="handleSearch(event, '${m.id}')">
             <div class="input-group">
               <input type="text" id="searchInput" class="input-glass" placeholder=" " maxlength="${m.max}" required autocomplete="off">
-              <label class="input-label">Alvo da Consulta</label>
+              <label class="input-label">Alvo da Investigação</label>
             </div>
-            <button type="submit" class="btn-primary w-full">Consultar Agora</button>
+            <button type="submit" class="btn-primary w-full">Investigar Agora</button>
           </form>
         </div>
-        
-        <!-- Resultados (Coluna Direita) -->
         <div class="lg:col-span-8">
-          <div id="result" class="min-h-[400px] liquid-glass p-8 flex flex-col justify-center items-center text-center">
-            <span class="material-symbols-rounded text-6xl text-white/10 mb-6">travel_explore</span>
-            <h3 class="text-xl font-semibold text-[var(--text-muted)] mb-2">Aguardando Parâmetros</h3>
-            <p class="text-sm text-[var(--text-muted)] opacity-70">Insira os dados ao lado para iniciar a consulta.</p>
+          <div id="result" class="min-h-[300px] liquid-glass p-6 flex flex-col justify-center items-center text-center">
+            <span class="material-symbols-rounded text-5xl text-white/10 mb-4">travel_explore</span>
+            <p class="text-[var(--text-muted)]">Aguardando parâmetros...</p>
           </div>
         </div>
       </div>
     `;
-
-    if (m.digits) {
-      document.getElementById('searchInput').addEventListener('input', function(e) {
-        this.value = this.value.replace(/\D/g, '');
-      });
-    }
+    if (m.digits) document.getElementById('searchInput').addEventListener('input', function(e) { this.value = this.value.replace(/\D/g, ''); });
   }
 }
 
@@ -346,11 +314,7 @@ async function handleSearch(e, id) {
 
   btn.disabled = true;
   btn.innerHTML = '<span class="material-symbols-rounded spinner">refresh</span> Processando...';
-  
-  resDiv.innerHTML = `
-    <span class="material-symbols-rounded spinner text-5xl mb-6 text-[var(--accent)]">refresh</span>
-    <p class="font-medium text-lg text-[var(--accent)]">Consultando bases...</p>
-  `;
+  resDiv.innerHTML = `<span class="material-symbols-rounded spinner text-4xl mb-4 text-[var(--accent)]">refresh</span><p class="font-medium text-[var(--accent)]">Consultando bases...</p>`;
 
   try {
     const data = await m.fetchApi(val);
@@ -359,78 +323,48 @@ async function handleSearch(e, id) {
     if (id === 'sherlock') {
       if (data.profiles && Array.isArray(data.profiles)) {
         htmlResult = data.profiles.map(p => `
-          <div class="data-item mb-3">
+          <div class="data-item mb-2">
             <span class="material-symbols-rounded data-icon">account_circle</span>
             <div class="flex flex-col">
               <span class="data-label">${p.platform}</span>
               <a href="${p.url}" target="_blank" class="data-value text-[var(--accent)] underline">${p.url}</a>
-              <span class="text-sm text-[var(--text-muted)] mt-1">${p.name || ''} ${p.repos ? `(${p.repos} repos)` : ''}</span>
+              <span class="text-xs text-[var(--text-muted)] mt-1">${p.name || ''} ${p.repos ? `(${p.repos} repos)` : ''} ${p.karma ? `(${p.karma} karma)` : ''}</span>
             </div>
           </div>
         `).join('');
-      } else {
-        htmlResult = `<p class="text-[var(--text-muted)] text-center">${data.message || 'Nenhum dado encontrado.'}</p>`;
-      }
+      } else htmlResult = `<p class="text-[var(--text-muted)]">${data.message || 'Nenhum dado.'}</p>`;
     } else {
-      if (Array.isArray(data)) {
-         htmlResult = data.map((item, idx) => `
-           <div class="mb-6"><h4 class="text-sm font-bold mb-3 text-[var(--accent)] uppercase tracking-wider">Resultado ${idx + 1}</h4>${renderDataGrid(item)}</div>
-         `).join('');
-      } else {
-         htmlResult = renderDataGrid(data);
-      }
+      if (Array.isArray(data)) htmlResult = data.map((item, idx) => `<div class="mb-4"><h4 class="text-sm font-bold mb-2 text-[var(--accent)]">Resultado ${idx + 1}</h4>${renderDataGrid(item)}</div>`).join('');
+      else htmlResult = renderDataGrid(data);
     }
 
     resDiv.innerHTML = `
       <div class="w-full text-left">
-        <div class="flex items-center gap-3 mb-6 pb-6 border-b border-[var(--glass-border)]">
-          <span class="material-symbols-rounded text-[var(--success)] text-3xl">check_circle</span>
-          <h3 class="font-bold text-xl">Informações Recuperadas</h3>
+        <div class="flex items-center gap-3 mb-4 pb-4 border-b border-[var(--glass-border)]">
+          <span class="material-symbols-rounded text-[var(--success)] text-2xl">check_circle</span>
+          <h3 class="font-bold text-lg">Informações Recuperadas</h3>
         </div>
         ${htmlResult}
       </div>
     `;
-
   } catch (err) {
-    resDiv.innerHTML = `
-      <div class="text-center">
-        <span class="material-symbols-rounded text-6xl mb-4 text-[var(--danger)]">error</span>
-        <h3 class="font-bold text-xl mb-2">Falha na Operação</h3>
-        <p class="text-sm text-[var(--text-muted)]">${err.message}</p>
-      </div>
-    `;
+    resDiv.innerHTML = `<div class="text-center"><span class="material-symbols-rounded text-5xl mb-4 text-[var(--danger)]">error</span><h3 class="font-bold text-lg mb-2">Falha</h3><p class="text-sm text-[var(--text-muted)]">${err.message}</p></div>`;
   } finally {
     btn.disabled = false;
-    btn.innerHTML = 'Consultar Agora';
+    btn.innerHTML = 'Investigar Agora';
   }
 }
 
 function renderDataGrid(data) {
   if (!data || typeof data !== 'object') return '';
   const ignoreKeys = ['raw', 'json', 'html', 'response', 'message'];
-  const keys = Object.keys(data).filter(k => 
-    !ignoreKeys.includes(k.toLowerCase()) && 
-    (typeof data[k] !== 'object' || data[k] === null) && 
-    data[k] !== ''
-  );
-
-  if (keys.length === 0) return '<p class="text-sm text-[var(--text-muted)]">Nenhum campo de texto para exibir.</p>';
-
+  const keys = Object.keys(data).filter(k => !ignoreKeys.includes(k.toLowerCase()) && (typeof data[k] !== 'object' || data[k] === null) && data[k] !== '');
+  if (keys.length === 0) return '<p class="text-sm text-[var(--text-muted)]">Nenhum campo para exibir.</p>';
   return `
     <div class="data-grid">
       ${keys.map(k => {
-        let v = data[k];
-        if (v === true) v = 'Sim';
-        if (v === false) v = 'Não';
-        return `
-          <div class="data-item">
-            <span class="material-symbols-rounded data-icon">${getIcon(k)}</span>
-            <div class="flex flex-col">
-              <span class="data-label">${k.replace(/_/g,' ')}</span>
-              <span class="data-value">${v}</span>
-            </div>
-          </div>
-        `;
+        let v = data[k]; if (v === true) v = 'Sim'; if (v === false) v = 'Não';
+        return `<div class="data-item"><span class="material-symbols-rounded data-icon">${getIcon(k)}</span><div class="flex flex-col"><span class="data-label">${k.replace(/_/g,' ')}</span><span class="data-value">${v}</span></div></div>`;
       }).join('')}
     </div>
   `;
