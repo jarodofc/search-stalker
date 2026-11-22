@@ -126,7 +126,7 @@
   }
   .btn-ghost:hover { background: rgba(255, 255, 255, 0.12); }
 
-  .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+  .data-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
   .data-item {
     display: flex;
     align-items: flex-start;
@@ -139,6 +139,37 @@
   .data-icon { color: var(--accent); font-size: 22px; flex-shrink: 0; margin-top: 2px; }
   .data-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600; margin-bottom: 3px; }
   .data-value { font-size: 14px; font-weight: 500; color: var(--text-main); word-break: break-word; }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .status-found { background: rgba(48, 209, 88, 0.15); color: var(--success); border: 1px solid rgba(48, 209, 88, 0.35); }
+  .status-notfound { background: rgba(255, 69, 58, 0.14); color: var(--danger); border: 1px solid rgba(255, 69, 58, 0.3); }
+  .status-manual { background: rgba(255, 159, 10, 0.14); color: var(--warning); border: 1px solid rgba(255, 159, 10, 0.3); }
+  .status-loading { background: rgba(10, 132, 255, 0.14); color: var(--accent); border: 1px solid rgba(10, 132, 255, 0.3); }
+
+  .site-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid var(--glass-border);
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .site-card:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.18); }
+
   .badge {
     display: inline-flex;
     align-items: center;
@@ -180,9 +211,6 @@ const CONFIG = {
   cpfKey: '778433e124468b1aa60f2681919cd918f852afe1761056985813881cb72a550f'
 };
 
-// ==========================================
-// UTILITÁRIOS
-// ==========================================
 let lastResultData = null;
 
 function escapeHtml(str) {
@@ -214,7 +242,7 @@ function getIcon(key) {
   return 'data_object';
 }
 
-async function fetchJson(url, options = {}, timeoutMs = 10000) {
+async function fetchJson(url, options = {}, timeoutMs = 9000) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
@@ -259,6 +287,175 @@ function getHistory(moduleId) {
 }
 
 // ==========================================
+// VERIFICADOR DE CONTAS (OSINT PROGRESSIVO)
+// ==========================================
+async function checkViaProxy(url, notFoundPatterns = []) {
+  try {
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+    const res = await fetchJson(proxyUrl, {}, 8000);
+    const code = res?.status?.http_code;
+    const html = (res?.contents || '').toLowerCase();
+
+    if (code === 404 || code === 410) return { status: 'notfound', label: 'Não encontrado' };
+    if (code === 403 || code === 429 || !code || html.includes('cf-browser-verification') || html.includes('just a moment')) {
+      return { status: 'manual', label: 'Protegido (Verificar)' };
+    }
+    if (notFoundPatterns.some(p => html.includes(p.toLowerCase()))) {
+      return { status: 'notfound', label: 'Não encontrado' };
+    }
+    if (code >= 200 && code < 400) return { status: 'found', label: 'Encontrado' };
+    return { status: 'manual', label: 'Verificar manual' };
+  } catch (e) {
+    return { status: 'manual', label: 'Protegido (Verificar)' };
+  }
+}
+
+function buildOsintTargets(alvo) {
+  const enc = encodeURIComponent(alvo);
+  const q = (dork) => `https://www.google.com/search?q=${encodeURIComponent(dork)}`;
+
+  return [
+    {
+      titulo: 'Redes Sociais',
+      icone: 'groups',
+      dorkGeral: q(`"${alvo}" (site:instagram.com OR site:tiktok.com OR site:x.com OR site:facebook.com OR site:linkedin.com OR site:threads.net OR site:reddit.com)`),
+      itens: [
+        {
+          id: 'github', nome: 'GitHub', url: `https://github.com/${enc}`,
+          check: async () => {
+            try {
+              const r = await fetch(`https://api.github.com/users/${enc}`);
+              if (r.status === 404) return { status: 'notfound', label: 'Não encontrado' };
+              if (r.ok) {
+                const d = await r.json();
+                return { status: 'found', label: 'Encontrado', info: `${d.public_repos} repos` };
+              }
+            } catch (e) {}
+            return { status: 'manual', label: 'Verificar' };
+          }
+        },
+        {
+          id: 'gitlab', nome: 'GitLab', url: `https://gitlab.com/${enc}`,
+          check: async () => {
+            try {
+              const arr = await fetchJson(`https://gitlab.com/api/v4/users?username=${enc}`);
+              return arr.length ? { status: 'found', label: 'Encontrado' } : { status: 'notfound', label: 'Não encontrado' };
+            } catch (e) { return { status: 'manual', label: 'Verificar' }; }
+          }
+        },
+        {
+          id: 'devto', nome: 'Dev.to', url: `https://dev.to/${enc}`,
+          check: async () => {
+            try {
+              const r = await fetch(`https://dev.to/api/users/by_username?url=${enc}`);
+              if (r.status === 404) return { status: 'notfound', label: 'Não encontrado' };
+              if (r.ok) return { status: 'found', label: 'Encontrado' };
+            } catch (e) {}
+            return { status: 'manual', label: 'Verificar' };
+          }
+        },
+        {
+          id: 'reddit', nome: 'Reddit', url: `https://www.reddit.com/user/${enc}`,
+          check: async () => {
+            try {
+              const r = await fetch(`https://www.reddit.com/user/${enc}/about.json`);
+              if (r.status === 404) return { status: 'notfound', label: 'Não encontrado' };
+              if (r.ok) return { status: 'found', label: 'Encontrado' };
+            } catch (e) {}
+            return await checkViaProxy(`https://www.reddit.com/user/${enc}`, ['page not found', 'nobody on reddit goes by that name']);
+          }
+        },
+        {
+          id: 'instagram', nome: 'Instagram', url: `https://www.instagram.com/${enc}/`,
+          check: () => checkViaProxy(`https://www.instagram.com/${enc}/`, ['page isn\'t available', 'página não está disponível'])
+        },
+        {
+          id: 'tiktok', nome: 'TikTok', url: `https://www.tiktok.com/@${enc}`,
+          check: () => checkViaProxy(`https://www.tiktok.com/@${enc}`, ['couldn\'t find this account', 'não foi possível encontrar'])
+        },
+        {
+          id: 'x', nome: 'X (Twitter)', url: `https://x.com/${enc}`,
+          check: () => checkViaProxy(`https://x.com/${enc}`, ['this account doesn’t exist', 'esta conta não existe'])
+        },
+        {
+          id: 'twitch', nome: 'Twitch', url: `https://www.twitch.tv/${enc}`,
+          check: () => checkViaProxy(`https://www.twitch.tv/${enc}`, ['unless you’ve got a time machine'])
+        },
+        {
+          id: 'youtube', nome: 'YouTube', url: `https://www.youtube.com/@${enc}`,
+          check: () => checkViaProxy(`https://www.youtube.com/@${enc}`, ['this page isn\'t available'])
+        },
+        {
+          id: 'facebook', nome: 'Facebook', url: q(`site:facebook.com "${alvo}"`),
+          check: async () => ({ status: 'manual', label: 'Busca Google' })
+        }
+      ]
+    },
+    {
+      titulo: 'Sites Adultos',
+      icone: 'visibility_off',
+      dorkGeral: q(`"${alvo}" (site:onlyfans.com OR site:privacy.com.br OR site:fansly.com OR site:pornhub.com OR site:xvideos.com OR site:chaturbate.com OR site:fatalmodel.com)`),
+      itens: [
+        {
+          id: 'onlyfans', nome: 'OnlyFans', url: `https://onlyfans.com/${enc}`,
+          check: () => checkViaProxy(`https://onlyfans.com/${enc}`, ['sorry this page is not available'])
+        },
+        {
+          id: 'privacy', nome: 'Privacy', url: `https://privacy.com.br/profile/${enc}`,
+          check: () => checkViaProxy(`https://privacy.com.br/profile/${enc}`, ['não encontrado', '404'])
+        },
+        {
+          id: 'fansly', nome: 'Fansly', url: `https://fansly.com/${enc}`,
+          check: () => checkViaProxy(`https://fansly.com/${enc}`, ['page not found'])
+        },
+        {
+          id: 'chaturbate', nome: 'Chaturbate', url: `https://chaturbate.com/${enc}/`,
+          check: () => checkViaProxy(`https://chaturbate.com/${enc}/`, ['page not found'])
+        },
+        {
+          id: 'pornhub', nome: 'Pornhub', url: `https://www.pornhub.com/users/${enc}`,
+          check: () => checkViaProxy(`https://www.pornhub.com/users/${enc}`, ['error 404', 'page not found'])
+        },
+        {
+          id: 'xvideos', nome: 'XVideos', url: `https://www.xvideos.com/profiles/${enc}`,
+          check: () => checkViaProxy(`https://www.xvideos.com/profiles/${enc}`, ['404', 'not found'])
+        },
+        {
+          id: 'fatalmodel', nome: 'Fatal Model', url: q(`site:fatalmodel.com "${alvo}"`),
+          check: async () => ({ status: 'manual', label: 'Busca Google' })
+        }
+      ]
+    },
+    {
+      titulo: 'Sites de Namoro',
+      icone: 'favorite',
+      dorkGeral: q(`"${alvo}" (site:tinder.com OR site:bumble.com OR site:badoo.com OR site:happn.com OR site:okcupid.com OR site:pof.com OR site:grindr.com)`),
+      itens: [
+        { id: 'tinder', nome: 'Tinder', url: q(`site:tinder.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) },
+        { id: 'badoo', nome: 'Badoo', url: q(`site:badoo.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) },
+        { id: 'bumble', nome: 'Bumble', url: q(`site:bumble.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) },
+        { id: 'happn', nome: 'Happn', url: q(`site:happn.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) },
+        { id: 'okcupid', nome: 'OkCupid', url: q(`site:okcupid.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) },
+        { id: 'grindr', nome: 'Grindr', url: q(`site:grindr.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'App Privado (Dork)' }) }
+      ]
+    },
+    {
+      titulo: 'Sites de Aposta',
+      icone: 'casino',
+      dorkGeral: q(`"${alvo}" (site:betano.com OR site:bet365.com OR site:blaze.com OR site:stake.com OR site:pixbet.com OR site:estrelabet.com OR site:superbet.com OR site:sportingbet.com)`),
+      itens: [
+        { id: 'betano', nome: 'Betano', url: q(`site:betano.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) },
+        { id: 'bet365', nome: 'Bet365', url: q(`site:bet365.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) },
+        { id: 'blaze', nome: 'Blaze', url: q(`site:blaze.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) },
+        { id: 'stake', nome: 'Stake', url: q(`site:stake.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) },
+        { id: 'pixbet', nome: 'Pixbet', url: q(`site:pixbet.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) },
+        { id: 'superbet', nome: 'Superbet', url: q(`site:superbet.com "${alvo}"`), check: async () => ({ status: 'manual', label: 'Login Privado (Dork)' }) }
+      ]
+    }
+  ];
+}
+
+// ==========================================
 // MÓDULOS OSINT
 // ==========================================
 const MODULES = [
@@ -267,109 +464,10 @@ const MODULES = [
     name: 'Varredura OSINT (Web)',
     desc: 'Redes Sociais, Adultos, Namoro e Apostas',
     icon: 'travel_explore',
-    placeholder: 'Username, nome ou e-mail',
+    placeholder: 'Ex: torvalds ou nome',
     max: 60,
     digits: false,
-    fetchApi: async (v) => {
-      const alvo = v.trim();
-      if (!alvo) throw new Error('Informe um username, nome ou e-mail.');
-      const enc = encodeURIComponent(alvo);
-      const q = (dork) => `https://www.google.com/search?q=${encodeURIComponent(dork)}`;
-
-      const checks = await Promise.all([
-        fetchJson(`https://api.github.com/users/${enc}`).then(d => d.login ? ({
-          platform: 'GitHub (Confirmado)', url: d.html_url, info: `${d.name || d.login} • ${d.public_repos} repos • ${d.followers} seguidores`
-        }) : null).catch(() => null),
-
-        fetchJson(`https://gitlab.com/api/v4/users?username=${enc}`).then(arr => arr[0] ? ({
-          platform: 'GitLab (Confirmado)', url: arr[0].web_url, info: `${arr[0].name} • Estado: ${arr[0].state}`
-        }) : null).catch(() => null),
-
-        fetchJson(`https://dev.to/api/users/by_username?url=${enc}`).then(d => d.username ? ({
-          platform: 'Dev.to (Confirmado)', url: `https://dev.to/${d.username}`, info: `${d.name || d.username} • ${d.summary || 'Sem bio'}`
-        }) : null).catch(() => null),
-
-        fetchJson(`https://hacker-news.firebaseio.com/v0/user/${enc}.json`).then(d => d && d.id ? ({
-          platform: 'Hacker News (Confirmado)', url: `https://news.ycombinator.com/user?id=${d.id}`, info: `Karma: ${d.karma}`
-        }) : null).catch(() => null)
-      ]);
-
-      const found = checks.filter(Boolean);
-
-      const categorias = [
-        {
-          titulo: 'Redes Sociais',
-          icone: 'groups',
-          dorkGeral: q(`"${alvo}" (site:instagram.com OR site:tiktok.com OR site:x.com OR site:facebook.com OR site:linkedin.com OR site:threads.net OR site:reddit.com)`),
-          itens: [
-            { nome: 'Instagram', url: `https://www.instagram.com/${enc}/` },
-            { nome: 'TikTok', url: `https://www.tiktok.com/@${enc}` },
-            { nome: 'X (Twitter)', url: `https://x.com/${enc}` },
-            { nome: 'Facebook', url: q(`site:facebook.com "${alvo}"`) },
-            { nome: 'LinkedIn', url: q(`site:linkedin.com/in "${alvo}"`) },
-            { nome: 'Threads', url: `https://www.threads.net/@${enc}` },
-            { nome: 'Reddit', url: `https://www.reddit.com/user/${enc}` },
-            { nome: 'YouTube', url: `https://www.youtube.com/@${enc}` },
-            { nome: 'Pinterest', url: `https://www.pinterest.com/${enc}/` },
-            { nome: 'Twitch', url: `https://www.twitch.tv/${enc}` }
-          ]
-        },
-        {
-          titulo: 'Sites Adultos',
-          icone: 'visibility_off',
-          dorkGeral: q(`"${alvo}" (site:onlyfans.com OR site:privacy.com.br OR site:fansly.com OR site:pornhub.com OR site:xvideos.com OR site:chaturbate.com OR site:fatalmodel.com)`),
-          itens: [
-            { nome: 'OnlyFans', url: `https://onlyfans.com/${enc}` },
-            { nome: 'Privacy', url: `https://privacy.com.br/profile/${enc}` },
-            { nome: 'Fansly', url: `https://fansly.com/${enc}` },
-            { nome: 'Pornhub', url: q(`site:pornhub.com "${alvo}"`) },
-            { nome: 'XVideos', url: q(`site:xvideos.com "${alvo}"`) },
-            { nome: 'Chaturbate', url: `https://chaturbate.com/${enc}/` },
-            { nome: 'Fatal Model', url: q(`site:fatalmodel.com "${alvo}"`) }
-          ]
-        },
-        {
-          titulo: 'Sites de Namoro',
-          icone: 'favorite',
-          dorkGeral: q(`"${alvo}" (site:tinder.com OR site:bumble.com OR site:badoo.com OR site:happn.com OR site:okcupid.com OR site:pof.com OR site:grindr.com)`),
-          itens: [
-            { nome: 'Tinder', url: q(`site:tinder.com "${alvo}"`) },
-            { nome: 'Badoo', url: q(`site:badoo.com "${alvo}"`) },
-            { nome: 'Bumble', url: q(`site:bumble.com "${alvo}"`) },
-            { nome: 'Happn', url: q(`site:happn.com "${alvo}"`) },
-            { nome: 'OkCupid', url: q(`site:okcupid.com "${alvo}"`) },
-            { nome: 'POF', url: q(`site:pof.com "${alvo}"`) },
-            { nome: 'Grindr', url: q(`site:grindr.com "${alvo}"`) }
-          ]
-        },
-        {
-          titulo: 'Sites de Aposta',
-          icone: 'casino',
-          dorkGeral: q(`"${alvo}" (site:betano.com OR site:bet365.com OR site:blaze.com OR site:stake.com OR site:pixbet.com OR site:estrelabet.com OR site:superbet.com OR site:sportingbet.com)`),
-          itens: [
-            { nome: 'Betano', url: q(`site:betano.com "${alvo}"`) },
-            { nome: 'Bet365', url: q(`site:bet365.com "${alvo}"`) },
-            { nome: 'Blaze', url: q(`site:blaze.com "${alvo}"`) },
-            { nome: 'Stake', url: q(`site:stake.com "${alvo}"`) },
-            { nome: 'Pixbet', url: q(`site:pixbet.com "${alvo}"`) },
-            { nome: 'EstrelaBet', url: q(`site:estrelabet.com "${alvo}"`) },
-            { nome: 'Superbet', url: q(`site:superbet.com "${alvo}"`) },
-            { nome: 'Sportingbet', url: q(`site:sportingbet.com "${alvo}"`) }
-          ]
-        }
-      ];
-
-      return {
-        resumo: {
-          alvo,
-          perfis_api_confirmados: found.length,
-          categorias_varredura: 'Redes Sociais, Adultos, Namoro e Apostas'
-        },
-        links: found,
-        categorias,
-        raw: { alvo, found, categorias }
-      };
-    }
+    progressive: true
   },
   {
     id: 'cpf',
@@ -386,14 +484,10 @@ const MODULES = [
       return await tryFallback([
         async () => {
           const raw = await fetchJson(`https://api.cpfhub.io/cpf/${cpf}`, {
-            headers: {
-              'x-api-key': CONFIG.cpfKey,
-              'Accept': 'application/json'
-            }
+            headers: { 'x-api-key': CONFIG.cpfKey, 'Accept': 'application/json' }
           });
           const info = raw.data || raw.result || raw;
           if (!info || typeof info !== 'object') throw new Error('Resposta inválida da CPFHub.io');
-
           const resumo = {};
           for (const [k, val] of Object.entries(info)) {
             if (val !== null && val !== '' && typeof val !== 'object') {
@@ -480,20 +574,13 @@ const MODULES = [
       if (!email.includes('@')) throw new Error('Informe um e-mail válido.');
       const r = await fetch(`https://api.xposedornot.com/v1/check-email/${encodeURIComponent(email)}`);
       if (r.status === 404) {
-        return {
-          resumo: { email, status: 'Nenhum vazamento encontrado', base: 'XposedOrNot' },
-          raw: { email, breaches: [] }
-        };
+        return { resumo: { email, status: 'Nenhum vazamento encontrado', base: 'XposedOrNot' }, raw: { email, breaches: [] } };
       }
       if (!r.ok) throw new Error(`Erro na API XposedOrNot (HTTP ${r.status}).`);
       const data = await r.json();
       const breaches = Array.isArray(data.breaches?.[0]) ? data.breaches[0] : (data.breaches || []);
       return {
-        resumo: {
-          email,
-          status: breaches.length ? 'Exposto em vazamentos' : 'Seguro',
-          total_vazamentos: breaches.length
-        },
+        resumo: { email, status: breaches.length ? 'Exposto em vazamentos' : 'Seguro', total_vazamentos: breaches.length },
         listas: breaches.length ? [{ titulo: 'Bases onde o e-mail apareceu', itens: breaches }] : [],
         raw: data
       };
@@ -512,11 +599,7 @@ const MODULES = [
       if (clean.length !== 8) throw new Error('Informe um CEP com 8 dígitos.');
       const data = await tryFallback([
         () => fetchJson(`https://brasilapi.com.br/api/cep/v2/${clean}`),
-        async () => {
-          const r = await fetchJson(`https://viacep.com.br/ws/${clean}/json/`);
-          if (r.erro) throw new Error('CEP não encontrado.');
-          return r;
-        }
+        async () => { const r = await fetchJson(`https://viacep.com.br/ws/${clean}/json/`); if (r.erro) throw new Error('CEP não encontrado.'); return r; }
       ]);
       return {
         resumo: {
@@ -544,25 +627,16 @@ const MODULES = [
     fetchApi: async (v) => {
       const target = v.trim();
       const data = await tryFallback([
-        async () => {
-          const r = await fetchJson(`https://ipwho.is/${encodeURIComponent(target)}`);
-          if (r.success === false) throw new Error(r.message || 'IP inválido');
-          return r;
-        },
+        async () => { const r = await fetchJson(`https://ipwho.is/${encodeURIComponent(target)}`); if (r.success === false) throw new Error(r.message || 'IP inválido'); return r; },
         () => fetchJson(target ? `https://ipapi.co/${encodeURIComponent(target)}/json/` : 'https://ipapi.co/json/')
       ]);
       return {
         resumo: {
-          ip: data.ip,
-          tipo: data.type || data.version || '-',
+          ip: data.ip, tipo: data.type || data.version || '-',
           pais: `${data.country || data.country_name || '-'} (${data.country_code || '-'})`,
-          regiao: data.region || '-',
-          cidade: data.city || '-',
-          isp: data.connection?.isp || data.org || '-',
-          asn: data.connection?.asn || data.asn || '-',
-          latitude: data.latitude,
-          longitude: data.longitude,
-          fuso_horario: data.timezone?.id || data.timezone || '-'
+          regiao: data.region || '-', cidade: data.city || '-',
+          isp: data.connection?.isp || data.org || '-', asn: data.connection?.asn || data.asn || '-',
+          latitude: data.latitude, longitude: data.longitude, fuso_horario: data.timezone?.id || data.timezone || '-'
         },
         raw: data
       };
@@ -579,38 +653,26 @@ const MODULES = [
     fetchApi: async (v) => {
       const domain = v.trim().toLowerCase().replace(/^https?:\/\//, '').split('/')[0];
       if (!domain || !domain.includes('.')) throw new Error('Informe um domínio válido (ex: site.com.br).');
-
       const [dnsA, dnsMX, dnsNS, dnsTXT, rdap] = await Promise.all([
         fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=A`).catch(() => null),
         fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=MX`).catch(() => null),
         fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=NS`).catch(() => null),
         fetchJson(`https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=TXT`).catch(() => null),
-        fetchJson(
-          domain.endsWith('.br')
-            ? `https://rdap.registro.br/domain/${encodeURIComponent(domain)}`
-            : `https://rdap.org/domain/${encodeURIComponent(domain)}`
-        ).catch(() => null)
+        fetchJson(domain.endsWith('.br') ? `https://rdap.registro.br/domain/${encodeURIComponent(domain)}` : `https://rdap.org/domain/${encodeURIComponent(domain)}`).catch(() => null)
       ]);
-
       const extractDns = (res) => (res?.Answer || []).map(a => a.data);
-      const events = (rdap?.events || []).reduce((acc, ev) => {
-        acc[ev.eventAction] = ev.eventDate?.split('T')[0];
-        return acc;
-      }, {});
-
+      const events = (rdap?.events || []).reduce((acc, ev) => { acc[ev.eventAction] = ev.eventDate?.split('T')[0]; return acc; }, {});
       return {
         resumo: {
           dominio: domain,
           status_rdap: (rdap?.status || []).join(', ') || 'Não retornado',
-          registro: events.registration || '-',
-          expiracao: events.expiration || '-',
-          ultima_alteracao: events['last changed'] || '-'
+          registro: events.registration || '-', expiracao: events.expiration || '-', ultima_alteracao: events['last changed'] || '-'
         },
         listas: [
           { titulo: 'Registros A (IPv4)', itens: extractDns(dnsA) },
           { titulo: 'Servidores de E-mail (MX)', itens: extractDns(dnsMX) },
           { titulo: 'Nameservers (NS)', itens: extractDns(dnsNS) },
-          { titulo: 'Registros TXT (SPF/DMARC/Verificações)', itens: extractDns(dnsTXT) }
+          { titulo: 'Registros TXT', itens: extractDns(dnsTXT) }
         ].filter(l => l.itens.length > 0),
         raw: { dnsA, dnsMX, dnsNS, dnsTXT, rdap }
       };
@@ -664,7 +726,7 @@ function render() {
         <h1 class="text-3xl md:text-4xl font-bold mb-2">
           Pegada <span class="text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent)] to-[#BF5AF2]">Digital</span>
         </h1>
-        <p class="text-sm text-[var(--text-muted)]">Módulos OSINT integrados a APIs públicas, CPFHub.io e varredura web.</p>
+        <p class="text-sm text-[var(--text-muted)]">Módulos OSINT com verificação em tempo real, CPFHub.io e APIs públicas.</p>
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">${cards}</div>
     `;
@@ -735,6 +797,95 @@ function fillAndSearch(val) {
   document.getElementById('searchForm').requestSubmit();
 }
 
+async function runProgressiveOsint(alvo, resDiv, btn) {
+  saveHistory('username', alvo);
+  const categorias = buildOsintTargets(alvo);
+  const report = { alvo, resultados: [] };
+  let foundCount = 0;
+  let notFoundCount = 0;
+
+  resDiv.className = 'min-h-[320px] liquid-glass p-6 text-left';
+  resDiv.innerHTML = `
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-[var(--glass-border)]">
+      <div>
+        <h3 class="font-bold text-lg">Varredura para: <span class="text-[var(--accent)]">${escapeHtml(alvo)}</span></h3>
+        <p id="osintCounter" class="text-xs text-[var(--text-muted)] mt-0.5">Verificando plataformas em tempo real...</p>
+      </div>
+      <div class="flex gap-2">
+        <button type="button" class="btn-ghost" onclick="copyJson()"><span class="material-symbols-rounded text-base">content_copy</span> JSON</button>
+        <button type="button" class="btn-ghost" onclick="downloadJson('osint')"><span class="material-symbols-rounded text-base">download</span> Exportar</button>
+      </div>
+    </div>
+    ${categorias.map(cat => `
+      <div class="mb-6 p-4 rounded-2xl bg-white/[0.02] border border-[var(--glass-border)]">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+          <h4 class="text-xs uppercase tracking-wider text-[var(--accent)] font-bold flex items-center gap-2">
+            <span class="material-symbols-rounded text-base">${escapeHtml(cat.icone)}</span>
+            ${escapeHtml(cat.titulo)}
+          </h4>
+          <a href="${escapeHtml(cat.dorkGeral)}" target="_blank" rel="noopener noreferrer" class="btn-ghost text-xs py-1 px-3">
+            <span class="material-symbols-rounded text-sm">manage_search</span> Dork Geral
+          </a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          ${cat.itens.map(item => `
+            <a id="card-${escapeHtml(item.id)}" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="site-card">
+              <div class="flex flex-col min-w-0">
+                <span class="font-semibold text-sm truncate">${escapeHtml(item.nome)}</span>
+                <span id="info-${escapeHtml(item.id)}" class="text-[11px] text-[var(--text-muted)] truncate">Verificando...</span>
+              </div>
+              <span id="status-${escapeHtml(item.id)}" class="status-pill status-loading">
+                <span class="material-symbols-rounded text-xs spinner">refresh</span> Checando
+              </span>
+            </a>
+          `).join('')}
+        </div>
+      </div>
+    `).join('')}
+  `;
+
+  const allTasks = [];
+  for (const cat of categorias) {
+    for (const item of cat.itens) {
+      allTasks.push(
+        item.check().then(res => {
+          const pill = document.getElementById(`status-${item.id}`);
+          const infoEl = document.getElementById(`info-${item.id}`);
+          if (!pill) return;
+
+          if (res.status === 'found') {
+            foundCount++;
+            pill.className = 'status-pill status-found';
+            pill.innerHTML = '<span class="material-symbols-rounded text-xs">check_circle</span> Encontrado';
+            infoEl.textContent = res.info || 'Conta localizada';
+          } else if (res.status === 'notfound') {
+            notFoundCount++;
+            pill.className = 'status-pill status-notfound';
+            pill.innerHTML = '<span class="material-symbols-rounded text-xs">cancel</span> Não encontrado';
+            infoEl.textContent = 'Sem conta pública';
+          } else {
+            pill.className = 'status-pill status-manual';
+            pill.innerHTML = `<span class="material-symbols-rounded text-xs">open_in_new</span> ${escapeHtml(res.label || 'Verificar')}`;
+            infoEl.textContent = 'Clique para abrir busca';
+          }
+
+          report.resultados.push({ categoria: cat.titulo, site: item.nome, url: item.url, status: res.status });
+          lastResultData = report;
+
+          const counter = document.getElementById('osintCounter');
+          if (counter) {
+            counter.textContent = `${foundCount} encontrado(s) • ${notFoundCount} não encontrado(s) • Demais em verificação manual`;
+          }
+        })
+      );
+    }
+  }
+
+  await Promise.allSettled(allTasks);
+  btn.disabled = false;
+  btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Consultar';
+}
+
 async function handleSearch(e, id) {
   e.preventDefault();
   const m = MODULES.find(x => x.id === id);
@@ -744,6 +895,12 @@ async function handleSearch(e, id) {
 
   btn.disabled = true;
   btn.innerHTML = '<span class="material-symbols-rounded spinner text-lg">refresh</span> Consultando...';
+
+  if (m.progressive) {
+    await runProgressiveOsint(val, resDiv, btn);
+    return;
+  }
+
   resDiv.className = 'min-h-[320px] liquid-glass p-6 flex flex-col justify-center items-center text-center';
   resDiv.innerHTML = `
     <span class="material-symbols-rounded spinner text-4xl mb-3 text-[var(--accent)]">refresh</span>
@@ -756,61 +913,13 @@ async function handleSearch(e, id) {
     if (val) saveHistory(id, val);
 
     let sectionsHtml = '';
-
-    if (data.resumo) {
-      sectionsHtml += renderDataGrid(data.resumo);
-    }
-
-    if (data.links && data.links.length) {
-      sectionsHtml += `
-        <div class="mt-6">
-          <h4 class="text-xs uppercase tracking-wider text-[var(--accent)] font-bold mb-3">Perfis Confirmados via API</h4>
-          <div class="space-y-2">
-            ${data.links.map(l => `
-              <div class="data-item">
-                <span class="material-symbols-rounded data-icon">account_circle</span>
-                <div class="flex flex-col">
-                  <span class="data-label">${escapeHtml(l.platform)}</span>
-                  <a href="${escapeHtml(l.url)}" target="_blank" rel="noopener noreferrer" class="data-value text-[var(--accent)] underline">${escapeHtml(l.url)}</a>
-                  <span class="text-xs text-[var(--text-muted)] mt-1">${escapeHtml(l.info)}</span>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
+    if (data.resumo) sectionsHtml += renderDataGrid(data.resumo);
     if (data.listas && data.listas.length) {
       sectionsHtml += data.listas.map(lista => `
         <div class="mt-6">
           <h4 class="text-xs uppercase tracking-wider text-[var(--accent)] font-bold mb-3">${escapeHtml(lista.titulo)} (${lista.itens.length})</h4>
           <div class="flex flex-wrap gap-2 max-h-60 overflow-y-auto pr-1">
             ${lista.itens.map(item => `<span class="text-xs px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-[var(--text-main)]">${escapeHtml(item)}</span>`).join('')}
-          </div>
-        </div>
-      `).join('');
-    }
-
-    if (data.categorias && data.categorias.length) {
-      sectionsHtml += data.categorias.map(cat => `
-        <div class="mt-6 p-4 rounded-2xl bg-white/[0.02] border border-[var(--glass-border)]">
-          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-            <h4 class="text-xs uppercase tracking-wider text-[var(--accent)] font-bold flex items-center gap-2">
-              <span class="material-symbols-rounded text-base">${escapeHtml(cat.icone)}</span>
-              ${escapeHtml(cat.titulo)}
-            </h4>
-            <a href="${escapeHtml(cat.dorkGeral)}" target="_blank" rel="noopener noreferrer" class="btn-ghost text-xs py-1 px-3">
-              <span class="material-symbols-rounded text-sm">manage_search</span> Varredura Geral (Dork)
-            </a>
-          </div>
-          <div class="flex flex-wrap gap-2">
-            ${cat.itens.map(item => `
-              <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="btn-ghost text-xs">
-                ${escapeHtml(item.nome)}
-                <span class="material-symbols-rounded text-xs opacity-60">open_in_new</span>
-              </a>
-            `).join('')}
           </div>
         </div>
       `).join('');
@@ -824,12 +933,8 @@ async function handleSearch(e, id) {
           <h3 class="font-bold text-lg">Resultado da Consulta</h3>
         </div>
         <div class="flex gap-2">
-          <button type="button" class="btn-ghost" onclick="copyJson()">
-            <span class="material-symbols-rounded text-base">content_copy</span> Copiar JSON
-          </button>
-          <button type="button" class="btn-ghost" onclick="downloadJson('${escapeHtml(id)}')">
-            <span class="material-symbols-rounded text-base">download</span> Exportar
-          </button>
+          <button type="button" class="btn-ghost" onclick="copyJson()"><span class="material-symbols-rounded text-base">content_copy</span> Copiar JSON</button>
+          <button type="button" class="btn-ghost" onclick="downloadJson('${escapeHtml(id)}')"><span class="material-symbols-rounded text-base">download</span> Exportar</button>
         </div>
       </div>
       ${sectionsHtml}
