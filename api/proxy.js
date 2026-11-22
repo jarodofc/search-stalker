@@ -37,7 +37,7 @@ module.exports = async (req, res) => {
   }
 
   const forwardHeaders = {
-    'User-Agent': 'Mozilla/5.0 (compatible; GlassOSINT-RemoteProxy/7.0; +KIIK-HACKING)'
+    'User-Agent': 'Mozilla/5.0 (compatible; GlassOSINT-RemoteProxy/7.1; +KIIK-HACKING)'
   };
 
   if (req.headers['x-proxy-headers']) {
