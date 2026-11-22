@@ -5,27 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#040408">
+<meta name="theme-color" content="#06070B">
 <meta http-equiv="X-Content-Type-Options" content="nosniff">
 <meta name="referrer" content="no-referrer">
-<title>GlassOSINT • Sherlock, Sites & CNPJ</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230A84FF'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E">
+<title>SHERLOCK 221B • Laboratório Forense & OSINT</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23E2B354'%3E%3Cpath d='M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z'/%3E%3C/svg%3E">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/exifr@7.1.3/dist/full.umd.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,1,0">
 <style>
   :root {
-    --bg-base: #040408;
-    --glass-border: rgba(255, 255, 255, 0.13);
-    --glass-specular: rgba(255, 255, 255, 0.28);
-    --text-primary: #FFFFFF;
-    --text-secondary: rgba(235, 235, 245, 0.68);
-    --text-tertiary: rgba(235, 235, 245, 0.38);
-    --ios-blue: #0A84FF;
-    --ios-green: #30D158;
-    --ios-red: #FF453A;
-    --ios-orange: #FF9F0A;
-    --ios-purple: #BF5AF2;
+    --bg-base: #06070B;
+    --glass-border: rgba(226, 179, 84, 0.16);
+    --glass-border-subtle: rgba(255, 255, 255, 0.11);
+    --glass-specular: rgba(255, 232, 185, 0.24);
+    --text-primary: #F8F5EE;
+    --text-secondary: rgba(236, 230, 218, 0.68);
+    --text-tertiary: rgba(236, 230, 218, 0.40);
+    --gold: #E2B354;
+    --gold-deep: #B5822A;
+    --gold-glow: rgba(226, 179, 84, 0.32);
+    --cyan: #5AC8FA;
+    --emerald: #30D158;
+    --crimson: #FF453A;
+    --amber: #FF9F0A;
     --spring: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
@@ -35,7 +41,7 @@
     user-select: none;
     -webkit-user-select: none;
   }
-  input, textarea, select { user-select: text; -webkit-user-select: text; }
+  input, textarea, select, pre, code { user-select: text; -webkit-user-select: text; }
 
   html, body {
     margin: 0;
@@ -48,22 +54,37 @@
     overflow-x: hidden;
   }
 
-  /* Aurora Wallpaper */
-  .aurora-bg { position: fixed; inset: 0; z-index: -1; overflow: hidden; background: #040408; }
-  .aurora-orb {
-    position: absolute; border-radius: 50%; filter: blur(95px); opacity: 0.40;
-    will-change: transform; animation: floatOrb 18s ease-in-out infinite alternate;
-  }
-  .orb-1 { width: 52vw; height: 52vw; max-width: 620px; max-height: 620px; top: -14%; left: -12%; background: radial-gradient(circle, #0A84FF, transparent 70%); }
-  .orb-2 { width: 48vw; height: 48vw; max-width: 560px; max-height: 560px; top: 8%; right: -14%; background: radial-gradient(circle, #BF5AF2, transparent 70%); animation-delay: -6s; }
-  .orb-3 { width: 46vw; height: 46vw; max-width: 540px; max-height: 540px; bottom: -16%; left: 24%; background: radial-gradient(circle, #30D158, transparent 70%); opacity: 0.22; animation-delay: -11s; }
-  @keyframes floatOrb { 0% { transform: translate3d(0,0,0) scale(1); } 100% { transform: translate3d(28px,22px,0) scale(1.08); } }
+  .font-sherlock { font-family: 'Cinzel', Georgia, serif; letter-spacing: 0.04em; }
+  .font-forensic { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
 
-  /* Tela de Inicialização Animada do Proxy Remoto */
+  /* Neo-Noir Baker Street Aurora Wallpaper */
+  .aurora-bg {
+    position: fixed; inset: 0; z-index: -1; overflow: hidden;
+    background: radial-gradient(circle at 50% 0%, #11131D 0%, #06070B 72%);
+  }
+  .aurora-grid {
+    position: absolute; inset: 0; opacity: 0.05;
+    background-image:
+      linear-gradient(rgba(226, 179, 84, 0.45) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(226, 179, 84, 0.45) 1px, transparent 1px);
+    background-size: 46px 46px;
+    mask-image: radial-gradient(circle at 50% 25%, #000 0%, transparent 78%);
+    -webkit-mask-image: radial-gradient(circle at 50% 25%, #000 0%, transparent 78%);
+  }
+  .aurora-orb {
+    position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.34;
+    will-change: transform; animation: floatOrb 20s ease-in-out infinite alternate;
+  }
+  .orb-1 { width: 52vw; height: 52vw; max-width: 600px; max-height: 600px; top: -16%; left: -12%; background: radial-gradient(circle, #D4A143, transparent 70%); }
+  .orb-2 { width: 48vw; height: 48vw; max-width: 560px; max-height: 560px; top: 10%; right: -16%; background: radial-gradient(circle, #28427B, transparent 70%); opacity: 0.42; animation-delay: -6s; }
+  .orb-3 { width: 44vw; height: 44vw; max-width: 500px; max-height: 500px; bottom: -18%; left: 26%; background: radial-gradient(circle, #7C2230, transparent 70%); opacity: 0.25; animation-delay: -11s; }
+  @keyframes floatOrb { 0% { transform: translate3d(0,0,0) scale(1); } 100% { transform: translate3d(26px,20px,0) scale(1.07); } }
+
+  /* Tela de Inicialização Animada do Proxy Remoto (Sherlock 221B) */
   #proxyBoot {
     position: fixed; inset: 0; z-index: 99990;
     display: flex; align-items: center; justify-content: center; padding: 24px;
-    background: rgba(4, 4, 8, 0.88);
+    background: rgba(6, 7, 11, 0.91);
     backdrop-filter: blur(42px) saturate(180%);
     -webkit-backdrop-filter: blur(42px) saturate(180%);
     transition: opacity 0.55s var(--spring), transform 0.55s var(--spring), visibility 0.55s;
@@ -71,15 +92,15 @@
   #proxyBoot.boot-done { opacity: 0; transform: scale(1.04); visibility: hidden; pointer-events: none; }
 
   .boot-card {
-    width: 100%; max-width: 400px; padding: 32px 26px 26px; border-radius: 34px;
-    background: linear-gradient(155deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.03) 100%);
-    border: 1px solid rgba(255,255,255,0.16);
-    box-shadow: 0 28px 70px rgba(0,0,0,0.72), inset 0 1px 0 rgba(255,255,255,0.34);
+    width: 100%; max-width: 410px; padding: 32px 26px 26px; border-radius: 32px;
+    background: linear-gradient(155deg, rgba(226,179,84,0.10) 0%, rgba(16,18,28,0.82) 100%);
+    border: 1px solid rgba(226,179,84,0.28);
+    box-shadow: 0 28px 70px rgba(0,0,0,0.78), inset 0 1px 0 rgba(255,232,185,0.34);
     text-align: center;
   }
   .radar-wrap { position: relative; width: 96px; height: 96px; margin: 0 auto 22px; display: flex; align-items: center; justify-content: center; }
   .radar-ring {
-    position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid rgba(10,132,255,0.55);
+    position: absolute; inset: 0; border-radius: 50%; border: 1.5px solid rgba(226,179,84,0.55);
     animation: radarPulse 2.1s cubic-bezier(0.16,1,0.3,1) infinite;
   }
   .radar-ring.r2 { animation-delay: 0.7s; }
@@ -87,56 +108,66 @@
   @keyframes radarPulse { 0% { transform: scale(0.62); opacity: 0.9; } 100% { transform: scale(1.55); opacity: 0; } }
   .radar-core {
     position: relative; z-index: 2; width: 64px; height: 64px; border-radius: 20px;
-    background: linear-gradient(135deg, #0A84FF 0%, #5E5CE6 100%);
+    background: linear-gradient(135deg, #E2B354 0%, #9E6E1F 100%);
     display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 12px 30px rgba(10,132,255,0.5), inset 0 1.5px 1px rgba(255,255,255,0.55);
+    box-shadow: 0 12px 30px rgba(226,179,84,0.42), inset 0 1.5px 1px rgba(255,255,255,0.55);
     transition: background 0.4s ease, box-shadow 0.4s ease;
   }
-  .radar-core.connected { background: linear-gradient(135deg, #30D158 0%, #0D9488 100%); box-shadow: 0 12px 30px rgba(48,209,88,0.5), inset 0 1.5px 1px rgba(255,255,255,0.55); }
-  .boot-bar-track { width: 100%; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.10); overflow: hidden; margin: 18px 0 16px; }
-  .boot-bar-fill { height: 100%; width: 10%; border-radius: 999px; background: linear-gradient(90deg,#0A84FF,#64D2FF,#30D158); transition: width 0.45s var(--spring); box-shadow: 0 0 14px rgba(10,132,255,0.7); }
+  .radar-core.connected {
+    background: linear-gradient(135deg, #30D158 0%, #0D9488 100%);
+    box-shadow: 0 12px 30px rgba(48,209,88,0.45), inset 0 1.5px 1px rgba(255,255,255,0.55);
+  }
+  .boot-bar-track { width: 100%; height: 6px; border-radius: 999px; background: rgba(255,255,255,0.09); overflow: hidden; margin: 18px 0 16px; }
+  .boot-bar-fill { height: 100%; width: 10%; border-radius: 999px; background: linear-gradient(90deg,#B5822A,#E2B354,#30D158); transition: width 0.45s var(--spring); box-shadow: 0 0 14px rgba(226,179,84,0.7); }
   .boot-step {
     display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    padding: 9px 12px; border-radius: 14px; background: rgba(255,255,255,0.04);
+    padding: 9px 12px; border-radius: 14px; background: rgba(255,255,255,0.035);
     border: 1px solid rgba(255,255,255,0.07); font-size: 12px; color: var(--text-secondary);
     transition: all 0.25s ease;
   }
-  .boot-step.active { background: rgba(10,132,255,0.12); border-color: rgba(10,132,255,0.35); color: #FFFFFF; }
+  .boot-step.active { background: rgba(226,179,84,0.12); border-color: rgba(226,179,84,0.38); color: #FFFFFF; }
   .boot-step.done { background: rgba(48,209,88,0.10); border-color: rgba(48,209,88,0.28); color: #FFFFFF; }
 
-  /* Liquid Glass + Material 3 */
+  /* Liquid Glass + Material 3 (Sherlock Edition) */
   .liquid-card {
-    background: linear-gradient(150deg, rgba(255,255,255,0.095) 0%, rgba(255,255,255,0.028) 100%);
-    backdrop-filter: blur(34px) saturate(210%);
-    -webkit-backdrop-filter: blur(34px) saturate(210%);
-    border: 1px solid var(--glass-border);
-    box-shadow: 0 18px 42px rgba(0,0,0,0.48), inset 0 1px 0 0 var(--glass-specular);
+    background: linear-gradient(155deg, rgba(255,248,232,0.075) 0%, rgba(16,18,28,0.58) 100%);
+    backdrop-filter: blur(34px) saturate(195%);
+    -webkit-backdrop-filter: blur(34px) saturate(195%);
+    border: 1px solid var(--glass-border-subtle);
+    box-shadow: 0 18px 42px rgba(0,0,0,0.52), inset 0 1px 0 0 var(--glass-specular);
     border-radius: 28px;
     transition: transform 0.28s var(--spring), background 0.25s ease, border-color 0.25s ease, box-shadow 0.28s ease;
   }
   .app-widget { cursor: pointer; position: relative; overflow: hidden; }
-  .app-widget:hover { transform: translateY(-5px); border-color: rgba(255,255,255,0.26); box-shadow: 0 24px 48px rgba(0,0,0,0.56), inset 0 1px 0 rgba(255,255,255,0.38); }
+  .app-widget:hover {
+    transform: translateY(-5px);
+    border-color: rgba(226, 179, 84, 0.42);
+    box-shadow: 0 24px 48px rgba(0,0,0,0.6), 0 0 28px rgba(226,179,84,0.10), inset 0 1px 0 rgba(255,232,185,0.42);
+  }
   .app-widget:active { transform: scale(0.965); }
 
   .dynamic-island {
-    background: rgba(14,14,20,0.82); backdrop-filter: blur(28px) saturate(190%);
+    background: rgba(12, 13, 20, 0.86); backdrop-filter: blur(28px) saturate(190%);
     -webkit-backdrop-filter: blur(28px) saturate(190%);
-    border: 1px solid rgba(255,255,255,0.15);
-    box-shadow: 0 10px 28px rgba(0,0,0,0.58), inset 0 1px 0 rgba(255,255,255,0.18);
+    border: 1px solid rgba(226, 179, 84, 0.24);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.62), inset 0 1px 0 rgba(255,232,185,0.18);
     border-radius: 999px; padding: 8px 16px; display: inline-flex; align-items: center; gap: 9px;
     transition: transform 0.22s var(--spring);
   }
   .dynamic-island:active { transform: scale(0.96); }
 
   .spotlight-bar {
-    position: relative; background: rgba(255,255,255,0.07);
-    backdrop-filter: blur(26px) saturate(190%); -webkit-backdrop-filter: blur(26px) saturate(190%);
-    border: 1px solid rgba(255,255,255,0.14); border-radius: 20px;
+    position: relative; background: rgba(255,248,232,0.06);
+    backdrop-filter: blur(26px) saturate(180%); -webkit-backdrop-filter: blur(26px) saturate(180%);
+    border: 1px solid rgba(226,179,84,0.22); border-radius: 20px;
     display: flex; align-items: center; padding: 0 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.2);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.36), inset 0 1px 0 rgba(255,232,185,0.18);
     transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   }
-  .spotlight-bar:focus-within { background: rgba(255,255,255,0.10); border-color: var(--ios-blue); box-shadow: 0 0 0 3px rgba(10,132,255,0.24), 0 12px 32px rgba(0,0,0,0.4); }
+  .spotlight-bar:focus-within {
+    background: rgba(255,248,232,0.09); border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(226,179,84,0.22), 0 12px 32px rgba(0,0,0,0.45);
+  }
   .spotlight-input { width: 100%; background: transparent; border: none; outline: none; color: #FFFFFF; font-size: 15px; padding: 14px 10px; }
   .spotlight-input::placeholder { color: var(--text-tertiary); }
 
@@ -144,37 +175,45 @@
   .sector-tabs::-webkit-scrollbar { display: none; }
   .sector-tab {
     flex-shrink: 0; padding: 9px 16px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
-    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.11);
+    background: rgba(255,255,255,0.055); border: 1px solid rgba(255,255,255,0.11);
     color: var(--text-secondary); cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
     transition: all 0.22s var(--spring);
   }
-  .sector-tab:hover { background: rgba(255,255,255,0.12); color: #FFFFFF; }
-  .sector-tab.active { background: var(--ios-blue); border-color: rgba(255,255,255,0.28); color: #FFFFFF; box-shadow: 0 6px 18px rgba(10,132,255,0.4); }
+  .sector-tab:hover { background: rgba(226,179,84,0.14); color: #FFFFFF; border-color: rgba(226,179,84,0.32); }
+  .sector-tab.active {
+    background: linear-gradient(135deg, #E2B354 0%, #C28E2E 100%);
+    border-color: rgba(255,240,200,0.45); color: #0B0B0F;
+    box-shadow: 0 6px 18px rgba(226,179,84,0.36);
+  }
 
   .squircle {
     width: 50px; height: 50px; border-radius: 15px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    box-shadow: 0 10px 22px rgba(0,0,0,0.42), inset 0 1.5px 1px rgba(255,255,255,0.48), inset 0 -2px 5px rgba(0,0,0,0.28);
+    box-shadow: 0 10px 22px rgba(0,0,0,0.45), inset 0 1.5px 1px rgba(255,255,255,0.45), inset 0 -2px 5px rgba(0,0,0,0.30);
   }
   .squircle .material-symbols-rounded { font-size: 25px; color: #FFFFFF; }
 
   .md-field { position: relative; margin-bottom: 13px; }
-  .md-input {
-    width: 100%; padding: 22px 16px 8px; background: rgba(118,118,128,0.20);
+  .md-input, .md-textarea {
+    width: 100%; padding: 22px 16px 8px; background: rgba(15, 17, 26, 0.55);
     border: 1px solid rgba(255,255,255,0.14); border-radius: 17px; color: #FFFFFF;
     font-size: 15px; outline: none; transition: all 0.2s ease;
   }
-  .md-input:focus { background: rgba(118,118,128,0.30); border-color: var(--ios-blue); box-shadow: 0 0 0 3px rgba(10,132,255,0.26); }
+  .md-textarea { padding: 14px 16px; min-height: 118px; resize: vertical; font-size: 13px; }
+  .md-input:focus, .md-textarea:focus {
+    background: rgba(15, 17, 26, 0.78); border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(226,179,84,0.22);
+  }
   .md-label {
     position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
     color: var(--text-secondary); font-size: 14px; pointer-events: none; transition: all 0.2s ease;
   }
   .md-input:focus ~ .md-label,
-  .md-input:not(:placeholder-shown) ~ .md-label { top: 11px; font-size: 11px; font-weight: 600; color: var(--ios-blue); }
+  .md-input:not(:placeholder-shown) ~ .md-label { top: 11px; font-size: 11px; font-weight: 700; color: var(--gold); }
 
   /* Dropzone Forense */
   .dropzone-glass {
-    border: 1.5px dashed rgba(10, 132, 255, 0.55);
-    background: rgba(10, 132, 255, 0.06);
+    border: 1.5px dashed rgba(226, 179, 84, 0.55);
+    background: rgba(226, 179, 84, 0.06);
     border-radius: 22px;
     padding: 26px 18px;
     text-align: center;
@@ -182,80 +221,118 @@
     transition: all 0.25s var(--spring);
   }
   .dropzone-glass:hover, .dropzone-glass.drag-over {
-    background: rgba(10, 132, 255, 0.14);
-    border-color: #64D2FF;
+    background: rgba(226, 179, 84, 0.14);
+    border-color: #F4CF7B;
     transform: scale(1.01);
   }
 
   /* Mapa Embutido */
   .map-frame-wrap {
-    border-radius: 22px;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 22px; overflow: hidden;
+    border: 1px solid rgba(226, 179, 84, 0.24);
     background: rgba(14, 14, 20, 0.7);
-    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.48);
   }
-  .map-frame-wrap iframe {
-    width: 100%;
-    height: 290px;
-    border: 0;
-    display: block;
-  }
+  .map-frame-wrap iframe { width: 100%; height: 290px; border: 0; display: block; }
 
   .ios-btn {
-    width: 100%; background: linear-gradient(180deg, #1E90FF 0%, #0A84FF 100%);
-    color: #FFFFFF; font-weight: 600; font-size: 15px; padding: 14px 20px; border-radius: 17px;
+    width: 100%; background: linear-gradient(180deg, #ECC267 0%, #C79130 100%);
+    color: #0B0C10; font-weight: 700; font-size: 15px; padding: 14px 20px; border-radius: 17px;
     border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    box-shadow: 0 8px 24px rgba(10,132,255,0.38), inset 0 1px 0 rgba(255,255,255,0.36);
+    box-shadow: 0 8px 24px rgba(226,179,84,0.32), inset 0 1px 0 rgba(255,255,255,0.48);
     transition: transform 0.2s var(--spring), opacity 0.2s ease;
   }
   .ios-btn:active { transform: scale(0.97); }
   .ios-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .ios-chip {
-    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.075); border: 1px solid rgba(255,255,255,0.14);
     color: #FFFFFF; font-size: 12px; font-weight: 600; padding: 7px 13px; border-radius: 999px;
     cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
-    transition: transform 0.2s var(--spring), background 0.2s ease;
+    transition: transform 0.2s var(--spring), background 0.2s ease, border-color 0.2s ease;
   }
-  .ios-chip:hover { background: rgba(255,255,255,0.16); }
+  .ios-chip:hover { background: rgba(226,179,84,0.16); border-color: rgba(226,179,84,0.38); }
   .ios-chip:active { transform: scale(0.95); }
 
-  .ios-group { background: rgba(18,18,26,0.56); border: 1px solid rgba(255,255,255,0.10); border-radius: 22px; overflow: hidden; }
+  .ios-group { background: rgba(14,16,24,0.62); border: 1px solid rgba(255,255,255,0.09); border-radius: 22px; overflow: hidden; }
   .ios-row {
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    padding: 13px 16px; border-bottom: 0.5px solid rgba(255,255,255,0.09);
+    padding: 13px 16px; border-bottom: 0.5px solid rgba(255,255,255,0.08);
     text-decoration: none; color: inherit; transition: background 0.15s ease;
   }
   .ios-row:last-child { border-bottom: none; }
-  .ios-row:hover { background: rgba(255,255,255,0.06); }
+  .ios-row:hover { background: rgba(226,179,84,0.06); }
 
   .pill-tag { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
-  .tag-ok { background: rgba(48,209,88,0.18); color: var(--ios-green); }
-  .tag-err { background: rgba(255,69,58,0.18); color: var(--ios-red); }
-  .tag-warn { background: rgba(255,159,10,0.18); color: var(--ios-orange); }
-  .tag-info { background: rgba(10,132,255,0.18); color: var(--ios-blue); }
+  .tag-ok { background: rgba(48,209,88,0.16); color: var(--emerald); }
+  .tag-err { background: rgba(255,69,58,0.16); color: var(--crimson); }
+  .tag-warn { background: rgba(255,159,10,0.16); color: var(--amber); }
+  .tag-gold { background: rgba(226,179,84,0.18); color: var(--gold); border: 1px solid rgba(226,179,84,0.28); }
+  .tag-info { background: rgba(90,200,250,0.16); color: var(--cyan); }
 
+  .code-block {
+    background: rgba(5, 6, 10, 0.72);
+    border: 1px solid rgba(226, 179, 84, 0.20);
+    border-radius: 16px;
+    padding: 14px;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 12px;
+    line-height: 1.55;
+    color: #E8DEC8;
+    max-height: 280px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* ELA Canvas & Range */
+  .ela-stage {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(226,179,84,0.28);
+    background: #000;
+  }
+  .ela-stage canvas, .ela-stage img {
+    width: 100%;
+    height: auto;
+    max-height: 390px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+  }
+  input[type="range"].gold-range {
+    width: 100%;
+    accent-color: #E2B354;
+    cursor: pointer;
+  }
+
+  /* Floating iOS Dock */
   .ios-dock-wrap { position: fixed; left: 0; right: 0; bottom: max(14px, env(safe-area-inset-bottom)); z-index: 60; display: flex; justify-content: center; pointer-events: none; padding: 0 14px; }
   .ios-dock {
     pointer-events: auto; display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 26px;
-    background: rgba(18,18,26,0.74); backdrop-filter: blur(32px) saturate(210%); -webkit-backdrop-filter: blur(32px) saturate(210%);
-    border: 1px solid rgba(255,255,255,0.16); box-shadow: 0 18px 44px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.25);
+    background: rgba(14, 15, 22, 0.80); backdrop-filter: blur(32px) saturate(200%); -webkit-backdrop-filter: blur(32px) saturate(200%);
+    border: 1px solid rgba(226, 179, 84, 0.24);
+    box-shadow: 0 18px 44px rgba(0,0,0,0.72), inset 0 1px 0 rgba(255,232,185,0.22);
   }
   .dock-item {
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
     padding: 7px 14px; border-radius: 18px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer;
     transition: all 0.22s var(--spring);
   }
-  .dock-item:hover { color: #FFFFFF; background: rgba(255,255,255,0.08); }
-  .dock-item.active { color: #FFFFFF; background: rgba(10,132,255,0.22); box-shadow: inset 0 0 0 1px rgba(10,132,255,0.45); }
+  .dock-item:hover { color: #FFFFFF; background: rgba(226,179,84,0.10); }
+  .dock-item.active {
+    color: var(--gold); background: rgba(226,179,84,0.18);
+    box-shadow: inset 0 0 0 1px rgba(226,179,84,0.45);
+  }
   .dock-item .material-symbols-rounded { font-size: 21px; }
   .dock-item span.dock-lbl { font-size: 10px; font-weight: 600; }
 
   .section-banner {
     display: flex; align-items: center; justify-content: space-between; gap: 12px;
     margin-bottom: 14px; padding: 12px 16px; border-radius: 20px;
-    background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.09);
+    background: linear-gradient(90deg, rgba(226,179,84,0.08) 0%, rgba(255,255,255,0.025) 100%);
+    border: 1px solid rgba(226,179,84,0.18);
   }
 
   .view-enter { animation: iosEnter 0.3s var(--spring) forwards; }
@@ -264,7 +341,7 @@
   @keyframes spin { 100% { transform: rotate(360deg); } }
 
   #securityLock {
-    position: fixed; inset: 0; z-index: 99999; background: rgba(0,0,0,0.94);
+    position: fixed; inset: 0; z-index: 99999; background: rgba(4,5,8,0.95);
     backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
     display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px;
   }
@@ -281,12 +358,13 @@
 <body class="pb-28">
 
 <div class="aurora-bg">
+  <div class="aurora-grid"></div>
   <div class="aurora-orb orb-1"></div>
   <div class="aurora-orb orb-2"></div>
   <div class="aurora-orb orb-3"></div>
 </div>
 
-<!-- BOOT ANIMADO DO PROXY REMOTO -->
+<!-- BOOT ANIMADO SHERLOCK 221B + PROXY REMOTO -->
 <div id="proxyBoot">
   <div class="boot-card">
     <div class="radar-wrap">
@@ -294,13 +372,14 @@
       <div class="radar-ring r2"></div>
       <div class="radar-ring r3"></div>
       <div id="bootCore" class="radar-core">
-        <span id="bootCoreIcon" class="material-symbols-rounded text-white text-3xl">vpn_lock</span>
+        <span id="bootCoreIcon" class="material-symbols-rounded text-[#0B0C10] text-3xl">policy</span>
       </div>
     </div>
 
-    <h1 class="text-xl font-bold tracking-tight text-white">Conectando via Proxy Remoto</h1>
+    <span class="text-[10px] font-forensic uppercase tracking-[0.22em] text-[#E2B354] block mb-1">BAKER STREET • 221B</span>
+    <h1 class="font-sherlock text-xl font-bold text-white">Sherlock Forensics</h1>
     <p id="bootSubtitle" class="text-xs text-[var(--text-secondary)] mt-1">
-      Estabelecendo túnel seguro e criptografia de sessão...
+      Estabelecendo túnel Proxy Remoto e criptografia de sessão...
     </p>
 
     <div class="boot-bar-track">
@@ -309,15 +388,15 @@
 
     <div class="space-y-2 text-left">
       <div id="stepP2P" class="boot-step active">
-        <span class="flex items-center gap-2"><span class="material-symbols-rounded text-base text-[#0A84FF]">encrypted</span> Sessão P2P (ECDH + AES-256)</span>
+        <span class="flex items-center gap-2"><span class="material-symbols-rounded text-base text-[#E2B354]">encrypted</span> Criptografia P2P (ECDH + AES-256)</span>
         <span class="material-symbols-rounded text-sm spinner" data-step-icon>refresh</span>
       </div>
       <div id="stepProxy" class="boot-step">
-        <span class="flex items-center gap-2"><span class="material-symbols-rounded text-base text-[#64D2FF]">hub</span> Túnel Proxy Remoto</span>
+        <span class="flex items-center gap-2"><span class="material-symbols-rounded text-base text-[#5AC8FA]">hub</span> Túnel Proxy Remoto</span>
         <span class="text-[11px] font-semibold" data-step-icon>Aguardando</span>
       </div>
       <div id="stepSig" class="boot-step">
-        <span class="flex items-center gap-2"><span class="material-symbols-rounded text-base text-[#30D158]">verified_user</span> Assinatura KIIK HACKING</span>
+        <span class="flex items-center gap-2"><span class="material-symbols-rounded text-base text-[#30D158]">verified_user</span> Selo KIIK HACKING</span>
         <span class="text-[11px] font-semibold" data-step-icon>Aguardando</span>
       </div>
     </div>
@@ -329,11 +408,11 @@
   <div class="w-20 h-20 rounded-[24px] bg-[#FF453A]/20 border border-[#FF453A]/40 flex items-center justify-center mb-5">
     <span class="material-symbols-rounded text-5xl text-[#FF453A]">lock</span>
   </div>
-  <h2 class="text-xl font-bold mb-1.5">Proteção de Código Ativa</h2>
+  <h2 class="font-sherlock text-xl font-bold mb-1.5">Dossiê Protegido</h2>
   <p class="text-sm text-[var(--text-secondary)] max-w-sm mb-5">
-    Atalho de inspeção bloqueado. A sessão será restaurada automaticamente.
+    Atalho de inspeção bloqueado. A sessão forense será restaurada automaticamente.
   </p>
-  <span class="dynamic-island text-xs font-semibold text-[#0A84FF]">
+  <span class="dynamic-island text-xs font-semibold text-[#E2B354]">
     <span class="material-symbols-rounded text-sm">verified_user</span> KIIK HACKING • P2P E2EE
   </span>
 </div>
@@ -343,13 +422,13 @@
   <header class="flex flex-wrap items-center justify-between gap-2.5 mb-7">
     <button type="button" data-nav="" class="dynamic-island cursor-pointer">
       <span id="proxyDot" class="w-2.5 h-2.5 rounded-full bg-[#FF9F0A] shadow-[0_0_8px_#FF9F0A]"></span>
-      <span class="font-bold text-sm tracking-tight text-white">GlassOSINT</span>
+      <span class="font-sherlock font-bold text-sm text-[#E2B354]">SHERLOCK 221B</span>
       <span id="proxyLabel" class="text-[11px] text-[var(--text-secondary)] font-medium">• Inicializando...</span>
     </button>
 
     <div class="dynamic-island text-[11px] font-semibold text-[var(--text-secondary)]">
-      <span class="material-symbols-rounded text-sm text-[#30D158]">verified_user</span>
-      <span>KIIK HACKING • P2P</span>
+      <span class="material-symbols-rounded text-sm text-[#E2B354]">verified_user</span>
+      <span>KIIK HACKING • FORENSE</span>
     </div>
   </header>
 
@@ -357,33 +436,33 @@
 
   <footer class="mt-10 flex justify-center">
     <div class="px-4 py-2 rounded-full text-[11px] text-[var(--text-tertiary)] text-center">
-      Assinado criptograficamente por <strong class="text-[var(--text-secondary)]">KIIK HACKING</strong> • Proxy Remoto + ECDH P-256
+      Selo Criptográfico <strong class="text-[#E2B354]">KIIK HACKING</strong> • Baker Street Forensics • Proxy Remoto + ECDH P-256
     </div>
   </footer>
 </div>
 
-<!-- DOCK IPHONE -->
+<!-- DOCK IPHONE (SHERLOCK FORENSE) -->
 <nav class="ios-dock-wrap" aria-label="Navegação rápida">
   <div class="ios-dock">
     <button type="button" class="dock-item" data-nav="" data-dock="">
       <span class="material-symbols-rounded">grid_view</span>
-      <span class="dock-lbl">Início</span>
+      <span class="dock-lbl">Painel</span>
     </button>
     <button type="button" class="dock-item" data-nav="metadata" data-dock="metadata">
       <span class="material-symbols-rounded">photo_camera</span>
       <span class="dock-lbl">EXIF</span>
     </button>
+    <button type="button" class="dock-item" data-nav="ela" data-dock="ela">
+      <span class="material-symbols-rounded">compare</span>
+      <span class="dock-lbl">ELA</span>
+    </button>
+    <button type="button" class="dock-item" data-nav="custody" data-dock="custody">
+      <span class="material-symbols-rounded">fingerprint</span>
+      <span class="dock-lbl">Custódia</span>
+    </button>
     <button type="button" class="dock-item" data-nav="osint" data-dock="osint">
       <span class="material-symbols-rounded">travel_explore</span>
-      <span class="dock-lbl">OSINT</span>
-    </button>
-    <button type="button" class="dock-item" data-nav="domain" data-dock="domain">
-      <span class="material-symbols-rounded">language</span>
-      <span class="dock-lbl">Sites</span>
-    </button>
-    <button type="button" class="dock-item" data-nav="cnpj" data-dock="cnpj">
-      <span class="material-symbols-rounded">domain</span>
-      <span class="dock-lbl">CNPJ</span>
+      <span class="dock-lbl">Sherlock</span>
     </button>
   </div>
 </nav>
@@ -393,7 +472,7 @@
   'use strict';
 
   // ==========================================================
-  // 1. PROTEÇÃO ANTI-INSPEÇÃO (ZERO FALSOS POSITIVOS)
+  // 1. PROTEÇÃO ANTI-INSPEÇÃO (SEM FALSOS POSITIVOS)
   // ==========================================================
   const AUTHOR_SIGNATURE = 'KIIK HACKING';
   const lockOverlay = document.getElementById('securityLock');
@@ -440,7 +519,7 @@
         { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']
       );
       const hmac = await crypto.subtle.importKey(
-        'raw', enc.encode(`${AUTHOR_SIGNATURE}::P2P::V11`),
+        'raw', enc.encode(`${AUTHOR_SIGNATURE}::SHERLOCK221B::V12`),
         { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
       );
       ctx = { aes, hmac };
@@ -468,12 +547,13 @@
         }
       } catch {}
       return {
+        dossier_suite: 'SHERLOCK 221B FORENSICS',
         signed_by: AUTHOR_SIGNATURE,
         protocol: 'P2P-ECDH-P256-AES256GCM',
         proxy_transport: RemoteProxy.getModeLabel(),
         timestamp: ts,
         hmac_sha256: sig,
-        data: payload
+        evidence: payload
       };
     }
 
@@ -481,7 +561,7 @@
   })();
 
   // ==========================================================
-  // 3. CAMADA NATIVA DE CONEXÃO VIA PROXY REMOTO (BOOT DO SITE)
+  // 3. CAMADA NATIVA DE CONEXÃO VIA PROXY REMOTO
   // ==========================================================
   const RemoteProxy = (() => {
     let mode = 'initializing';
@@ -496,7 +576,7 @@
       if (txt) txt.textContent = `• ${label}`;
     };
 
-    async function rawTimeoutFetch(url, options = {}, timeoutMs = 11000) {
+    async function rawTimeoutFetch(url, options = {}, timeoutMs = 12000) {
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), timeoutMs);
       try { return await fetch(url, { ...options, signal: ctrl.signal }); }
@@ -526,10 +606,9 @@
       return initPromise;
     }
 
-    async function request(targetUrl, options = {}, timeoutMs = 10500) {
+    async function request(targetUrl, options = {}, timeoutMs = 12000) {
       await init();
 
-      // Rota 1: Proxy Remoto próprio (/api/proxy na Vercel)
       if (mode === 'vercel') {
         const proxyHeaders = {};
         if (options.headers && Object.keys(options.headers).length) {
@@ -540,7 +619,6 @@
         return { ok: r.ok, status: r.status, text: () => Promise.resolve(bodyText), json: () => Promise.resolve(JSON.parse(bodyText)), via: 'Proxy Remoto (Vercel)' };
       }
 
-      // Rota 2: Gateways de Proxy Remoto Públicos (AllOrigins → CorsProxy → CodeTabs)
       try {
         const r = await rawTimeoutFetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`, {}, timeoutMs);
         if (r.ok) {
@@ -568,16 +646,16 @@
       return { ok: direct.ok, status: direct.status, text: () => Promise.resolve(bodyText), json: () => Promise.resolve(JSON.parse(bodyText)), via: 'Fallback Direto' };
     }
 
-    async function fetchJson(url, options = {}, timeoutMs = 10500) {
+    async function fetchJson(url, options = {}, timeoutMs = 12000) {
       const r = await request(url, options, timeoutMs);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       return await r.json();
     }
 
-    async function fetchHtml(url, timeoutMs = 11000) {
+    async function fetchHtml(url, timeoutMs = 12000) {
       const r = await request(url, {}, timeoutMs);
       const html = await r.text();
-      if (!html) throw new Error('Sem HTML retornado pelo proxy remoto.');
+      if (!html) throw new Error('Sem resposta retornada pelo proxy remoto.');
       return { html, code: r.status, via: r.via };
     }
 
@@ -607,7 +685,7 @@
     const markActive = (el) => {
       el.classList.add('active');
       const icon = el.querySelector('[data-step-icon]');
-      if (icon) { icon.className = 'material-symbols-rounded text-sm spinner text-[#0A84FF]'; icon.textContent = 'refresh'; }
+      if (icon) { icon.className = 'material-symbols-rounded text-sm spinner text-[#E2B354]'; icon.textContent = 'refresh'; }
     };
 
     bar.style.width = '28%';
@@ -622,14 +700,15 @@
 
     markActive(step3);
     bar.style.width = '92%';
-    sub.textContent = 'Validando integridade da assinatura KIIK HACKING...';
+    sub.textContent = 'Validando selo de custódia KIIK HACKING...';
     await sleep(320);
-    markDone(step3, 'Verificada');
+    markDone(step3, 'Autêntico');
 
     bar.style.width = '100%';
     core.classList.add('connected');
+    coreIcon.className = 'material-symbols-rounded text-white text-3xl';
     coreIcon.textContent = 'verified_user';
-    sub.textContent = `Conectado • ${proxyRes.label}`;
+    sub.textContent = `Laboratório Pronto • ${proxyRes.label}`;
     await sleep(360);
 
     bootEl.classList.add('boot-done');
@@ -637,14 +716,14 @@
   }
 
   // ==========================================================
-  // 4. UTILITÁRIOS, MAPA EMBUTIDO & EXTRAÇÃO RDAP
+  // 4. UTILITÁRIOS FORENSES, HASHES, MAGIC BYTES & MAPA
   // ==========================================================
   let lastResultData = null;
-  let lastModuleId = 'osint';
+  let lastModuleId = 'sherlock';
   let activeSectorFilter = 'all';
   let homeSearchQuery = '';
   let historyCache = [];
-  try { historyCache = JSON.parse(localStorage.getItem('kiik_v11_history') || '[]'); } catch { historyCache = []; }
+  try { historyCache = JSON.parse(localStorage.getItem('sherlock221b_history') || '[]'); } catch { historyCache = []; }
 
   function escapeHtml(str) {
     return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -664,6 +743,78 @@
     }
   }
 
+  async function digestHex(algo, buffer) {
+    if (!window.crypto?.subtle) return 'Indisponível (requer HTTPS)';
+    const d = await crypto.subtle.digest(algo, buffer);
+    return Array.from(new Uint8Array(d)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  const MAGIC_SIGNATURES = [
+    { name: 'Imagem JPEG', exts: ['jpg', 'jpeg', 'jfif'], test: (h) => h.startsWith('FFD8FF') },
+    { name: 'Imagem PNG', exts: ['png'], test: (h) => h.startsWith('89504E470D0A1A0A') },
+    { name: 'Imagem GIF', exts: ['gif'], test: (h) => h.startsWith('47494638') },
+    { name: 'Documento PDF', exts: ['pdf'], test: (h) => h.startsWith('25504446') },
+    { name: 'Arquivo ZIP / Office (DOCX/XLSX/APK)', exts: ['zip', 'docx', 'xlsx', 'pptx', 'apk', 'jar', 'odt'], test: (h) => h.startsWith('504B0304') || h.startsWith('504B0506') },
+    { name: 'Arquivo RAR', exts: ['rar'], test: (h) => h.startsWith('526172211A07') },
+    { name: 'Arquivo 7-Zip', exts: ['7z'], test: (h) => h.startsWith('377ABCAF271C') },
+    { name: 'Executável Windows (PE / EXE / DLL)', exts: ['exe', 'dll', 'scr', 'sys'], test: (h) => h.startsWith('4D5A') },
+    { name: 'Executável Linux (ELF)', exts: ['elf', 'so', 'bin', ''], test: (h) => h.startsWith('7F454C46') },
+    { name: 'Imagem WebP', exts: ['webp'], test: (h) => h.startsWith('52494646') && h.slice(16, 24) === '57454250' },
+    { name: 'Contêiner ISO Media (MP4 / MOV / HEIC)', exts: ['mp4', 'm4a', 'mov', 'heic', 'heif', 'avif'], test: (h) => h.slice(8, 16) === '66747970' },
+    { name: 'Imagem TIFF', exts: ['tif', 'tiff'], test: (h) => h.startsWith('49492A00') || h.startsWith('4D4D002A') },
+    { name: 'Áudio MP3', exts: ['mp3'], test: (h) => h.startsWith('494433') || h.startsWith('FFFB') },
+    { name: 'SQLite Database', exts: ['db', 'sqlite', 'sqlite3'], test: (h) => h.startsWith('53514C6974652066') },
+    { name: 'HTML / Script Web', exts: ['html', 'htm', 'svg', 'xml'], test: (h) => h.startsWith('3C21444F') || h.startsWith('3C68746D') || h.startsWith('3C736372') || h.startsWith('3C3F786D') }
+  ];
+
+  function inspectMagicBytes(arrayBuffer, fileName) {
+    const bytes = new Uint8Array(arrayBuffer.slice(0, 16));
+    const hexRaw = Array.from(bytes).map(b => b.toString(16).padStart(2, '0').toUpperCase()).join('');
+    const hexSpaced = hexRaw.match(/.{1,2}/g)?.join(' ') || '-';
+    const ext = fileName.includes('.') ? fileName.split('.').pop().toLowerCase() : '';
+    const match = MAGIC_SIGNATURES.find(sig => sig.test(hexRaw));
+
+    let spoofAlert = false;
+    let status = 'Tipo binário genérico / texto puro';
+
+    if (match) {
+      if (ext && !match.exts.includes(ext)) {
+        spoofAlert = true;
+        status = `ALERTA: Extensão declarada (.${ext}) diverge do cabeçalho real (${match.name})`;
+      } else {
+        status = `Assinatura autêntica (${match.name})`;
+      }
+    }
+    return { hexSpaced, detected: match ? match.name : 'Texto / Desconhecido', ext: ext ? `.${ext}` : 'Sem extensão', spoofAlert, status };
+  }
+
+  function extractAsciiStrings(arrayBuffer) {
+    const head = new Uint8Array(arrayBuffer.slice(0, 65536));
+    const tail = arrayBuffer.byteLength > 65536 ? new Uint8Array(arrayBuffer.slice(Math.max(65536, arrayBuffer.byteLength - 32768))) : new Uint8Array(0);
+    const combined = new Uint8Array(head.length + tail.length);
+    combined.set(head, 0);
+    combined.set(tail, head.length);
+
+    const found = [];
+    let cur = '';
+    for (let i = 0; i < combined.length; i++) {
+      const c = combined[i];
+      if (c >= 32 && c <= 126) {
+        cur += String.fromCharCode(c);
+      } else {
+        if (cur.length >= 6) found.push(cur.trim());
+        cur = '';
+      }
+    }
+    if (cur.length >= 6) found.push(cur.trim());
+
+    const interestingRx = /(https?:\/\/|[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}|photoshop|adobe|iphone|samsung|xiaomi|android|windows|macos|ffmpeg|python|creator|author|producer|gimp|canva|whatsapp|telegram)/i;
+    const unique = [...new Set(found.filter(s => s.length <= 160))];
+    const highlighted = unique.filter(s => interestingRx.test(s)).slice(0, 25);
+    const sample = unique.slice(0, 20);
+    return { highlighted, sample, total: unique.length };
+  }
+
   const ICON_MAP = {
     cnpj:'badge', razao:'domain', fantasia:'storefront', situacao:'info', cnae:'category',
     natureza:'gavel', porte:'business_center', capital:'payments', municipio:'location_city',
@@ -676,7 +827,9 @@
     descricao:'description', idioma:'translate', tecnologia:'memory', imagens:'image', dominio:'language',
     aparelho:'smartphone', fabricante:'devices', modelo:'smartphone', lente:'camera', software:'memory',
     iso:'iso', abertura_lente:'camera', exposicao:'shutter_speed', flash:'flash_on', resolucao:'aspect_ratio',
-    arquivo:'image', tamanho:'data_usage', hash:'fingerprint', servidor:'dns', vazamentos:'security'
+    arquivo:'description', tamanho:'data_usage', hash:'fingerprint', sha:'fingerprint', magic:'memory',
+    extensao:'rule', assin:'verified_user', servidor:'dns', vazamentos:'security', subdominios:'account_tree',
+    certificados:'workspace_premium', erro:'analytics', anomalia:'warning'
   };
 
   function getIcon(key) {
@@ -704,8 +857,8 @@
     historyCache.unshift({ moduleId, query, ts: Date.now() });
     historyCache = historyCache.slice(0, 20);
     try {
-      localStorage.setItem('kiik_v11_history', JSON.stringify(historyCache));
-      localStorage.setItem('kiik_v11_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
+      localStorage.setItem('sherlock221b_history', JSON.stringify(historyCache));
+      localStorage.setItem('sherlock221b_p2p_vault', await P2PLayer.seal(JSON.stringify(historyCache)));
     } catch {}
   }
 
@@ -728,22 +881,22 @@
       <div class="mt-5">
         <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5 px-1">
           <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold flex items-center gap-1.5">
-            <span class="material-symbols-rounded text-base text-[#30D158]">map</span> ${escapeHtml(label)}
+            <span class="material-symbols-rounded text-base text-[#E2B354]">map</span> ${escapeHtml(label)}
           </h4>
-          <span class="text-[11px] font-mono text-[#64D2FF]">${la.toFixed(6)}, ${lo.toFixed(6)}</span>
+          <span class="text-[11px] font-forensic text-[#E2B354]">${la.toFixed(6)}, ${lo.toFixed(6)}</span>
         </div>
         <div class="map-frame-wrap mb-3">
-          <iframe loading="lazy" referrerpolicy="no-referrer" src="${osmEmbed}" title="Mapa de Geolocalização"></iframe>
+          <iframe loading="lazy" referrerpolicy="no-referrer" src="${osmEmbed}" title="Mapa Forense"></iframe>
         </div>
         <div class="flex flex-wrap gap-2">
           <a href="${gmaps}" target="_blank" rel="noopener noreferrer" class="ios-chip">
             <span class="material-symbols-rounded text-sm text-[#30D158]">location_on</span> Google Maps
           </a>
           <a href="${street}" target="_blank" rel="noopener noreferrer" class="ios-chip">
-            <span class="material-symbols-rounded text-sm text-[#FF9F0A]">streetview</span> Street View
+            <span class="material-symbols-rounded text-sm text-[#E2B354]">streetview</span> Street View
           </a>
           <a href="${apple}" target="_blank" rel="noopener noreferrer" class="ios-chip">
-            <span class="material-symbols-rounded text-sm text-[#0A84FF]">explore</span> Apple Maps
+            <span class="material-symbols-rounded text-sm text-[#5AC8FA]">explore</span> Apple Maps
           </a>
         </div>
       </div>
@@ -753,14 +906,8 @@
   async function reverseGeocode(lat, lon) {
     try {
       const { data } = await tryFallback([
-        {
-          name: 'Nominatim OSM',
-          run: () => RemoteProxy.fetchJson(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&accept-language=pt-BR`)
-        },
-        {
-          name: 'BigDataCloud Geo',
-          run: () => RemoteProxy.fetchJson(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=pt`)
-        }
+        { name: 'Nominatim OSM', run: () => RemoteProxy.fetchJson(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&accept-language=pt-BR`) },
+        { name: 'BigDataCloud Geo', run: () => RemoteProxy.fetchJson(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=pt`) }
       ]);
       if (data.display_name) return data.display_name;
       const parts = [data.locality, data.city, data.principalSubdivision, data.countryName].filter(Boolean);
@@ -791,58 +938,97 @@
   }
 
   // ==========================================================
-  // 5. SETORES & MÓDULOS (SHERLOCK | SITES & REDE | EMPRESAS)
+  // 5. SETORES & MÓDULOS FORENSES SHERLOCK 221B
   // ==========================================================
   const SECTORS = [
     {
+      id: 'forense',
+      title: 'Laboratório Forense — Imagens, Arquivos & Artefatos',
+      subtitle: 'Perícia local de EXIF/GPS, detecção de adulteração ELA, cadeia de custódia e decodificador',
+      short: 'Lab Forense',
+      icon: 'biotech',
+      accent: '#E2B354'
+    },
+    {
       id: 'sherlock',
-      title: 'Área Sherlock — Investigação & Forense',
-      subtitle: 'Metadados de fotos (EXIF/GPS), perfis OSINT, Google Dorks e vazamentos',
-      short: 'Área Sherlock',
+      title: 'Rastreamento Sherlock — OSINT, Dorks & Vazamentos',
+      subtitle: 'Investigação de perfis, Google Hacking forense de documentos e exposição de e-mails',
+      short: 'Sherlock OSINT',
       icon: 'policy',
-      accent: '#5E5CE6'
+      accent: '#5AC8FA'
     },
     {
       id: 'web',
-      title: 'Sites, Scraping & Rede',
-      subtitle: 'Proprietário de domínios (RDAP/DNS), Web Scraper e IP via Proxy Remoto',
-      short: 'Sites & Scraping',
+      title: 'Inteligência Web, SSL & Empresas (CNPJ)',
+      subtitle: 'Subdomínios crt.sh, proprietário RDAP/DNS, Web Scraper, IP no mapa e consulta CNPJ',
+      short: 'Web & CNPJ',
       icon: 'language',
-      accent: '#0A84FF'
-    },
-    {
-      id: 'empresas',
-      title: 'Área Empresas (CNPJ)',
-      subtitle: 'Consulta empresarial completa com situação cadastral, CNAE e sócios (QSA)',
-      short: 'CNPJ',
-      icon: 'domain',
       accent: '#30D158'
     }
   ];
 
   const MODULES = [
-    // ==================== ÁREA SHERLOCK ====================
+    // ==================== 1. LABORATÓRIO FORENSE ====================
     {
       id: 'metadata',
-      sector: 'sherlock',
+      sector: 'forense',
       name: 'Metadados & EXIF (Foto)',
-      desc: 'Analisa foto enviada: extrai aparelho, câmera, data, hash SHA-256, GPS e mapa.',
-      keywords: 'metadados exif foto imagem gps localizacao mapa aparelho camera forense sherlock',
-      apisLabel: 'Forense + Mapa',
-      tagClass: 'tag-ok',
+      desc: 'Extrai aparelho, lente, SO, data original, hash SHA-256, coordenadas GPS e mapa.',
+      keywords: 'metadados exif foto imagem gps localizacao mapa aparelho camera forense',
+      apisLabel: 'EXIF + Mapa',
+      tagClass: 'tag-gold',
       icon: 'photo_camera',
-      gradient: 'linear-gradient(135deg, #00C7BE 0%, #0A84FF 100%)',
+      gradient: 'linear-gradient(135deg, #E2B354 0%, #9E6E1F 100%)',
       customView: 'metadata'
     },
     {
+      id: 'ela',
+      sector: 'forense',
+      name: 'Análise ELA (Adulteração)',
+      desc: 'Error Level Analysis em Canvas para revelar edições, montagens e colagens em fotos.',
+      keywords: 'ela adulteracao fraude montagem photoshop edicao imagem forense pericia',
+      apisLabel: 'Perícia Visual',
+      tagClass: 'tag-gold',
+      icon: 'compare',
+      gradient: 'linear-gradient(135deg, #FF453A 0%, #9B1C26 100%)',
+      customView: 'ela'
+    },
+    {
+      id: 'custody',
+      sector: 'forense',
+      name: 'Cadeia de Custódia & Magic Bytes',
+      desc: 'Gera SHA-256/512/1, detecta extensão falsificada (spoofing) e extrai strings do arquivo.',
+      keywords: 'custodia hash sha256 sha512 magic bytes hex spoofing binario strings pericia arquivo',
+      apisLabel: 'Hashes + Hex',
+      tagClass: 'tag-gold',
+      icon: 'fingerprint',
+      gradient: 'linear-gradient(135deg, #5AC8FA 0%, #1E5BB8 100%)',
+      customView: 'custody'
+    },
+    {
+      id: 'decoder',
+      sector: 'forense',
+      name: 'Decodificador Forense',
+      desc: 'Analisa tokens JWT, Base64, Hexadecimal, URL Encoding e Timestamps Unix.',
+      keywords: 'jwt base64 hex url timestamp decoder decodificador artefato forense',
+      apisLabel: '5 Motores',
+      tagClass: 'tag-gold',
+      icon: 'terminal',
+      gradient: 'linear-gradient(135deg, #BF5AF2 0%, #6B21A8 100%)',
+      customView: 'decoder'
+    },
+
+    // ==================== 2. RASTREAMENTO SHERLOCK ====================
+    {
       id: 'osint',
       sector: 'sherlock',
-      name: 'OSINT Direto (APIs)',
-      desc: 'Verifica username em 11 plataformas compatíveis roteadas pelo proxy remoto.',
-      keywords: 'osint sherlock usuario username github reddit perfis',
+      name: 'Sherlock OSINT (11 APIs)',
+      desc: 'Verifica username em 11 plataformas compatíveis em tempo real via Proxy Remoto.',
+      keywords: 'osint sherlock usuario username github reddit perfis rastreamento',
       apisLabel: '11 APIs Diretas',
+      tagClass: 'tag-info',
       icon: 'travel_explore',
-      gradient: 'linear-gradient(135deg, #5E5CE6 0%, #3634A3 100%)',
+      gradient: 'linear-gradient(135deg, #5E5CE6 0%, #312E81 100%)',
       placeholder: 'Username (ex: torvalds)',
       max: 60,
       customSearch: 'osint_api'
@@ -850,14 +1036,15 @@
     {
       id: 'dork',
       sector: 'sherlock',
-      name: 'Central de Dorks',
-      desc: 'Buscas avançadas no Google para Redes Sociais, Adultos, Namoro e Apostas.',
-      keywords: 'dork sherlock google redes sociais instagram tiktok apostas namoro',
-      apisLabel: 'Google Dorks',
+      name: 'Central de Dorks Forenses',
+      desc: 'Google Hacking para documentos expostos (PDF/XLS/Pastes), redes sociais e plataformas.',
+      keywords: 'dork google hacking documentos pdf pastes vazamento redes sociais',
+      apisLabel: '4 Categorias',
+      tagClass: 'tag-warn',
       icon: 'manage_search',
-      gradient: 'linear-gradient(135deg, #FF9F0A 0%, #EA580C 100%)',
-      placeholder: 'Nome, @user ou e-mail',
-      max: 80,
+      gradient: 'linear-gradient(135deg, #FF9F0A 0%, #B45309 100%)',
+      placeholder: 'Nome, domínio, @user ou termo',
+      max: 90,
       customSearch: 'dork_only'
     },
     {
@@ -867,8 +1054,9 @@
       desc: 'Checa exposição em bases vazadas + validação alternativa de servidor MX.',
       keywords: 'vazamento email breach senha seguranca sherlock',
       apisLabel: '2 APIs Sec',
+      tagClass: 'tag-err',
       icon: 'security',
-      gradient: 'linear-gradient(135deg, #FF453A 0%, #C62828 100%)',
+      gradient: 'linear-gradient(135deg, #E5484D 0%, #8C1D24 100%)',
       placeholder: 'Ex: nome@dominio.com',
       max: 80,
       fetchApi: async (v) => {
@@ -900,12 +1088,85 @@
       }
     },
 
-    // ==================== SITES, SCRAPING & REDE ====================
+    // ==================== 3. INTELIGÊNCIA WEB, SSL & EMPRESAS ====================
+    {
+      id: 'ssl_crt',
+      sector: 'web',
+      name: 'Subdomínios & SSL (crt.sh)',
+      desc: 'Auditoria de transparência de certificados para mapear subdomínios ocultos e CAs.',
+      keywords: 'ssl tls certificados crt.sh subdominios enumeracao recon dominio',
+      apisLabel: 'crt.sh + Fallback',
+      tagClass: 'tag-ok',
+      icon: 'workspace_premium',
+      gradient: 'linear-gradient(135deg, #00C7BE 0%, #0F766E 100%)',
+      placeholder: 'Ex: exemplo.com.br',
+      max: 80,
+      fetchApi: async (v) => {
+        const domain = v.trim().toLowerCase().replace(/^https?:\/\//, '').replace(/^www\./, '').split('/')[0];
+        if (!domain || !domain.includes('.')) throw new Error('Informe um domínio válido (ex: exemplo.com.br).');
+
+        const { data, provider } = await tryFallback([
+          {
+            name: 'crt.sh Certificate Transparency via Proxy',
+            run: async () => {
+              const rows = await RemoteProxy.fetchJson(`https://crt.sh/?q=%25.${encodeURIComponent(domain)}&output=json`, {}, 14000);
+              if (!Array.isArray(rows) || !rows.length) throw new Error('Sem registros no crt.sh');
+              const subSet = new Set();
+              const issuers = new Set();
+              for (const r of rows) {
+                String(r.name_value || '').split('\n').forEach(s => {
+                  const clean = s.trim().toLowerCase().replace(/^\*\./, '');
+                  if (clean && clean.includes('.')) subSet.add(clean);
+                });
+                if (r.issuer_name) {
+                  const cn = r.issuer_name.match(/O=([^,]+)/)?.[1] || r.issuer_name.slice(0, 50);
+                  issuers.add(cn);
+                }
+              }
+              const subs = [...subSet].sort().slice(0, 120);
+              const recent = rows.slice(0, 12).map(r => `${r.common_name || r.name_value?.split('\n')[0]} (${(r.not_before || '').split('T')[0]} → ${(r.not_after || '').split('T')[0]})`);
+              return {
+                resumo: {
+                  dominio_base: domain,
+                  total_certificados: rows.length,
+                  subdominios_unicos: subSet.size,
+                  autoridades_emissoras: issuers.size,
+                  ultimo_certificado: (rows[0]?.entry_timestamp || '').split('T')[0] || '-'
+                },
+                listas: [
+                  { titulo: 'Subdomínios Descobertos', itens: subs },
+                  { titulo: 'Autoridades Certificadoras (CA)', itens: [...issuers].slice(0, 20) },
+                  { titulo: 'Certificados Recentes', itens: recent }
+                ].filter(l => l.itens.length > 0),
+                raw: { domain, total_certs: rows.length, subdomains: subs, issuers: [...issuers] }
+              };
+            }
+          },
+          {
+            name: 'HackerTarget HostSearch (Alternativa)',
+            run: async () => {
+              const res = await RemoteProxy.request(`https://api.hackertarget.com/hostsearch/?q=${encodeURIComponent(domain)}`, {}, 12000);
+              const txt = await res.text();
+              if (!txt || /error|API count exceeded/i.test(txt)) throw new Error('Limite atingido no fallback.');
+              const lines = txt.split(/\r?\n/).map(l => l.trim()).filter(l => l.includes(','));
+              if (!lines.length) throw new Error('Nenhum subdomínio encontrado.');
+              const subs = lines.map(l => l.replace(',', ' → ')).slice(0, 100);
+              return {
+                resumo: { dominio_base: domain, subdominios_unicos: lines.length },
+                listas: [{ titulo: 'Subdomínios & IPs', itens: subs }],
+                raw: { domain, hosts: lines }
+              };
+            }
+          }
+        ]);
+        return { ...data, provider };
+      }
+    },
     {
       id: 'domain',
       sector: 'web',
       name: 'Proprietário de Site',
-      desc: 'Retorna titular (dono), registro público, registrador, datas e DNS.',
+      desc: 'Retorna titular (dono), registro público, registrador, datas e registros DNS.',
       keywords: 'site dominio dono proprietario whois rdap dns',
       apisLabel: 'RDAP + 2 DNS',
       icon: 'language',
@@ -965,12 +1226,12 @@
     {
       id: 'scraping',
       sector: 'web',
-      name: 'Web Scraper',
-      desc: 'Extrai metadados HTML, e-mails, telefones e links públicos via proxy remoto.',
+      name: 'Web Scraper Forense',
+      desc: 'Extrai metadados HTML, e-mails, telefones e links públicos via Proxy Remoto.',
       keywords: 'scraper html extrair links telefones emails site proxy',
       apisLabel: 'Proxy Remoto',
       icon: 'code',
-      gradient: 'linear-gradient(135deg, #32ADE6 0%, #007AFF 100%)',
+      gradient: 'linear-gradient(135deg, #32ADE6 0%, #0369A1 100%)',
       placeholder: 'Ex: https://site.com.br',
       max: 150,
       fetchApi: async (v) => {
@@ -1012,12 +1273,12 @@
     {
       id: 'ip',
       sector: 'web',
-      name: 'IP & Geolocalização',
+      name: 'IP, ASN & Mapa Forense',
       desc: 'Operadora, ASN e mapa de localização (vazio retorna o IP do Proxy Remoto).',
       keywords: 'ip geo localizacao mapa operadora asn servidor proxy',
       apisLabel: '3 APIs + Mapa',
       icon: 'router',
-      gradient: 'linear-gradient(135deg, #BF5AF2 0%, #892CDC 100%)',
+      gradient: 'linear-gradient(135deg, #8B5CF6 0%, #5B21B6 100%)',
       placeholder: 'IP alvo (vazio = IP do Proxy)',
       max: 45,
       optional: true,
@@ -1045,18 +1306,16 @@
         };
       }
     },
-
-    // ==================== ÁREA EMPRESAS (CNPJ) ====================
     {
       id: 'cnpj',
-      sector: 'empresas',
+      sector: 'web',
       name: 'Consulta CNPJ',
-      desc: 'Razão social, situação cadastral, CNAE, endereço e sócios (QSA) com 3 APIs via proxy remoto.',
+      desc: 'Razão social, situação cadastral, CNAE, endereço e sócios (QSA) via 3 APIs BR.',
       keywords: 'cnpj empresa razao social socios qsa receita cnae',
       apisLabel: '3 APIs BR',
       tagClass: 'tag-ok',
       icon: 'domain',
-      gradient: 'linear-gradient(135deg, #30D158 0%, #1E9E3E 100%)',
+      gradient: 'linear-gradient(135deg, #30D158 0%, #15803D 100%)',
       placeholder: 'CNPJ (14 dígitos)',
       max: 18,
       digits: true,
@@ -1071,22 +1330,10 @@
         ]);
 
         const est = data.estabelecimento || {};
-        const socios = (data.qsa || data.socios || []).map(s => {
-          const nome = s.nome_socio || s.nome || 'Não informado';
-          const qual = s.qualificacao_socio || s.qualificacao?.descricao || '-';
-          return `${nome} — ${qual}`;
-        });
-        const cnaesSec = (data.cnaes_secundarios || est.atividades_secundarias || [])
-          .map(c => c.descricao || c.text)
-          .filter(Boolean)
-          .slice(0, 20);
-
+        const socios = (data.qsa || data.socios || []).map(s => `${s.nome_socio || s.nome || 'Não informado'} — ${s.qualificacao_socio || s.qualificacao?.descricao || '-'}`);
+        const cnaesSec = (data.cnaes_secundarios || est.atividades_secundarias || []).map(c => c.descricao || c.text).filter(Boolean).slice(0, 20);
         const tel = data.ddd_telefone_1 || (est.ddd1 && est.telefone1 ? `(${est.ddd1}) ${est.telefone1}` : '-');
-        const logradouro = [
-          data.descricao_tipo_de_logradouro || est.tipo_logradouro || '',
-          data.logradouro || est.logradouro || '',
-          (data.numero || est.numero) ? `, ${data.numero || est.numero}` : ''
-        ].join(' ').replace(/\s+,/g, ',').trim() || '-';
+        const logradouro = [data.descricao_tipo_de_logradouro || est.tipo_logradouro || '', data.logradouro || est.logradouro || '', (data.numero || est.numero) ? `, ${data.numero || est.numero}` : ''].join(' ').replace(/\s+,/g, ',').trim() || '-';
 
         return {
           provider,
@@ -1096,7 +1343,7 @@
             nome_fantasia: data.nome_fantasia || est.nome_fantasia || '-',
             situacao_cadastral: data.descricao_situacao_cadastral || est.situacao_cadastral || '-',
             data_abertura: data.data_inicio_atividade || est.data_inicio_atividade || '-',
-            porte: data.porte || data.porte?.descricao || '-',
+            porte: data.porte?.descricao || data.porte || '-',
             natureza_juridica: data.natureza_juridica?.descricao || data.natureza_juridica || '-',
             cnae_principal: data.cnae_fiscal_descricao || est.atividade_principal?.descricao || '-',
             capital_social: data.capital_social != null ? `R$ ${Number(data.capital_social).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '-',
@@ -1118,14 +1365,8 @@
   ];
 
   // ==========================================================
-  // 6. MÓDULO FORENSE DE METADADOS & EXIF (FOTO + GPS + MAPA)
+  // 6. LABORATÓRIO FORENSE — MÓDULO A: METADADOS & EXIF
   // ==========================================================
-  async function computeSha256(arrayBuffer) {
-    if (!window.crypto?.subtle) return 'Indisponível (requer HTTPS)';
-    const digest = await crypto.subtle.digest('SHA-256', arrayBuffer);
-    return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
-  }
-
   function formatDateExif(val) {
     if (!val) return '-';
     if (val instanceof Date && !isNaN(val)) return val.toLocaleString('pt-BR');
@@ -1136,47 +1377,47 @@
     view.innerHTML = `
       <div class="view-enter">
         <button type="button" data-nav="" class="ios-chip mb-5">
-          <span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar ao Início
+          <span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar ao Painel
         </button>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
           <div class="lg:col-span-5 liquid-card p-6 lg:sticky lg:top-6">
             <div class="flex items-center gap-3.5 mb-4">
-              <div class="squircle" style="background:linear-gradient(135deg,#00C7BE,#0A84FF)">
+              <div class="squircle" style="background:linear-gradient(135deg,#E2B354,#9E6E1F)">
                 <span class="material-symbols-rounded">photo_camera</span>
               </div>
               <div>
                 <h2 class="text-lg font-bold leading-tight">Metadados & EXIF</h2>
-                <span class="pill-tag tag-ok mt-1">Forense • GPS • Mapa</span>
+                <span class="pill-tag tag-gold mt-1">Forense • GPS • Mapa</span>
               </div>
             </div>
             <p class="text-xs text-[var(--text-secondary)] mb-5 leading-relaxed">
-              Envie uma foto original (JPG, HEIC, PNG, TIFF ou WebP). A análise extrai aparelho, câmera, data, hash SHA-256, coordenadas GPS e localiza o ponto no mapa.
+              Envie a imagem original (JPG, HEIC, PNG, TIFF ou WebP). Extrai modelo do aparelho, lente, SO, data real de captura, hash SHA-256, GPS e localização no mapa.
             </p>
 
             <input type="file" id="metaFileInput" accept="image/*,.heic,.heif,.tif,.tiff" class="hidden">
             <div id="metaDropzone" class="dropzone-glass">
-              <div class="w-14 h-14 mx-auto rounded-2xl bg-[#0A84FF]/20 border border-[#0A84FF]/40 flex items-center justify-center mb-3">
-                <span class="material-symbols-rounded text-3xl text-[#64D2FF]">add_photo_alternate</span>
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-[#E2B354]/20 border border-[#E2B354]/40 flex items-center justify-center mb-3">
+                <span class="material-symbols-rounded text-3xl text-[#E2B354]">add_photo_alternate</span>
               </div>
-              <p class="text-sm font-semibold text-white mb-1">Toque ou arraste a foto aqui</p>
-              <p class="text-[11px] text-[var(--text-secondary)]">Processamento forense local no navegador (JPEG, HEIC, PNG, WebP)</p>
+              <p class="text-sm font-semibold text-white mb-1">Toque ou arraste a evidência aqui</p>
+              <p class="text-[11px] text-[var(--text-secondary)]">Perícia local no navegador (JPEG, HEIC, PNG, WebP)</p>
             </div>
 
             <div id="metaPreviewBox" class="hidden mt-4 p-3 rounded-2xl bg-white/5 border border-white/10">
-              <img id="metaPreviewImg" src="" alt="Prévia da foto" class="w-full max-h-56 object-contain rounded-xl mb-2">
+              <img id="metaPreviewImg" src="" alt="Prévia da evidência" class="w-full max-h-56 object-contain rounded-xl mb-2">
               <p id="metaPreviewName" class="text-xs text-[var(--text-secondary)] text-center truncate"></p>
             </div>
           </div>
 
           <div class="lg:col-span-7">
             <div id="metaResult" class="min-h-[340px] liquid-card p-6 flex flex-col justify-center items-center text-center">
-              <div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-3">
-                <span class="material-symbols-rounded text-3xl text-white/30">pin_drop</span>
+              <div class="w-16 h-16 rounded-2xl bg-[#E2B354]/10 border border-[#E2B354]/25 flex items-center justify-center mb-3">
+                <span class="material-symbols-rounded text-3xl text-[#E2B354]/70">pin_drop</span>
               </div>
-              <p class="text-sm font-medium text-white mb-1">Aguardando imagem</p>
+              <p class="text-sm font-semibold text-white mb-1">Aguardando fotografia</p>
               <p class="text-xs text-[var(--text-secondary)] max-w-sm">
-                Dica: fotos enviadas diretamente da galeria ou como arquivo preservam o EXIF e o GPS; redes sociais e WhatsApp (modo padrão) costumam remover esses dados.
+                Fotos originais da galeria ou enviadas como arquivo preservam o EXIF e o GPS. Redes sociais e WhatsApp padrão costumam limpar esses metadados.
               </p>
             </div>
           </div>
@@ -1190,16 +1431,8 @@
     dropzone.addEventListener('click', () => fileInput.click());
     dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
     dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
-    dropzone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropzone.classList.remove('drag-over');
-      const file = e.dataTransfer?.files?.[0];
-      if (file) analyzePhotoMetadata(file);
-    });
-    fileInput.addEventListener('change', () => {
-      const file = fileInput.files?.[0];
-      if (file) analyzePhotoMetadata(file);
-    });
+    dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.classList.remove('drag-over'); if (e.dataTransfer?.files?.[0]) analyzePhotoMetadata(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', () => { if (fileInput.files?.[0]) analyzePhotoMetadata(fileInput.files[0]); });
   }
 
   async function analyzePhotoMetadata(file) {
@@ -1214,11 +1447,7 @@
     prevName.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
 
     resDiv.className = 'min-h-[340px] liquid-card p-6 flex flex-col justify-center items-center text-center';
-    resDiv.innerHTML = `
-      <span class="material-symbols-rounded spinner text-4xl mb-3 text-[#0A84FF]">refresh</span>
-      <p class="text-sm font-semibold text-white">Extraindo metadados EXIF, XMP e GPS...</p>
-      <p class="text-xs text-[var(--text-secondary)] mt-1">Calculando hash forense SHA-256 e resolvendo mapa...</p>
-    `;
+    resDiv.innerHTML = `<span class="material-symbols-rounded spinner text-4xl mb-3 text-[#E2B354]">refresh</span><p class="text-sm font-semibold text-white">Extraindo metadados EXIF, XMP e GPS...</p>`;
 
     try {
       const [buffer, dimensions] = await Promise.all([
@@ -1231,10 +1460,9 @@
         })
       ]);
 
-      const sha256 = await computeSha256(buffer);
+      const sha256 = await digestHex('SHA-256', buffer);
 
-      let exifAll = null;
-      let gpsOnly = null;
+      let exifAll = null, gpsOnly = null;
       if (window.exifr) {
         try { exifAll = await window.exifr.parse(file, { tiff: true, exif: true, gps: true, xmp: true, iptc: true, ifd0: true }); } catch {}
         try { gpsOnly = await window.exifr.gps(file); } catch {}
@@ -1243,13 +1471,9 @@
       const lat = gpsOnly?.latitude ?? exifAll?.latitude ?? null;
       const lon = gpsOnly?.longitude ?? exifAll?.longitude ?? null;
       const hasGps = Number.isFinite(Number(lat)) && Number.isFinite(Number(lon));
+      let resolvedAddress = hasGps ? await reverseGeocode(Number(lat), Number(lon)) : null;
 
-      let resolvedAddress = null;
-      if (hasGps) resolvedAddress = await reverseGeocode(Number(lat), Number(lon));
-
-      const make = exifAll?.Make || '';
-      const model = exifAll?.Model || '';
-      const aparelho = [make, model].filter(Boolean).join(' ').trim() || 'Não informado nos metadados';
+      const aparelho = [exifAll?.Make || '', exifAll?.Model || ''].filter(Boolean).join(' ').trim() || 'Não informado nos metadados';
       const mp = (dimensions.w && dimensions.h) ? `${((dimensions.w * dimensions.h) / 1e6).toFixed(2)} MP` : '-';
 
       const arquivoInfo = {
@@ -1292,14 +1516,14 @@
         }
       }
 
-      lastModuleId = 'metadados-exif';
+      lastModuleId = 'laudo-exif';
       lastResultData = { arquivo: arquivoInfo, camera: cameraInfo, gps: gpsInfo, exif_bruto: rawTags };
 
       const gpsBanner = hasGps
         ? `<div class="mb-5 p-4 rounded-2xl bg-[#30D158]/12 border border-[#30D158]/35">
              <div class="flex items-center gap-2 mb-1">
                <span class="material-symbols-rounded text-[#30D158] text-xl">my_location</span>
-               <span class="text-xs uppercase tracking-wider text-[#30D158] font-bold">Geolocalização GPS Encontrada</span>
+               <span class="text-xs uppercase tracking-wider text-[#30D158] font-bold">Geolocalização GPS Localizada</span>
              </div>
              <p class="text-sm font-semibold text-white">${escapeHtml(resolvedAddress)}</p>
            </div>`
@@ -1308,7 +1532,7 @@
                <span class="material-symbols-rounded text-[#FF9F0A] text-xl">location_off</span>
                <span class="text-xs uppercase tracking-wider text-[#FF9F0A] font-bold">Sem Coordenadas GPS na Imagem</span>
              </div>
-             <p class="text-xs text-[var(--text-secondary)]">Esta foto não contém tags GPS embutidas (comum em capturas de tela ou imagens baixadas de redes sociais).</p>
+             <p class="text-xs text-[var(--text-secondary)]">Esta foto não contém tags GPS embutidas (comum em prints ou imagens reenviadas por mensageiros).</p>
            </div>`;
 
       resDiv.className = 'min-h-[340px] liquid-card p-6 text-left';
@@ -1319,27 +1543,23 @@
               <span class="material-symbols-rounded text-[#30D158] text-2xl">check_circle</span>
               <h3 class="font-bold text-lg">Laudo de Metadados</h3>
             </div>
-            <span class="text-[11px] text-[#0A84FF] font-semibold">Aparelho: ${escapeHtml(aparelho)}</span>
+            <span class="text-[11px] text-[#E2B354] font-semibold">Aparelho: ${escapeHtml(aparelho)}</span>
           </div>
           <div class="flex flex-wrap gap-2">
             <button type="button" class="ios-chip" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button>
             <button type="button" class="ios-chip" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button>
-            <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#0A84FF]">verified</span> Assinado</button>
+            <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#E2B354]">verified</span> Dossiê</button>
           </div>
         </div>
-
         ${gpsBanner}
         ${hasGps ? renderIosList(gpsInfo) + renderMapBlock(lat, lon, 'Local Exato da Captura') : ''}
-
         <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mt-5 mb-2 px-1">Aparelho & Câmera (EXIF)</h4>
         ${renderIosList(cameraInfo)}
-
         <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mt-5 mb-2 px-1">Arquivo & Integridade Forense</h4>
         ${renderIosList(arquivoInfo)}
-
         ${Object.keys(rawTags).length ? `
           <details class="mt-5">
-            <summary class="cursor-pointer text-xs uppercase tracking-wider text-[#0A84FF] font-semibold px-1 py-2">
+            <summary class="cursor-pointer text-xs uppercase tracking-wider text-[#E2B354] font-semibold px-1 py-2">
               Ver todas as tags EXIF/XMP brutas (${Object.keys(rawTags).length})
             </summary>
             <div class="mt-2">${renderIosList(rawTags)}</div>
@@ -1348,16 +1568,566 @@
       `;
     } catch (err) {
       resDiv.className = 'min-h-[340px] liquid-card p-6 flex flex-col justify-center items-center text-center';
-      resDiv.innerHTML = `
-        <span class="material-symbols-rounded text-5xl mb-2 text-[#FF453A]">error</span>
-        <h3 class="font-bold text-base mb-1">Erro ao analisar imagem</h3>
-        <p class="text-xs text-[var(--text-secondary)] max-w-md">${escapeHtml(err.message)}</p>
-      `;
+      resDiv.innerHTML = `<span class="material-symbols-rounded text-5xl mb-2 text-[#FF453A]">error</span><h3 class="font-bold text-base mb-1">Erro na perícia EXIF</h3><p class="text-xs text-[var(--text-secondary)] max-w-md">${escapeHtml(err.message)}</p>`;
     }
   }
 
   // ==========================================================
-  // 7. OSINT DIRETO & CENTRAL DE DORKS
+  // 7. LABORATÓRIO FORENSE — MÓDULO B: ANÁLISE ELA (ADULTERAÇÃO)
+  // ==========================================================
+  function renderElaView(view) {
+    view.innerHTML = `
+      <div class="view-enter">
+        <button type="button" data-nav="" class="ios-chip mb-5">
+          <span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar ao Painel
+        </button>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          <div class="lg:col-span-4 liquid-card p-6 lg:sticky lg:top-6">
+            <div class="flex items-center gap-3.5 mb-4">
+              <div class="squircle" style="background:linear-gradient(135deg,#FF453A,#9B1C26)">
+                <span class="material-symbols-rounded">compare</span>
+              </div>
+              <div>
+                <h2 class="text-lg font-bold leading-tight">Análise ELA</h2>
+                <span class="pill-tag tag-gold mt-1">Detecção de Edição</span>
+              </div>
+            </div>
+            <p class="text-xs text-[var(--text-secondary)] mb-5 leading-relaxed">
+              Recompime a imagem em nível controlado (JPEG) e amplifica as diferenças de compressão. Regiões recortadas, clonadas ou editadas destacam-se com brilho anômalo.
+            </p>
+
+            <input type="file" id="elaFileInput" accept="image/*" class="hidden">
+            <div id="elaDropzone" class="dropzone-glass mb-5">
+              <div class="w-12 h-12 mx-auto rounded-2xl bg-[#FF453A]/20 border border-[#FF453A]/40 flex items-center justify-center mb-2.5">
+                <span class="material-symbols-rounded text-2xl text-[#FF453A]">image_search</span>
+              </div>
+              <p class="text-sm font-semibold text-white mb-0.5">Enviar imagem para perícia</p>
+              <p class="text-[11px] text-[var(--text-secondary)]">JPG, PNG ou WebP</p>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-[var(--text-secondary)] font-semibold">Ganho de Amplificação</span>
+                  <span id="elaScaleVal" class="font-forensic text-[#E2B354]">18x</span>
+                </div>
+                <input type="range" id="elaScale" class="gold-range" min="5" max="45" value="18">
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-[var(--text-secondary)] font-semibold">Qualidade Base JPEG</span>
+                  <span id="elaQualVal" class="font-forensic text-[#E2B354]">90%</span>
+                </div>
+                <input type="range" id="elaQuality" class="gold-range" min="70" max="98" value="90">
+              </div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-8">
+            <div id="elaResult" class="min-h-[340px] liquid-card p-6 flex flex-col justify-center items-center text-center">
+              <div class="w-16 h-16 rounded-2xl bg-[#FF453A]/10 border border-[#FF453A]/25 flex items-center justify-center mb-3">
+                <span class="material-symbols-rounded text-3xl text-[#FF453A]/75">compare</span>
+              </div>
+              <p class="text-sm font-semibold text-white mb-1">Laboratório ELA pronto</p>
+              <p class="text-xs text-[var(--text-secondary)] max-w-sm">
+                Carregue uma foto ao lado para gerar o mapa de erro de compressão e inspecionar possíveis adulterações.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    let cachedOrigImg = null;
+    let cachedFileMeta = null;
+
+    const fileInput = document.getElementById('elaFileInput');
+    const dropzone = document.getElementById('elaDropzone');
+    const scaleInput = document.getElementById('elaScale');
+    const qualInput = document.getElementById('elaQuality');
+
+    const loadAndRun = (file) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        cachedOrigImg = img;
+        cachedFileMeta = { name: file.name, size: file.size, w: img.naturalWidth, h: img.naturalHeight };
+        computeEla();
+      };
+      img.src = url;
+    };
+
+    const computeEla = () => {
+      if (!cachedOrigImg) return;
+      const scale = Number(scaleInput.value);
+      const quality = Number(qualInput.value) / 100;
+      const resDiv = document.getElementById('elaResult');
+
+      const maxDim = 1100;
+      let w = cachedOrigImg.naturalWidth;
+      let h = cachedOrigImg.naturalHeight;
+      if (w > maxDim || h > maxDim) {
+        const ratio = Math.min(maxDim / w, maxDim / h);
+        w = Math.round(w * ratio);
+        h = Math.round(h * ratio);
+      }
+
+      const cOrig = document.createElement('canvas');
+      cOrig.width = w; cOrig.height = h;
+      const ctxO = cOrig.getContext('2d', { willReadFrequently: true });
+      ctxO.drawImage(cachedOrigImg, 0, 0, w, h);
+      const origData = ctxO.getImageData(0, 0, w, h);
+      const recompressedUrl = cOrig.toDataURL('image/jpeg', quality);
+
+      const img2 = new Image();
+      img2.onload = () => {
+        const cComp = document.createElement('canvas');
+        cComp.width = w; cComp.height = h;
+        const ctxC = cComp.getContext('2d', { willReadFrequently: true });
+        ctxC.drawImage(img2, 0, 0, w, h);
+        const compData = ctxC.getImageData(0, 0, w, h);
+
+        const outData = ctxO.createImageData(w, h);
+        const d1 = origData.data, d2 = compData.data, out = outData.data;
+
+        let sumDiff = 0, maxDiff = 0, hotPixels = 0;
+        const totalPixels = w * h;
+
+        for (let i = 0; i < d1.length; i += 4) {
+          const dr = Math.abs(d1[i] - d2[i]);
+          const dg = Math.abs(d1[i + 1] - d2[i + 1]);
+          const db = Math.abs(d1[i + 2] - d2[i + 2]);
+          const avg = (dr + dg + db) / 3;
+          sumDiff += avg;
+          if (avg > maxDiff) maxDiff = avg;
+
+          const er = Math.min(255, dr * scale);
+          const eg = Math.min(255, dg * scale);
+          const eb = Math.min(255, db * scale);
+          if ((er + eg + eb) / 3 > 110) hotPixels++;
+
+          out[i] = er;
+          out[i + 1] = eg;
+          out[i + 2] = eb;
+          out[i + 3] = 255;
+        }
+
+        const meanErr = (sumDiff / totalPixels).toFixed(2);
+        const hotPct = ((hotPixels / totalPixels) * 100).toFixed(2);
+
+        const metrics = {
+          arquivo: cachedFileMeta.name,
+          dimensoes_originais: `${cachedFileMeta.w} × ${cachedFileMeta.h} px`,
+          ganho_aplicado: `${scale}x (JPEG ${Math.round(quality * 100)}%)`,
+          erro_medio_pixel: `${meanErr} / 255`,
+          pico_erro_bruto: `${Math.round(maxDiff)} / 255`,
+          pixels_alta_variacao: `${hotPct}%`
+        };
+
+        lastModuleId = 'pericia-ela';
+        lastResultData = metrics;
+
+        resDiv.className = 'min-h-[340px] liquid-card p-6 text-left';
+        resDiv.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-rounded text-[#E2B354] text-2xl">analytics</span>
+                <h3 class="font-bold text-lg">Mapa Forense ELA</h3>
+              </div>
+              <span class="text-[11px] text-[var(--text-secondary)]">Compare áreas com brilho destoante do fundo</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" id="elaToggleView" class="ios-chip"><span class="material-symbols-rounded text-sm">visibility</span> Ver Original</button>
+              <button type="button" id="elaDownloadPng" class="ios-chip"><span class="material-symbols-rounded text-sm text-[#30D158]">download</span> Baixar PNG</button>
+              <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#E2B354]">verified</span> Dossiê</button>
+            </div>
+          </div>
+
+          <div class="ela-stage mb-4">
+            <canvas id="elaCanvas" width="${w}" height="${h}"></canvas>
+            <img id="elaOrigPreview" src="${cachedOrigImg.src}" alt="Original" class="hidden">
+          </div>
+
+          <div class="mb-4 p-3.5 rounded-2xl bg-[#E2B354]/10 border border-[#E2B354]/25 text-xs text-[var(--text-secondary)] leading-relaxed">
+            <strong class="text-[#E2B354]">Leitura Pericial:</strong> Bordas nítidas e texturas naturais aparecem mais claras. Suspeite quando um objeto liso (texto, rosto, placa ou número) apresentar luminosidade muito maior ou muito menor do que o restante da cena com a mesma textura.
+          </div>
+
+          ${renderIosList(metrics)}
+        `;
+
+        const canvas = document.getElementById('elaCanvas');
+        canvas.getContext('2d').putImageData(outData, 0, 0);
+
+        let showingOrig = false;
+        document.getElementById('elaToggleView').addEventListener('click', (ev) => {
+          showingOrig = !showingOrig;
+          canvas.classList.toggle('hidden', showingOrig);
+          document.getElementById('elaOrigPreview').classList.toggle('hidden', !showingOrig);
+          ev.currentTarget.innerHTML = showingOrig
+            ? '<span class="material-symbols-rounded text-sm">compare</span> Ver Mapa ELA'
+            : '<span class="material-symbols-rounded text-sm">visibility</span> Ver Original';
+        });
+
+        document.getElementById('elaDownloadPng').addEventListener('click', () => {
+          const a = document.createElement('a');
+          a.href = canvas.toDataURL('image/png');
+          a.download = `sherlock-ela-${Date.now()}.png`;
+          a.click();
+        });
+      };
+      img2.src = recompressedUrl;
+    };
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+    dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.classList.remove('drag-over'); if (e.dataTransfer?.files?.[0]) loadAndRun(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', () => { if (fileInput.files?.[0]) loadAndRun(fileInput.files[0]); });
+
+    scaleInput.addEventListener('input', () => { document.getElementById('elaScaleVal').textContent = `${scaleInput.value}x`; computeEla(); });
+    qualInput.addEventListener('input', () => { document.getElementById('elaQualVal').textContent = `${qualInput.value}%`; computeEla(); });
+  }
+
+  // ==========================================================
+  // 8. LABORATÓRIO FORENSE — MÓDULO C: CADEIA DE CUSTÓDIA
+  // ==========================================================
+  function renderCustodyView(view) {
+    view.innerHTML = `
+      <div class="view-enter">
+        <button type="button" data-nav="" class="ios-chip mb-5">
+          <span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar ao Painel
+        </button>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          <div class="lg:col-span-5 liquid-card p-6 lg:sticky lg:top-6">
+            <div class="flex items-center gap-3.5 mb-4">
+              <div class="squircle" style="background:linear-gradient(135deg,#5AC8FA,#1E5BB8)">
+                <span class="material-symbols-rounded">fingerprint</span>
+              </div>
+              <div>
+                <h2 class="text-lg font-bold leading-tight">Cadeia de Custódia</h2>
+                <span class="pill-tag tag-gold mt-1">Hashes • Magic Bytes • Strings</span>
+              </div>
+            </div>
+            <p class="text-xs text-[var(--text-secondary)] mb-5 leading-relaxed">
+              Suba qualquer evidência digital (PDF, ZIP, imagem, áudio, documento). Gera SHA-256/512/1, detecta extensão falsificada pelo cabeçalho hexadecimal e extrai strings legíveis.
+            </p>
+
+            <input type="file" id="custodyFileInput" class="hidden">
+            <div id="custodyDropzone" class="dropzone-glass mb-4">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-[#5AC8FA]/20 border border-[#5AC8FA]/40 flex items-center justify-center mb-3">
+                <span class="material-symbols-rounded text-3xl text-[#5AC8FA]">upload_file</span>
+              </div>
+              <p class="text-sm font-semibold text-white mb-1">Selecionar arquivo de evidência</p>
+              <p class="text-[11px] text-[var(--text-secondary)]">100% local — o arquivo não sai do seu dispositivo</p>
+            </div>
+
+            <div class="md-field mb-0">
+              <input type="text" id="custodyExpectedHash" class="md-input font-forensic text-xs" placeholder=" " autocomplete="off">
+              <label for="custodyExpectedHash" class="md-label">Conferir contra SHA-256 esperado (opcional)</label>
+            </div>
+          </div>
+
+          <div class="lg:col-span-7">
+            <div id="custodyResult" class="min-h-[340px] liquid-card p-6 flex flex-col justify-center items-center text-center">
+              <div class="w-16 h-16 rounded-2xl bg-[#5AC8FA]/10 border border-[#5AC8FA]/25 flex items-center justify-center mb-3">
+                <span class="material-symbols-rounded text-3xl text-[#5AC8FA]/75">verified_user</span>
+              </div>
+              <p class="text-sm font-semibold text-white mb-1">Aguardando arquivo</p>
+              <p class="text-xs text-[var(--text-secondary)] max-w-sm">
+                Ideal para lavrar cadeia de custódia digital, confirmar autenticidade de arquivos e identificar documentos camuflados.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const fileInput = document.getElementById('custodyFileInput');
+    const dropzone = document.getElementById('custodyDropzone');
+
+    const processFile = async (file) => {
+      const resDiv = document.getElementById('custodyResult');
+      const expected = document.getElementById('custodyExpectedHash').value.trim().toLowerCase();
+
+      resDiv.className = 'min-h-[340px] liquid-card p-6 flex flex-col justify-center items-center text-center';
+      resDiv.innerHTML = `<span class="material-symbols-rounded spinner text-4xl mb-3 text-[#E2B354]">refresh</span><p class="text-sm font-semibold text-white">Calculando hashes criptográficos e analisando cabeçalho...</p>`;
+
+      try {
+        const buffer = await file.arrayBuffer();
+        const [sha256, sha512, sha1] = await Promise.all([
+          digestHex('SHA-256', buffer),
+          digestHex('SHA-512', buffer),
+          digestHex('SHA-1', buffer)
+        ]);
+
+        const magic = inspectMagicBytes(buffer, file.name);
+        const strings = extractAsciiStrings(buffer);
+
+        const resumo = {
+          arquivo: file.name,
+          tamanho_exato: `${file.size.toLocaleString('pt-BR')} bytes (${(file.size / 1024).toFixed(2)} KB)`,
+          extensao_declarada: magic.ext,
+          tipo_real_magic_bytes: magic.detected,
+          assinatura_hex_16b: magic.hexSpaced,
+          ultima_modificacao: file.lastModified ? new Date(file.lastModified).toLocaleString('pt-BR') : '-',
+          sha256,
+          sha512,
+          sha1
+        };
+
+        lastModuleId = 'cadeia-custodia';
+        lastResultData = { custodia: resumo, spoofing_detectado: magic.spoofAlert, strings_destaque: strings.highlighted };
+
+        let alertBanner = magic.spoofAlert
+          ? `<div class="mb-4 p-4 rounded-2xl bg-[#FF453A]/15 border border-[#FF453A]/45">
+               <div class="flex items-center gap-2 mb-1">
+                 <span class="material-symbols-rounded text-[#FF453A]">gpp_bad</span>
+                 <span class="text-xs uppercase tracking-wider text-[#FF453A] font-bold">Alerta de Extensão Falsificada (Spoofing)</span>
+               </div>
+               <p class="text-xs text-white">${escapeHtml(magic.status)}</p>
+             </div>`
+          : `<div class="mb-4 p-4 rounded-2xl bg-[#30D158]/12 border border-[#30D158]/35">
+               <div class="flex items-center gap-2 mb-1">
+                 <span class="material-symbols-rounded text-[#30D158]">verified_user</span>
+                 <span class="text-xs uppercase tracking-wider text-[#30D158] font-bold">Cabeçalho Verificado</span>
+               </div>
+               <p class="text-xs text-white">${escapeHtml(magic.status)}</p>
+             </div>`;
+
+        if (expected) {
+          const match = expected === sha256.toLowerCase();
+          alertBanner += match
+            ? `<div class="mb-4 p-3.5 rounded-2xl bg-[#30D158]/15 border border-[#30D158]/40 text-xs text-[#30D158] font-bold flex items-center gap-2"><span class="material-symbols-rounded text-base">check_circle</span> INTEGRIDADE CONFIRMADA: O SHA-256 confere 100% com o hash informado.</div>`
+            : `<div class="mb-4 p-3.5 rounded-2xl bg-[#FF453A]/15 border border-[#FF453A]/40 text-xs text-[#FF453A] font-bold flex items-center gap-2"><span class="material-symbols-rounded text-base">cancel</span> DIVERGÊNCIA DETECTADA: O arquivo foi alterado em relação ao SHA-256 informado.</div>`;
+        }
+
+        resDiv.className = 'min-h-[340px] liquid-card p-6 text-left';
+        resDiv.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-rounded text-[#E2B354] text-2xl">verified</span>
+                <h3 class="font-bold text-lg">Certificado de Custódia</h3>
+              </div>
+              <span class="text-[11px] text-[var(--text-secondary)]">Perícia local • Selo KIIK HACKING</span>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" class="ios-chip" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button>
+              <button type="button" class="ios-chip" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button>
+              <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#E2B354]">verified</span> Dossiê</button>
+            </div>
+          </div>
+
+          ${alertBanner}
+          ${renderIosList(resumo)}
+
+          ${strings.highlighted.length ? `
+            <h4 class="text-xs uppercase tracking-wider text-[#E2B354] font-semibold mt-5 mb-2 px-1">Indícios / Strings de Interesse (${strings.highlighted.length})</h4>
+            <div class="code-block">${escapeHtml(strings.highlighted.join('\n'))}</div>
+          ` : ''}
+
+          ${strings.sample.length ? `
+            <details class="mt-4">
+              <summary class="cursor-pointer text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold px-1 py-1">
+                Amostra de strings legíveis no cabeçalho (${strings.total} encontradas)
+              </summary>
+              <div class="code-block mt-2">${escapeHtml(strings.sample.join('\n'))}</div>
+            </details>
+          ` : ''}
+        `;
+      } catch (err) {
+        resDiv.className = 'min-h-[340px] liquid-card p-6 flex flex-col justify-center items-center text-center';
+        resDiv.innerHTML = `<span class="material-symbols-rounded text-5xl mb-2 text-[#FF453A]">error</span><h3 class="font-bold text-base mb-1">Erro ao ler arquivo</h3><p class="text-xs text-[var(--text-secondary)]">${escapeHtml(err.message)}</p>`;
+      }
+    };
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-over'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-over'));
+    dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.classList.remove('drag-over'); if (e.dataTransfer?.files?.[0]) processFile(e.dataTransfer.files[0]); });
+    fileInput.addEventListener('change', () => { if (fileInput.files?.[0]) processFile(fileInput.files[0]); });
+  }
+
+  // ==========================================================
+  // 9. LABORATÓRIO FORENSE — MÓDULO D: DECODIFICADOR DE ARTEFATOS
+  // ==========================================================
+  function decodeBase64Utf8(str) {
+    const norm = str.replace(/-/g, '+').replace(/_/g, '/').replace(/\s+/g, '');
+    const padded = norm + '='.repeat((4 - (norm.length % 4)) % 4);
+    const bin = atob(padded);
+    const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  }
+
+  function renderDecoderView(view) {
+    view.innerHTML = `
+      <div class="view-enter">
+        <button type="button" data-nav="" class="ios-chip mb-5">
+          <span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar ao Painel
+        </button>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+          <div class="lg:col-span-5 liquid-card p-6 lg:sticky lg:top-6">
+            <div class="flex items-center gap-3.5 mb-4">
+              <div class="squircle" style="background:linear-gradient(135deg,#BF5AF2,#6B21A8)">
+                <span class="material-symbols-rounded">terminal</span>
+              </div>
+              <div>
+                <h2 class="text-lg font-bold leading-tight">Decodificador Forense</h2>
+                <span class="pill-tag tag-gold mt-1">JWT • Base64 • Hex • Unix</span>
+              </div>
+            </div>
+            <p class="text-xs text-[var(--text-secondary)] mb-4 leading-relaxed">
+              Cole qualquer artefato capturado em logs, URLs, cabeçalhos ou códigos. O motor detecta automaticamente o formato e extrai o conteúdo legível.
+            </p>
+
+            <form id="decoderForm">
+              <textarea id="decoderInput" class="md-textarea font-forensic mb-4" placeholder="Cole aqui um token JWT, string Base64, Hexadecimal, URL codificada ou Unix Timestamp (ex: 1763820000)..." required></textarea>
+              <button type="submit" class="ios-btn">
+                <span class="material-symbols-rounded text-lg">auto_fix_high</span> Analisar & Decodificar
+              </button>
+            </form>
+          </div>
+
+          <div class="lg:col-span-7">
+            <div id="decoderResult" class="min-h-[320px] liquid-card p-6 flex flex-col justify-center items-center text-center">
+              <div class="w-16 h-16 rounded-2xl bg-[#BF5AF2]/10 border border-[#BF5AF2]/25 flex items-center justify-center mb-3">
+                <span class="material-symbols-rounded text-3xl text-[#BF5AF2]/75">terminal</span>
+              </div>
+              <p class="text-sm font-semibold text-white mb-1">Pronto para decodificar</p>
+              <p class="text-xs text-[var(--text-secondary)] max-w-sm">
+                Suporta inspeção de expiração JWT, conversão de datas Unix para BRT/UTC, Base64/Base64URL, Hex e cálculo de SHA-256 do texto.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('decoderForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const raw = document.getElementById('decoderInput').value.trim();
+      const resDiv = document.getElementById('decoderResult');
+      if (!raw) return;
+
+      const findings = [];
+      const textBytes = new TextEncoder().encode(raw);
+      const textSha256 = await digestHex('SHA-256', textBytes);
+
+      // 1. JWT
+      if (/^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]*$/.test(raw)) {
+        try {
+          const [h, p] = raw.split('.');
+          const header = JSON.parse(decodeBase64Utf8(h));
+          const payload = JSON.parse(decodeBase64Utf8(p));
+          const expStatus = payload.exp
+            ? (Date.now() / 1000 > payload.exp ? `Expirado em ${new Date(payload.exp * 1000).toLocaleString('pt-BR')}` : `Válido até ${new Date(payload.exp * 1000).toLocaleString('pt-BR')}`)
+            : 'Sem campo exp';
+          findings.push({
+            tipo: 'Token JWT Detectado',
+            badge: 'tag-gold',
+            extra: `Status: ${expStatus}`,
+            conteudo: JSON.stringify({ header, payload }, null, 2)
+          });
+        } catch {}
+      }
+
+      // 2. Unix Timestamp (10 ou 13 dígitos)
+      if (/^\d{10}$/.test(raw) || /^\d{13}$/.test(raw)) {
+        const ms = raw.length === 10 ? Number(raw) * 1000 : Number(raw);
+        const dt = new Date(ms);
+        if (!isNaN(dt)) {
+          findings.push({
+            tipo: 'Unix Timestamp',
+            badge: 'tag-ok',
+            conteudo: `Horário Local (BRT): ${dt.toLocaleString('pt-BR')}\nUTC / ISO 8601: ${dt.toISOString()}`
+          });
+        }
+      }
+
+      // 3. URL Decoding
+      if (/%[0-9A-Fa-f]{2}/.test(raw)) {
+        try {
+          const dec = decodeURIComponent(raw);
+          if (dec !== raw) findings.push({ tipo: 'URL Decodificada', badge: 'tag-info', conteudo: dec });
+        } catch {}
+      }
+
+      // 4. Hexadecimal
+      const cleanHex = raw.replace(/^0x/i, '').replace(/[\s:,-]/g, '');
+      if (cleanHex.length >= 4 && cleanHex.length % 2 === 0 && /^[0-9a-fA-F]+$/.test(cleanHex)) {
+        try {
+          const arr = new Uint8Array(cleanHex.match(/.{2}/g).map(b => parseInt(b, 16)));
+          const dec = new TextDecoder().decode(arr);
+          if (/[\x20-\x7E]/.test(dec)) findings.push({ tipo: 'Hexadecimal → Texto', badge: 'tag-info', conteudo: dec });
+        } catch {}
+      }
+
+      // 5. Base64
+      if (/^[A-Za-z0-9+/=_\-\s]{4,}$/.test(raw) && !findings.some(f => f.tipo.includes('JWT'))) {
+        try {
+          const dec = decodeBase64Utf8(raw);
+          if (dec && !/[\x00-\x08\x0E-\x1F]/.test(dec)) {
+            findings.push({ tipo: 'Base64 → UTF-8', badge: 'tag-ok', conteudo: dec });
+          }
+        } catch {}
+      }
+
+      // Conversões de saída úteis (sempre disponíveis)
+      const encodedB64 = btoa(String.fromCharCode(...textBytes));
+      const encodedHex = Array.from(textBytes).map(b => b.toString(16).padStart(2, '0')).join(' ');
+
+      const summary = {
+        tamanho_texto: `${raw.length} caracteres (${textBytes.length} bytes)`,
+        hash_sha256: textSha256,
+        em_base64: encodedB64.slice(0, 140) + (encodedB64.length > 140 ? '...' : ''),
+        em_hex: encodedHex.slice(0, 140) + (encodedHex.length > 140 ? '...' : '')
+      };
+
+      lastModuleId = 'decodificador-forense';
+      lastResultData = { entrada: raw, achados: findings, resumo: summary };
+
+      resDiv.className = 'min-h-[320px] liquid-card p-6 text-left';
+      resDiv.innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-3 border-b border-white/10">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-rounded text-[#30D158] text-2xl">check_circle</span>
+              <h3 class="font-bold text-lg">Análise do Artefato</h3>
+            </div>
+            <span class="text-[11px] text-[#E2B354] font-semibold">${findings.length} formato(s) decodificado(s)</span>
+          </div>
+          <div class="flex gap-2">
+            <button type="button" class="ios-chip" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button>
+            <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#E2B354]">verified</span> Dossiê</button>
+          </div>
+        </div>
+
+        ${findings.length ? findings.map(f => `
+          <div class="mb-4">
+            <div class="flex items-center justify-between gap-2 mb-1.5 px-1">
+              <span class="pill-tag ${f.badge}">${escapeHtml(f.tipo)}</span>
+              ${f.extra ? `<span class="text-[11px] text-[#E2B354] font-semibold">${escapeHtml(f.extra)}</span>` : ''}
+            </div>
+            <pre class="code-block">${escapeHtml(f.conteudo)}</pre>
+          </div>
+        `).join('') : `
+          <div class="mb-4 p-3.5 rounded-2xl bg-white/5 border border-white/10 text-xs text-[var(--text-secondary)]">
+            Nenhum formato codificado conhecido (JWT/Base64/Hex/Unix) foi detectado na entrada. Abaixo estão o hash SHA-256 e as codificações geradas.
+          </div>
+        `}
+
+        <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mt-4 mb-2 px-1">Hash & Conversões</h4>
+        ${renderIosList(summary)}
+      `;
+    });
+  }
+
+  // ==========================================================
+  // 10. OSINT DIRETO & CENTRAL DE DORKS FORENSES
   // ==========================================================
   function getCompatibleOsintApis(alvo) {
     const enc = encodeURIComponent(alvo);
@@ -1379,6 +2149,18 @@
   function getDorkCategories(alvo) {
     const q = (dork) => `https://www.google.com/search?q=${encodeURIComponent(dork)}`;
     return [
+      {
+        titulo: 'Documentos, Diretórios & Pastes (Forense)', icone: 'folder_open',
+        dorkGeral: q(`"${alvo}" (filetype:pdf OR filetype:xlsx OR filetype:docx OR site:pastebin.com OR site:docs.google.com)`),
+        itens: [
+          { nome: 'PDFs Indexados', url: q(`"${alvo}" filetype:pdf`) },
+          { nome: 'Planilhas (XLS / CSV)', url: q(`"${alvo}" (filetype:xlsx OR filetype:xls OR filetype:csv)`) },
+          { nome: 'Documentos Word / TXT', url: q(`"${alvo}" (filetype:docx OR filetype:doc OR filetype:txt)`) },
+          { nome: 'Diretórios Abertos (Index of)', url: q(`intitle:"index of" "${alvo}"`) },
+          { nome: 'Pastebin / Ghostbin / GitHub Gist', url: q(`"${alvo}" (site:pastebin.com OR site:gist.github.com OR site:dpaste.org)`) },
+          { nome: 'Google Docs / Drive Públicos', url: q(`"${alvo}" (site:docs.google.com OR site:drive.google.com)`) }
+        ]
+      },
       {
         titulo: 'Redes Sociais', icone: 'groups',
         dorkGeral: q(`"${alvo}" (site:instagram.com OR site:tiktok.com OR site:x.com OR site:facebook.com OR site:linkedin.com OR site:youtube.com OR site:threads.net)`),
@@ -1423,7 +2205,7 @@
 
   async function runOsintApis(alvo, resDiv, btn) {
     await saveHistory('osint', alvo);
-    lastModuleId = 'osint';
+    lastModuleId = 'sherlock-osint';
     const apis = getCompatibleOsintApis(alvo);
     const report = { alvo, resultados: [] };
     let found = 0, notFound = 0;
@@ -1432,12 +2214,12 @@
     resDiv.innerHTML = `
       <div class="flex flex-wrap items-center justify-between gap-3 mb-4 pb-4 border-b border-white/10">
         <div>
-          <h3 class="font-bold text-lg">OSINT Direto: <span class="text-[#0A84FF]">${escapeHtml(alvo)}</span></h3>
+          <h3 class="font-bold text-lg">Rastreamento: <span class="text-[#E2B354]">${escapeHtml(alvo)}</span></h3>
           <p id="osintCounter" class="text-xs text-[var(--text-secondary)] mt-0.5">Consultando ${apis.length} APIs via ${escapeHtml(RemoteProxy.getModeLabel())}...</p>
         </div>
         <div class="flex gap-2">
           <button type="button" class="ios-chip" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button>
-          <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#0A84FF]">verified</span> Assinado</button>
+          <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#E2B354]">verified</span> Dossiê</button>
         </div>
       </div>
       <div class="ios-group">
@@ -1476,12 +2258,12 @@
 
     await Promise.allSettled(tasks);
     btn.disabled = false;
-    btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Consultar';
+    btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Investigar';
   }
 
   async function runDorks(alvo, resDiv, btn) {
     await saveHistory('dork', alvo);
-    lastModuleId = 'dork';
+    lastModuleId = 'dorks-forenses';
     const dorks = getDorkCategories(alvo);
     lastResultData = { alvo, dorks };
 
@@ -1489,16 +2271,16 @@
     resDiv.innerHTML = `
       <div class="flex flex-wrap items-center justify-between gap-3 mb-5 pb-4 border-b border-white/10">
         <div>
-          <h3 class="font-bold text-lg">Dorks para: <span class="text-[#FF9F0A]">${escapeHtml(alvo)}</span></h3>
-          <p class="text-xs text-[var(--text-secondary)] mt-0.5">Toque em qualquer plataforma para abrir a busca filtrada no Google.</p>
+          <h3 class="font-bold text-lg">Dorks para: <span class="text-[#E2B354]">${escapeHtml(alvo)}</span></h3>
+          <p class="text-xs text-[var(--text-secondary)] mt-0.5">Toque em qualquer filtro para abrir a consulta avançada no Google.</p>
         </div>
-        <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#0A84FF]">verified</span> Assinado</button>
+        <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#E2B354]">verified</span> Dossiê</button>
       </div>
       ${dorks.map(cat => `
         <div class="mb-5">
           <div class="flex items-center justify-between gap-2 mb-2 px-1">
             <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold flex items-center gap-1.5">
-              <span class="material-symbols-rounded text-base text-[#FF9F0A]">${escapeHtml(cat.icone)}</span> ${escapeHtml(cat.titulo)}
+              <span class="material-symbols-rounded text-base text-[#E2B354]">${escapeHtml(cat.icone)}</span> ${escapeHtml(cat.titulo)}
             </h4>
             <a href="${escapeHtml(cat.dorkGeral)}" target="_blank" rel="noopener noreferrer" class="ios-chip text-[11px] py-1 px-2.5">
               <span class="material-symbols-rounded text-xs">manage_search</span> Dork Geral
@@ -1508,7 +2290,7 @@
             ${cat.itens.map(item => `
               <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer" class="ios-row">
                 <span class="font-semibold text-sm text-white truncate">${escapeHtml(item.nome)}</span>
-                <span class="pill-tag tag-warn"><span class="material-symbols-rounded text-xs">open_in_new</span> Abrir Dork</span>
+                <span class="pill-tag tag-gold"><span class="material-symbols-rounded text-xs">open_in_new</span> Abrir Dork</span>
               </a>
             `).join('')}
           </div>
@@ -1521,7 +2303,7 @@
   }
 
   // ==========================================================
-  // 8. HOME SCREEN & ROTEADOR
+  // 11. HOME SCREEN SHERLOCK & ROTEADOR
   // ==========================================================
   function navigate(id) { window.location.hash = id ? '#' + id : ''; }
 
@@ -1552,7 +2334,7 @@
         <section class="mb-9">
           <div class="section-banner">
             <div class="flex items-center gap-3 min-w-0">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:${sec.accent}24; border:1px solid ${sec.accent}55;">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background:${sec.accent}22; border:1px solid ${sec.accent}55;">
                 <span class="material-symbols-rounded text-xl" style="color:${sec.accent}">${escapeHtml(sec.icon)}</span>
               </div>
               <div class="min-w-0">
@@ -1560,7 +2342,7 @@
                 <p class="text-[11px] text-[var(--text-secondary)] truncate mt-0.5">${escapeHtml(sec.subtitle)}</p>
               </div>
             </div>
-            <span class="pill-tag tag-info shrink-0">${items.length}</span>
+            <span class="pill-tag tag-gold shrink-0">${items.length}</span>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -1570,7 +2352,7 @@
                   <div class="squircle" style="background: ${m.gradient};">
                     <span class="material-symbols-rounded">${escapeHtml(m.icon)}</span>
                   </div>
-                  <span class="pill-tag ${m.tagClass || 'tag-info'}">${escapeHtml(m.apisLabel)}</span>
+                  <span class="pill-tag ${m.tagClass || 'tag-gold'}">${escapeHtml(m.apisLabel)}</span>
                 </div>
                 <div>
                   <div class="flex items-center justify-between gap-2 mb-1">
@@ -1604,15 +2386,16 @@
         <div class="view-enter">
           <div class="mb-7">
             <div class="mb-5 px-1">
-              <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">Central Sherlock, Web & CNPJ</h1>
+              <span class="text-[11px] font-forensic uppercase tracking-[0.2em] text-[#E2B354] block mb-1">Baker Street 221B • Suite Pericial</span>
+              <h1 class="font-sherlock text-2xl sm:text-3xl font-bold text-white">Laboratório Forense & OSINT</h1>
               <p class="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
-                Metadados EXIF, OSINT, Dorks, Web Scraper, Proprietário de Sites, IP e Consulta CNPJ via Proxy Remoto.
+                Perícia de imagens (EXIF/ELA), cadeia de custódia, decodificação de artefatos, OSINT, SSL, sites e CNPJ via Proxy Remoto.
               </p>
             </div>
 
             <div class="spotlight-bar mb-4">
-              <span class="material-symbols-rounded text-[var(--text-secondary)] text-xl">search</span>
-              <input type="text" id="spotlightInput" class="spotlight-input" placeholder="Buscar ferramenta (ex: CNPJ, metadados, foto, scraper, dork, site, IP...)" value="${escapeHtml(homeSearchQuery)}" autocomplete="off">
+              <span class="material-symbols-rounded text-[#E2B354] text-xl">search</span>
+              <input type="text" id="spotlightInput" class="spotlight-input" placeholder="Investigar ferramenta (ex: ELA, EXIF, custódia, JWT, crt.sh, dork, CNPJ...)" value="${escapeHtml(homeSearchQuery)}" autocomplete="off">
               ${homeSearchQuery ? '<button type="button" id="clearSpotlight" class="text-[var(--text-secondary)] hover:text-white"><span class="material-symbols-rounded text-lg">close</span></button>' : ''}
             </div>
 
@@ -1641,11 +2424,14 @@
     const m = MODULES.find(x => x.id === hash);
     if (!m) return navigate('');
     if (m.customView === 'metadata') { renderMetadataView(view); return; }
+    if (m.customView === 'ela') { renderElaView(view); return; }
+    if (m.customView === 'custody') { renderCustodyView(view); return; }
+    if (m.customView === 'decoder') { renderDecoderView(view); return; }
 
     const history = getHistory(m.id);
     const historyHtml = history.length ? `
       <div class="mt-4 pt-4 border-t border-white/10">
-        <span class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold block mb-2">Recentes</span>
+        <span class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold block mb-2">Casos Recentes</span>
         <div class="flex flex-wrap gap-2">
           ${history.map(h => `<button type="button" class="ios-chip py-1 px-3" data-fill="${escapeHtml(h.query)}">${escapeHtml(h.query)}</button>`).join('')}
         </div>
@@ -1655,7 +2441,7 @@
     view.innerHTML = `
       <div class="view-enter">
         <button type="button" data-nav="" class="ios-chip mb-5">
-          <span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar ao Início
+          <span class="material-symbols-rounded text-sm">arrow_back_ios_new</span> Voltar ao Painel
         </button>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
@@ -1666,7 +2452,7 @@
               </div>
               <div>
                 <h2 class="text-lg font-bold leading-tight">${escapeHtml(m.name)}</h2>
-                <span class="pill-tag ${m.tagClass || 'tag-info'} mt-1">${escapeHtml(m.apisLabel)}</span>
+                <span class="pill-tag ${m.tagClass || 'tag-gold'} mt-1">${escapeHtml(m.apisLabel)}</span>
               </div>
             </div>
             <p class="text-xs text-[var(--text-secondary)] mb-5 leading-relaxed">${escapeHtml(m.desc)}</p>
@@ -1677,7 +2463,7 @@
                 <label for="searchInput" class="md-label">${escapeHtml(m.placeholder)}</label>
               </div>
               <button type="submit" class="ios-btn">
-                <span class="material-symbols-rounded text-lg">search</span> ${m.customSearch === 'dork_only' ? 'Gerar Dorks' : 'Consultar'}
+                <span class="material-symbols-rounded text-lg">search</span> ${m.customSearch === 'dork_only' ? 'Gerar Dorks' : 'Investigar'}
               </button>
             </form>
             ${historyHtml}
@@ -1685,12 +2471,12 @@
 
           <div class="lg:col-span-8">
             <div id="result" class="min-h-[300px] liquid-card p-6 flex flex-col justify-center items-center text-center">
-              <div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-3">
-                <span class="material-symbols-rounded text-3xl text-white/30">${escapeHtml(m.icon)}</span>
+              <div class="w-16 h-16 rounded-2xl bg-[#E2B354]/10 border border-[#E2B354]/25 flex items-center justify-center mb-3">
+                <span class="material-symbols-rounded text-3xl text-[#E2B354]/70">${escapeHtml(m.icon)}</span>
               </div>
-              <p class="text-sm font-medium text-white mb-1">Pronto para consultar</p>
+              <p class="text-sm font-semibold text-white mb-1">Dossiê aguardando alvo</p>
               <p class="text-xs text-[var(--text-secondary)] max-w-xs">
-                Os dados serão roteados automaticamente pelo túnel de Proxy Remoto ativo.
+                Todas as consultas saem automaticamente pelo túnel de Proxy Remoto ativo.
               </p>
             </div>
           </div>
@@ -1699,9 +2485,7 @@
     `;
 
     const inputEl = document.getElementById('searchInput');
-    if (m.digits) {
-      inputEl.addEventListener('input', () => { inputEl.value = inputEl.value.replace(/\D/g, ''); });
-    }
+    if (m.digits) inputEl.addEventListener('input', () => { inputEl.value = inputEl.value.replace(/\D/g, ''); });
     document.getElementById('searchForm').addEventListener('submit', (e) => handleSearch(e, m.id));
   }
 
@@ -1713,16 +2497,16 @@
     const resDiv = document.getElementById('result');
 
     btn.disabled = true;
-    btn.innerHTML = '<span class="material-symbols-rounded spinner text-lg">refresh</span> Processando...';
+    btn.innerHTML = '<span class="material-symbols-rounded spinner text-lg">refresh</span> Investigando...';
 
     if (m.customSearch === 'osint_api') { await runOsintApis(val, resDiv, btn); return; }
     if (m.customSearch === 'dork_only') { await runDorks(val, resDiv, btn); return; }
 
     resDiv.className = 'min-h-[300px] liquid-card p-6 flex flex-col justify-center items-center text-center';
     resDiv.innerHTML = `
-      <span class="material-symbols-rounded spinner text-4xl mb-3 text-[#0A84FF]">refresh</span>
+      <span class="material-symbols-rounded spinner text-4xl mb-3 text-[#E2B354]">refresh</span>
       <p class="text-sm font-semibold text-white">Consultando via ${escapeHtml(RemoteProxy.getModeLabel())}</p>
-      <p class="text-xs text-[var(--text-secondary)] mt-1">Com fallback automático entre APIs...</p>
+      <p class="text-xs text-[var(--text-secondary)] mt-1">Com redundância automática entre fontes...</p>
     `;
 
     try {
@@ -1738,8 +2522,8 @@
         html += data.listas.map(l => `
           <div class="mt-5">
             <h4 class="text-xs uppercase tracking-wider text-[var(--text-secondary)] font-semibold mb-2 px-1">${escapeHtml(l.titulo)} (${l.itens.length})</h4>
-            <div class="flex flex-wrap gap-2 max-h-60 overflow-y-auto">
-              ${l.itens.map(item => `<span class="text-xs px-3 py-1.5 rounded-full bg-white/10 text-white">${escapeHtml(item)}</span>`).join('')}
+            <div class="flex flex-wrap gap-2 max-h-64 overflow-y-auto">
+              ${l.itens.map(item => `<span class="text-xs font-forensic px-3 py-1.5 rounded-full bg-white/8 border border-white/10 text-white">${escapeHtml(item)}</span>`).join('')}
             </div>
           </div>
         `).join('');
@@ -1751,14 +2535,14 @@
           <div>
             <div class="flex items-center gap-2">
               <span class="material-symbols-rounded text-[#30D158] text-2xl">check_circle</span>
-              <h3 class="font-bold text-lg">Resultado</h3>
+              <h3 class="font-bold text-lg">Evidências Coletadas</h3>
             </div>
-            ${data.provider ? `<span class="text-[11px] text-[#0A84FF] font-semibold">Fonte: ${escapeHtml(data.provider)}</span>` : ''}
+            ${data.provider ? `<span class="text-[11px] text-[#E2B354] font-semibold">Fonte: ${escapeHtml(data.provider)}</span>` : ''}
           </div>
           <div class="flex flex-wrap gap-2">
             <button type="button" class="ios-chip" data-print="1"><span class="material-symbols-rounded text-sm">print</span> PDF</button>
             <button type="button" class="ios-chip" data-export="copy"><span class="material-symbols-rounded text-sm">content_copy</span> Copiar</button>
-            <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#0A84FF]">verified</span> Assinado</button>
+            <button type="button" class="ios-chip" data-export="download"><span class="material-symbols-rounded text-sm text-[#E2B354]">verified</span> Dossiê</button>
           </div>
         </div>
         ${html}
@@ -1767,12 +2551,12 @@
       resDiv.className = 'min-h-[300px] liquid-card p-6 flex flex-col justify-center items-center text-center';
       resDiv.innerHTML = `
         <span class="material-symbols-rounded text-5xl mb-2 text-[#FF453A]">error</span>
-        <h3 class="font-bold text-base mb-1">Falha na consulta</h3>
+        <h3 class="font-bold text-base mb-1">Falha na investigação</h3>
         <p class="text-xs text-[var(--text-secondary)] max-w-md">${escapeHtml(err.message)}</p>
       `;
     } finally {
       btn.disabled = false;
-      btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Consultar';
+      btn.innerHTML = '<span class="material-symbols-rounded text-lg">search</span> Investigar';
     }
   }
 
@@ -1781,26 +2565,29 @@
     if (!entries.length) return '<p class="text-sm text-[var(--text-secondary)]">Nenhum dado retornado.</p>';
     return `
       <div class="ios-group">
-        ${entries.map(([k, v]) => `
-          <div class="ios-row">
-            <div class="flex items-center gap-3 min-w-0">
-              <span class="material-symbols-rounded text-[#0A84FF] text-xl shrink-0">${escapeHtml(getIcon(k))}</span>
-              <div class="flex flex-col min-w-0">
-                <span class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold">${escapeHtml(k.replace(/_/g, ' '))}</span>
-                <span class="text-sm font-medium text-white break-words">${escapeHtml(v)}</span>
+        ${entries.map(([k, v]) => {
+          const isMono = /(hash|sha|hex|ip|latitude|longitude|cnpj|base64)/i.test(k);
+          return `
+            <div class="ios-row">
+              <div class="flex items-center gap-3 min-w-0">
+                <span class="material-symbols-rounded text-[#E2B354] text-xl shrink-0">${escapeHtml(getIcon(k))}</span>
+                <div class="flex flex-col min-w-0">
+                  <span class="text-[11px] uppercase tracking-wider text-[var(--text-secondary)] font-semibold">${escapeHtml(k.replace(/_/g, ' '))}</span>
+                  <span class="${isMono ? 'font-forensic text-xs' : 'text-sm'} font-medium text-white break-words">${escapeHtml(v)}</span>
+                </div>
               </div>
+              <button type="button" class="ios-chip text-[11px] py-1 px-2.5 shrink-0" data-copy-val="${escapeHtml(v)}">
+                <span class="material-symbols-rounded text-xs">content_copy</span>
+              </button>
             </div>
-            <button type="button" class="ios-chip text-[11px] py-1 px-2.5 shrink-0" data-copy-val="${escapeHtml(v)}">
-              <span class="material-symbols-rounded text-xs">content_copy</span>
-            </button>
-          </div>
-        `).join('')}
+          `;
+        }).join('')}
       </div>
     `;
   }
 
   // ==========================================================
-  // 9. EVENTOS CENTRALIZADOS & BOOT
+  // 12. EVENTOS CENTRALIZADOS & BOOT
   // ==========================================================
   document.addEventListener('click', async (e) => {
     const navEl = e.target.closest('[data-nav]');
@@ -1838,7 +2625,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `kiik-glassosint-${lastModuleId}-${Date.now()}.json`;
+        a.download = `sherlock221b-${lastModuleId}-${Date.now()}.json`;
         a.click();
         URL.revokeObjectURL(url);
       }
