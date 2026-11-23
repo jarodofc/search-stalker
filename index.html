@@ -6,18 +6,18 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#06090F" />
-  <meta name="description" content="SHERLOCK 221B Prism Intelligence Deck: Pericia Digital, Proxy e VPN Lab, OSINT e Threat Intelligence na Vercel." />
-  <title>SHERLOCK 221B • Prism Intelligence Deck</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23080D16'/%3E%3Ccircle cx='14' cy='14' r='6.5' fill='none' stroke='%232DD4BF' stroke-width='2.4'/%3E%3Cpath d='M19 19l5.5 5.5' stroke='%23E2B354' stroke-width='2.6' stroke-linecap='round'/%3E%3Ccircle cx='14' cy='14' r='2.1' fill='%232DD4BF'/%3E%3C/svg%3E" />
+  <meta name="description" content="LÚMEN por zFORENSE. Investigação digital, OSINT e inteligência de ameaças em uma plataforma web." />
+  <title>LÚMEN · zFORENSE</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/brand/lumen-mark.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0" />
-  <link rel="stylesheet" href="/assets/css/styles.css?v=4.1.0" />
+  <link rel="stylesheet" href="/assets/css/styles.css?v=4.2.0" />
 </head>
 <body>
 
-  <!-- Animated Prism Liquid Orbs Backdrop -->
+  <!-- LÚMEN soft ambient backdrop -->
   <div class="prism-backdrop" aria-hidden="true">
     <div class="prism-orb p-orb-1"></div>
     <div class="prism-orb p-orb-2"></div>
@@ -28,19 +28,15 @@
   <div id="proxyBoot" role="status" aria-live="polite">
     <div class="boot-box">
       <div class="boot-logo">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2DD4BF" stroke-width="2" stroke-linecap="round">
-          <circle cx="11" cy="11" r="6.8"></circle>
-          <path d="M20 20l-4-4" stroke="#E2B354"></path>
-          <circle cx="11" cy="11" r="2" fill="#2DD4BF"></circle>
-        </svg>
+        <img class="brand-mark" src="/assets/brand/lumen-mark.svg" alt="" width="42" height="42" />
       </div>
-      <span class="boot-overline font-mono-code">BAKER STREET • 221B</span>
-      <h1 class="font-crest boot-title">Prism Intelligence Deck</h1>
+      <span class="boot-overline font-mono-code">INTELIGÊNCIA EM FOCO</span>
+      <h1 class="font-crest boot-title">LÚMEN <span class="brand-muted">/ zFORENSE</span></h1>
       <p id="bootSubtitle" class="boot-sub">Inicializando Web Worker, AES-256 e Proxy Remoto...</p>
       <div class="boot-track"><div id="bootBar" class="boot-fill"></div></div>
       <div class="boot-steps">
         <div id="stepP2P" class="boot-line active">
-          <span class="boot-step-lbl"><span class="material-symbols-rounded text-accent">encrypted</span> Custodia Local (AES-256 + HMAC)</span>
+          <span class="boot-step-lbl"><span class="material-symbols-rounded text-accent">encrypted</span> Dossiê da sessão (AES-256-GCM)</span>
           <span class="material-symbols-rounded spinner boot-step-ic" data-step-icon>refresh</span>
         </div>
         <div id="stepProxy" class="boot-line">
@@ -48,7 +44,7 @@
           <span class="boot-step-txt" data-step-icon>Aguardando</span>
         </div>
         <div id="stepSig" class="boot-line">
-          <span class="boot-step-lbl"><span class="material-symbols-rounded text-gold">verified_user</span> Selo KIIK HACKING • SSRF Guard</span>
+          <span class="boot-step-lbl"><span class="material-symbols-rounded text-gold">verified_user</span> Verificações de destino remoto</span>
           <span class="boot-step-txt" data-step-icon>Aguardando</span>
         </div>
       </div>
@@ -60,7 +56,7 @@
   <!-- Mobile Navigation Drawer -->
   <aside id="mobileDrawer" aria-label="Menu Mobile">
     <div class="drawer-head">
-      <span class="font-crest brand-crest-sm">SHERLOCK 221B</span>
+      <span class="font-crest brand-crest-sm">LÚMEN</span>
       <button type="button" id="closeMobileBtn" class="btn-soft btn-icon-only" aria-label="Fechar Menu">
         <span class="material-symbols-rounded">close</span>
       </button>
@@ -115,11 +111,7 @@
     <!-- Compact Vector Icon Rail (Desktop) -->
     <aside class="icon-rail" aria-label="Barra Lateral de Ferramentas">
       <button type="button" data-nav="" class="rail-brand-btn" title="Central Sherlock 221B">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
-          <circle cx="11" cy="11" r="6.8"></circle>
-          <path d="M20 20l-4-4"></path>
-          <circle cx="11" cy="11" r="2" fill="currentColor"></circle>
-        </svg>
+        <img class="brand-mark" src="/assets/brand/lumen-mark.svg" alt="" width="38" height="38" />
       </button>
 
       <div id="railNav" class="rail-scroll"></div>
@@ -128,7 +120,7 @@
       <button type="button" id="railSolidBtn" class="rail-btn" title="Alternar Paineis Solidos (Acessibilidade)">
         <span class="material-symbols-rounded">contrast</span>
       </button>
-      <button type="button" id="railThemeBtn" class="rail-btn" title="Alternar Aparencia (Prism / Ivory / Noir)">
+      <button type="button" id="railThemeBtn" class="rail-btn" title="Alternar aparência (Lúmen / Claro / Alto contraste)">
         <span class="material-symbols-rounded">palette</span>
       </button>
     </aside>
@@ -142,7 +134,7 @@
           </button>
           <div class="ribbon-title-wrap">
             <div class="ribbon-crumb">
-              <span class="font-crest brand-crest-xs hide-xs">SHERLOCK 221B</span>
+              <span class="font-crest brand-crest-xs hide-xs">LÚMEN</span>
               <span class="crumb-sep hide-xs">/</span>
               <h1 id="topTitle" class="top-title">Central de Inteligencia</h1>
             </div>
@@ -152,7 +144,7 @@
                 <span id="proxyLabel" class="font-mono-code">Conectando Proxy...</span>
               </button>
               <span class="hide-md status-sep">•</span>
-              <span class="hide-md font-mono-code text-gold">KIIK HACKING • E2EE</span>
+              <span class="hide-md font-mono-code text-gold">DADOS LOCAIS • API SEGURA</span>
             </div>
           </div>
         </div>
@@ -167,9 +159,9 @@
         </nav>
 
         <div class="ribbon-right">
-          <button type="button" id="topThemeBtn" class="btn-soft" title="Alternar Aparencia (Prism / Ivory / Noir)">
+          <button type="button" id="topThemeBtn" class="btn-soft" title="Alternar aparência (Lúmen / Claro / Alto contraste)">
             <span class="material-symbols-rounded text-accent">palette</span>
-            <span id="themeNameLbl" class="hide-xs">Prism</span>
+            <span id="themeNameLbl" class="hide-xs">Lúmen</span>
           </button>
           <button type="button" id="openCmdBtn" class="btn-soft" title="Busca Rapida (Ctrl+K)">
             <span class="material-symbols-rounded text-accent">search</span>
@@ -185,7 +177,7 @@
 
       <main id="workspace" class="deck-scroll"></main>
 
-      <!-- Dynamic Island GitHub Footer (iOS Liquid Glass) -->
+      <!-- LÚMEN / GitHub link, compact glass pill -->
       <div class="gh-island-wrap">
         <a href="https://github.com/jarodofc" target="_blank" rel="noopener noreferrer" class="gh-dynamic-island" aria-label="Abrir GitHub @jarodofc">
           <span class="gh-island-avatar">
@@ -196,7 +188,7 @@
           <span class="gh-island-pulse"></span>
           <span class="font-mono-code gh-island-user">github.com/jarodofc</span>
           <span class="gh-island-sep hide-xs"></span>
-          <span class="font-mono-code gh-island-tag hide-xs">KIIK HACKING</span>
+          <span class="font-mono-code gh-island-tag hide-xs">zFORENSE</span>
           <span class="gh-island-expand font-mono-code">• Abrir Repo</span>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M7 17L17 7"></path>
@@ -208,6 +200,6 @@
   </div>
 
   <div id="toastHost" class="toast-host" aria-live="polite"></div>
-  <script type="module" src="/assets/js/app.js?v=4.1.0"></script>
+  <script type="module" src="/assets/js/app.js?v=4.2.0"></script>
 </body>
 </html>
