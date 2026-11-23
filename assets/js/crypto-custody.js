@@ -55,8 +55,7 @@ async function deriveAesKey() {
 export async function saveEncryptedDossier(items) {
   try {
     if (!window.crypto || !window.crypto.subtle) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ plain: true, items }));
-      return;
+      throw new Error('Web Crypto indisponível; dossiê não armazenado.');
     }
     const key = await deriveAesKey();
     const iv = crypto.getRandomValues(new Uint8Array(12));
@@ -69,8 +68,8 @@ export async function saveEncryptedDossier(items) {
       updatedAt: new Date().toISOString()
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(envelope));
-  } catch {
-    // Fallback silencioso se storage estiver indisponivel
+  } catch (error) {
+    throw new Error('Falha ao salvar dossiê criptografado.', {cause:error});
   }
 }
 
@@ -79,7 +78,7 @@ export async function loadEncryptedDossier() {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const env = JSON.parse(raw);
-    if (env.plain && Array.isArray(env.items)) return env.items;
+    if (env.plain) return []; // Não restaurar texto puro.
     if (!env.iv || !env.ct || !window.crypto || !window.crypto.subtle) return [];
     const key = await deriveAesKey();
     const plainBuf = await crypto.subtle.decrypt(
@@ -105,7 +104,7 @@ export async function buildSignedExport(moduleName, payload, proxyMeta = {}) {
   const exportedAt = new Date().toISOString();
   const body = {
     platform: 'zFORENSE',
-    version: '2.0.0',
+    version: '4.2.0',
     module: moduleName,
     exportedAt,
     transport: {
@@ -140,6 +139,7 @@ export async function buildSignedExport(moduleName, payload, proxyMeta = {}) {
     ...body,
     custody: {
       algorithm: 'SHA-256 + HMAC-SHA256',
+      scope: 'Integridade de sessão, não assinatura digital verificável por terceiros',
       contentSha256: sha256,
       sessionHmacSha256: hmacSha256
     }

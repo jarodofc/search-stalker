@@ -123,7 +123,7 @@ html, body {
   height: 100%;
   background: var(--bg-base);
   color: var(--text-1);
-  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
   font-size: 14px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -131,8 +131,8 @@ html, body {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
-.font-crest { font-family: 'Manrope', -apple-system, sans-serif; letter-spacing: -0.035em; }
-.font-mono-code { font-family: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
+.font-crest { font-family: 'Cinzel', Georgia, serif; letter-spacing: 0.06em; }
+.font-mono-code { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
 
 .text-accent { color: var(--accent) !important; }
 .text-gold { color: var(--accent-2) !important; }
@@ -616,61 +616,4 @@ input[type="range"].prism-range { width: 100%; accent-color: var(--accent); curs
   html, body, .deck-shell, .deck-main, .deck-scroll { height: auto !important; overflow: visible !important; background: #fff !important; color: #000 !important; }
   .glass-panel, .kv-list { border: 1px solid #ccc !important; background: #fff !important; box-shadow: none !important; color: #000 !important; }
   .workbench-grid { grid-template-columns: 1fr !important; }
-}
-
-/* =========================================================
-   LÚMEN / zFORENSE · Liquid Glass + Material UX
-   Uma camada de identidade visual sobre os componentes atuais.
-   ========================================================= */
-html[data-theme="prism"] {
-  --bg-base: #090F18;
-  --bg-rail: rgba(13, 22, 35, .82);
-  --bg-bar: rgba(14, 24, 38, .70);
-  --surface: rgba(21, 32, 49, .60);
-  --surface-solid: #141E2D;
-  --surface-2: rgba(30, 43, 62, .68);
-  --input-bg: rgba(11, 19, 31, .78);
-  --kv-bg: rgba(10, 20, 33, .46);
-  --border: rgba(209, 230, 255, .10);
-  --border-strong: rgba(209, 230, 255, .20);
-  --accent: #94B6FF;
-  --accent-2: #78DFC9;
-  --accent-border: rgba(148, 182, 255, .30);
-  --accent-soft: rgba(148, 182, 255, .12);
-  --specular: rgba(241, 249, 255, .22);
-  --text-1: #EFF5FF;
-  --text-2: #ADBDD1;
-  --text-3: #8193A9;
-  --btn-text: #091321;
-  --orb-a: rgba(116, 155, 239, .12);
-  --orb-b: rgba(120, 223, 201, .08);
-  --orb-c: rgba(160, 184, 238, .06);
-}
-.brand-mark { display: block; object-fit: contain; flex: none; }
-.brand-muted { color: #9CAFC4; font-weight: 500; font-size: .7em; }
-.brand-crest-xs,.brand-crest-sm { letter-spacing: -.02em; color: var(--text-1); }
-.rail-brand-btn { background: transparent; border-color: transparent; box-shadow: none; }
-.rail-brand-btn:hover { transform: translateY(-1px); background: var(--accent-soft); }
-.boot-logo { background: transparent; border: 0; border-radius: 20px; }
-.boot-overline { color: #A6C0FF; letter-spacing: .14em; }
-.boot-box { background: #111C2A; border: 1px solid rgba(198,219,255,.18); box-shadow: 0 24px 75px rgba(0,0,0,.5); }
-.boot-track { height: 3px; }
-.boot-fill { background: linear-gradient(90deg,#94B6FF,#78DFC9); }
-.prism-orb { filter: blur(120px); opacity: .58; animation-duration: 35s; }
-.glass-panel { box-shadow: 0 8px 32px rgba(1,8,18,.12), inset 0 1px rgba(255,255,255,.05); }
-.top-ribbon,.icon-rail,.gh-dynamic-island { box-shadow: inset 0 1px rgba(255,255,255,.04); }
-button,input,textarea,select { font-family: inherit; }
-button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,[tabindex]:focus-visible {
-  outline: 2px solid var(--accent); outline-offset: 3px;
-}
-.material-symbols-rounded { font-variation-settings: 'FILL' 0,'wght' 450,'GRAD' 0,'opsz' 24; }
-@media (prefers-reduced-motion: reduce) {
-  *,*::before,*::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
-}
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass-panel,.icon-rail,.top-ribbon,.gh-dynamic-island,#mobileDrawer,#caseDrawer,.cmd-dialog { background: var(--surface-solid); }
-}
-@media (max-width: 640px) {
-  .top-ribbon { padding-top: max(10px, env(safe-area-inset-top)); }
-  .gh-island-wrap { padding-bottom: env(safe-area-inset-bottom); }
 }

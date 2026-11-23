@@ -1,14 +1,13 @@
 {
-  "name": "zforense-lumen",
-  "version": "4.2.0",
-  "description": "LÚMEN | zFORENSE, plataforma web modular de perícia digital e OSINT",
+  "name": "sherlock-221b-prism",
+  "version": "4.1.0",
+  "description": "SHERLOCK 221B Prism Intelligence Deck (zFORENSE Modular para GitHub + Vercel)",
   "private": true,
   "engines": {
     "node": ">=20.0.0"
   },
   "scripts": {
     "dev": "vercel dev",
-    "deploy": "vercel --prod",
-    "check": "node --test tests/*.test.cjs"
+    "deploy": "vercel --prod"
   }
 }

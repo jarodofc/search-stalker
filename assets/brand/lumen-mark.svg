@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" role="img" aria-labelledby="title desc">
-<title id="title">Lúmen, marca zFORENSE</title><desc id="desc">Quatro traços de focalização ao redor de um núcleo de evidência.</desc>
-<defs><linearGradient id="glass" x1="17" y1="12" x2="112" y2="119" gradientUnits="userSpaceOnUse"><stop stop-color="#182B42"/><stop offset="1" stop-color="#0A101A"/></linearGradient><linearGradient id="light" x1="23" y1="25" x2="103" y2="102" gradientUnits="userSpaceOnUse"><stop stop-color="#A6C0FF"/><stop offset="1" stop-color="#65DDCB"/></linearGradient></defs>
-<rect x="6" y="6" width="116" height="116" rx="34" fill="url(#glass)"/><rect x="6.75" y="6.75" width="114.5" height="114.5" rx="33.25" stroke="#DCE9FF" stroke-opacity=".18" stroke-width="1.5"/>
-<path d="M44 29H35a6 6 0 0 0-6 6v9m55-15h9a6 6 0 0 1 6 6v9M29 84v9a6 6 0 0 0 6 6h9m55-15v9a6 6 0 0 1-6 6h-9" stroke="url(#light)" stroke-width="5" stroke-linecap="round"/>
-<circle cx="64" cy="64" r="26" stroke="url(#light)" stroke-opacity=".88" stroke-width="3"/><path d="m50 64 10 10 19-22" stroke="#E8F4FF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="64" cy="64" r="37" stroke="#DCE9FF" stroke-opacity=".08" stroke-width="1.5"/>
-</svg>

@@ -44,7 +44,7 @@ export async function copyText(text) {
   }
 }
 
-export async function downloadSignedJson(moduleName, payload, filenamePrefix = 'lumen') {
+export async function downloadSignedJson(moduleName, payload, filenamePrefix = 'sherlock221b') {
   const signed = await buildSignedExport(moduleName, payload, getProxyState());
   const blob = new Blob([JSON.stringify(signed, null, 2)], { type: 'application/json;charset=utf-8' });
   const url = URL.createObjectURL(blob);
@@ -55,7 +55,7 @@ export async function downloadSignedJson(moduleName, payload, filenamePrefix = '
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-  showToast('Dossiê JSON exportado com hash e HMAC de sessão.', 'success');
+  showToast('Dossie JSON assinado (HMAC-SHA256) baixado.', 'success');
 }
 
 export function renderKvList(rows) {

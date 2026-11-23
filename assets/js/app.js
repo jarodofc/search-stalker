@@ -126,7 +126,8 @@ async function recordEvidence(moduleId, target, payload) {
     payload
   });
   state.dossier = state.dossier.slice(0, 40);
-  await saveEncryptedDossier(state.dossier);
+  try { await saveEncryptedDossier(state.dossier); }
+  catch (error) { showToast(error.message, 'error'); }
   updateEvidenceUI();
 }
 
@@ -1162,7 +1163,7 @@ document.getElementById('proxyRetryBtn').addEventListener('click', async () => {
   document.getElementById('proxyLabel').textContent = 'Reconectando...';
   await initRemoteProxy();
   renderProxyStatus();
-  showToast('Handshake de Proxy Remoto atualizado.', 'info');
+  showToast(getProxyState().online ? 'Conexão com a API validada.' : 'API indisponível. Ferramentas locais seguem ativas.', getProxyState().online ? 'success' : 'error');
 });
 
 document.getElementById('exportFullCaseBtn').addEventListener('click', () => {
