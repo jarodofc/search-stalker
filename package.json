@@ -1,12 +1,13 @@
 {
-  "name": "sherlock-221b-prism-deck",
-  "version": "2.0.0",
+  "name": "zforense",
+  "version": "3.0.0",
+  "description": "zFORENSE v3.0 - Pericia Digital e OSINT (Sherlock com Alma Florence: Liquid Glass + Material UX)",
   "private": true,
-  "description": "SHERLOCK 221B Prism Intelligence Deck - Plataforma Forense, Proxy/VPN, Threat Intel e OSINT",
   "engines": {
     "node": ">=20.0.0"
   },
   "scripts": {
-    "check": "node --check api/_lib/net.js && node --check api/proxy.js && node --check api/recon.js && node --check api/scrape.js && node --check assets/js/forensics.worker.js"
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
   }
 }
