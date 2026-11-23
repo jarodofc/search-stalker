@@ -1,0 +1,12 @@
+{
+  "name": "sherlock-221b-prism-deck",
+  "version": "2.0.0",
+  "private": true,
+  "description": "SHERLOCK 221B Prism Intelligence Deck - Plataforma Forense, Proxy/VPN, Threat Intel e OSINT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "check": "node --check api/_lib/net.js && node --check api/proxy.js && node --check api/recon.js && node --check api/scrape.js && node --check assets/js/forensics.worker.js"
+  }
+}
