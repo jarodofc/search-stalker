@@ -645,7 +645,7 @@ async function handleBreach(req, res) {
 }
 
 async function handleVirusTotal(req, res) {
-  const vtKey = String(process.env.VT_API_KEY || req.headers['x-vt-key'] || '').trim();
+  const vtKey = String(process.env.VT_API_KEY || '').trim();
   const type = String(req.query.type || '').toLowerCase();
   const target = String(req.query.target || '').trim();
 

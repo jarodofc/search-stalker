@@ -159,24 +159,15 @@ async function readLimitedText(response, maxBytes = MAX_RESPONSE_BYTES) {
 }
 
 function setCommonHeaders(req, res) {
-  const allowedOrigin = process.env.ALLOWED_ORIGIN;
-  if (allowedOrigin) {
-    res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+  const origin = req.headers.origin;
+  const allowed = String(process.env.ALLOWED_ORIGIN || '').split(',').map(s => s.trim()).filter(Boolean);
+  if (origin && allowed.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Vary', 'Origin');
-  } else {
-    const origin = req.headers.origin;
-    const host = req.headers.host;
-    if (origin && host && origin.includes(host)) {
-      res.setHeader('Access-Control-Allow-Origin', origin);
-      res.setHeader('Vary', 'Origin');
-    } else {
-      res.setHeader('Access-Control-Allow-Origin', '*');
-    }
   }
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, X-VT-Key');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept');
   res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Powered-By', 'zFORENSE/2.0');
 }
 
 function sendJson(res, status, payload, cacheSeconds = 0) {
@@ -187,6 +178,27 @@ function sendJson(res, status, payload, cacheSeconds = 0) {
   }
   res.setHeader('Content-Type', 'application/json; charset=utf-8');
   return res.status(status).json(payload);
+}
+
+async function readLimitedBuffer(response, limit = MAX_RESPONSE_BYTES) {
+  const length = Number(response.headers.get('content-length') || 0);
+  if (length > limit) throw Object.assign(new Error('Limite de resposta excedido.'), {statusCode:413});
+  if (!response.body) return Buffer.alloc(0);
+  const reader = response.body.getReader(), chunks = [];
+  let total = 0;
+  try {
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > limit) {
+        await reader.cancel().catch(()=>{});
+        throw Object.assign(new Error('Limite de resposta excedido.'), {statusCode:413});
+      }
+      chunks.push(Buffer.from(value));
+    }
+  } finally { reader.releaseLock(); }
+  return Buffer.concat(chunks,total);
 }
 
 function sanitizeDomain(input) {
@@ -210,6 +222,7 @@ module.exports = {
   validatePublicUrl,
   fetchWithTimeout,
   readLimitedText,
+  readLimitedBuffer,
   setCommonHeaders,
   sendJson,
   sanitizeDomain

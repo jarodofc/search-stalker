@@ -8,11 +8,11 @@ import {
   downloadSignedJson, renderKvList, renderBanner, renderLoading, renderMapBlock, renderResHeader
 } from './ui.js';
 
-const CASE_ID = `CASE-221B-${new Date().toISOString().slice(2, 10).replace(/-/g, '')}`;
+const CASE_ID = `ZF-LMN-${new Date().toISOString().slice(2, 10).replace(/-/g, '')}`;
 const THEMES = [
-  { id: 'prism', label: 'Prism' },
-  { id: 'ivory', label: 'Ivory' },
-  { id: 'noir', label: 'Noir' }
+  { id: 'prism', label: 'Lúmen' },
+  { id: 'ivory', label: 'Claro' },
+  { id: 'noir', label: 'Alto contraste' }
 ];
 
 const SECTORS = [
@@ -126,7 +126,8 @@ async function recordEvidence(moduleId, target, payload) {
     payload
   });
   state.dossier = state.dossier.slice(0, 40);
-  await saveEncryptedDossier(state.dossier);
+  try { await saveEncryptedDossier(state.dossier); }
+  catch (error) { showToast(error.message, 'error'); }
   updateEvidenceUI();
 }
 
@@ -163,7 +164,7 @@ function renderProxyStatus() {
   } else {
     dot.style.background = 'var(--orange)';
     dot.style.boxShadow = '0 0 8px var(--orange)';
-    lbl.textContent = 'Modo Local (Deploy Vercel p/ /api)';
+    lbl.textContent = 'API indisponível (módulos locais ativos)';
   }
 }
 
@@ -203,7 +204,7 @@ async function runBootSequence() {
     const [loaded] = await Promise.all([loadEncryptedDossier(), sleep(220)]);
     state.dossier = loaded;
     updateEvidenceUI();
-    markDone(s1, 'Ativo');
+    markDone(s1, 'Pronto');
 
     markAct(s2);
     bar.style.width = '72%';
@@ -214,9 +215,9 @@ async function runBootSequence() {
 
     markAct(s3);
     bar.style.width = '96%';
-    sub.textContent = 'Ativando escudo anti-SSRF e assinatura...';
+    sub.textContent = 'Preparando a sessão e verificações de rede...';
     await sleep(180);
-    markDone(s3, 'Protegido');
+    markDone(s3, 'Pronto');
 
     bar.style.width = '100%';
     await sleep(180);
@@ -316,7 +317,7 @@ function renderOverview(ws) {
         <div class="hero-top">
           <div>
             <span class="hero-overline font-mono-code">${CASE_ID} • AUTO-ROTEAMENTO DE ALVO</span>
-            <h2 class="font-crest hero-title">Painel Sherlock Prism</h2>
+            <h2 class="font-crest hero-title">Painel LÚMEN</h2>
             <p class="hero-sub">Cole um IP, Hash SHA-256, CNPJ, Dominio, URL, E-mail ou Username para direcionamento automatico.</p>
           </div>
           <div class="hero-quick">
@@ -1147,7 +1148,7 @@ document.getElementById('railThemeBtn').addEventListener('click', cycleTheme);
 document.getElementById('topThemeBtn').addEventListener('click', cycleTheme);
 document.getElementById('railSolidBtn').addEventListener('click', () => {
   applySolid(!state.solid);
-  showToast(state.solid ? 'Paineis Solidos ativados.' : 'Vidro Prism reativado.', 'info');
+  showToast(state.solid ? 'Paineis Solidos ativados.' : 'Transparência Lúmen ativada.', 'info');
 });
 document.getElementById('openMobileBtn').addEventListener('click', openMobileDrawer);
 document.getElementById('closeMobileBtn').addEventListener('click', closeMobileDrawer);
@@ -1162,7 +1163,7 @@ document.getElementById('proxyRetryBtn').addEventListener('click', async () => {
   document.getElementById('proxyLabel').textContent = 'Reconectando...';
   await initRemoteProxy();
   renderProxyStatus();
-  showToast('Handshake de Proxy Remoto atualizado.', 'info');
+  showToast(getProxyState().online ? 'Conexão com a API validada.' : 'API indisponível. Ferramentas locais seguem ativas.', getProxyState().online ? 'success' : 'error');
 });
 
 document.getElementById('exportFullCaseBtn').addEventListener('click', () => {
@@ -1213,7 +1214,7 @@ document.addEventListener('click', (e) => {
 
   const ex = e.target.closest('[data-export]');
   if (ex && state.lastResultData) {
-    downloadSignedJson(state.lastModuleId, state.lastResultData, `sherlock221b-${state.lastModuleId}`);
+    downloadSignedJson(state.lastModuleId, state.lastResultData, `lumen-${state.lastModuleId}`);
   }
 });
 

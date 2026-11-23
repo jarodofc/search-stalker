@@ -5,7 +5,7 @@ const {
   fetchWithTimeout,
   setCommonHeaders,
   sendJson,
-  MAX_RESPONSE_BYTES
+  readLimitedBuffer
 } = require('./_utils');
 
 const ALLOWED_PROXY_DOMAINS = [
@@ -58,8 +58,8 @@ module.exports = async (req, res) => {
   if (req.query.ping === '1') {
     return sendJson(res, 200, {
       ok: true,
-      service: 'SHERLOCK 221B Prism Proxy',
-      version: '4.1.0',
+      service: 'LÚMEN zFORENSE API',
+      version: '4.2.0',
       mode: 'vercel-serverless',
       region: process.env.VERCEL_REGION || 'local-node',
       node: process.version,
@@ -101,17 +101,17 @@ module.exports = async (req, res) => {
       return sendJson(res, 403, { ok: false, error: 'Redirecionamento bloqueado pelo proxy seguro.' });
     }
 
-    const arrayBuf = await upstream.arrayBuffer();
-    if (arrayBuf.byteLength > MAX_RESPONSE_BYTES) {
-      return sendJson(res, 413, { ok: false, error: 'Payload excede o limite de 5 MB.' });
-    }
-
-    res.setHeader('Content-Type', upstream.headers.get('content-type') || 'application/octet-stream');
-    res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=120');
-    return res.status(upstream.status).send(Buffer.from(arrayBuf));
+    const payload = await readLimitedBuffer(upstream);
+    const upstreamType = (upstream.headers.get('content-type') || '').toLowerCase();
+    const safeType = /^application\/(json|rdap\+json|problem\+json)(?:;|$)/.test(upstreamType)
+      ? 'application/json; charset=utf-8' : 'text/plain; charset=utf-8';
+    res.setHeader('Content-Type', safeType);
+    res.setHeader('Content-Disposition', 'attachment');
+    res.setHeader('Cache-Control', 'private, no-store');
+    return res.status(upstream.status).send(payload);
   } catch (err) {
     const isAbort = err && err.name === 'AbortError';
-    return sendJson(res, isAbort ? 504 : 502, {
+    return sendJson(res, err.statusCode || (isAbort ? 504 : 502), {
       ok: false,
       error: isAbort ? 'Timeout ao conectar ao destino via proxy remoto.' : 'Falha na conexao via proxy remoto.'
     });
