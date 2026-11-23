@@ -1,75 +1,213 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark" data-solid-panels="false">
+<html lang="pt-BR" data-theme="prism" data-solid-panels="false">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="zFORENSE v3.0: Pericia Digital, OSINT e Threat Intelligence em Liquid Glass e Material UX." />
-  <title>zFORENSE v3.0 | Gabinete de Pericia Digital &amp; OSINT</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#06090F" />
+  <meta name="description" content="SHERLOCK 221B Prism Intelligence Deck: Pericia Digital, Proxy e VPN Lab, OSINT e Threat Intelligence na Vercel." />
+  <title>SHERLOCK 221B • Prism Intelligence Deck</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23080D16'/%3E%3Ccircle cx='14' cy='14' r='6.5' fill='none' stroke='%232DD4BF' stroke-width='2.4'/%3E%3Cpath d='M19 19l5.5 5.5' stroke='%23E2B354' stroke-width='2.6' stroke-linecap='round'/%3E%3Ccircle cx='14' cy='14' r='2.1' fill='%232DD4BF'/%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Courier+Prime:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0,0" />
   <link rel="stylesheet" href="/assets/css/styles.css" />
 </head>
 <body>
-  <div class="ambient-stage" aria-hidden="true"></div>
-  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
 
-  <div class="app-shell">
-    <div class="rail-wrap">
-      <aside class="sidebar liquid-glass-elevated" aria-label="Navegacao de Modulos">
-        <div class="brand">
-          <div class="brand-seal" id="brand-seal" aria-hidden="true"></div>
-          <div>
-            <div class="brand-name">zFORENSE</div>
-            <div class="brand-sub">CASE 221B • FLORENCE</div>
+  <!-- Animated Prism Liquid Orbs Backdrop -->
+  <div class="prism-backdrop" aria-hidden="true">
+    <div class="prism-orb p-orb-1"></div>
+    <div class="prism-orb p-orb-2"></div>
+    <div class="prism-orb p-orb-3"></div>
+  </div>
+
+  <!-- Non-Blocking Boot Handshake Overlay -->
+  <div id="proxyBoot" role="status" aria-live="polite">
+    <div class="boot-box">
+      <div class="boot-logo">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2DD4BF" stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="6.8"></circle>
+          <path d="M20 20l-4-4" stroke="#E2B354"></path>
+          <circle cx="11" cy="11" r="2" fill="#2DD4BF"></circle>
+        </svg>
+      </div>
+      <span class="boot-overline font-mono-code">BAKER STREET • 221B</span>
+      <h1 class="font-crest boot-title">Prism Intelligence Deck</h1>
+      <p id="bootSubtitle" class="boot-sub">Inicializando Web Worker, AES-256 e Proxy Remoto...</p>
+      <div class="boot-track"><div id="bootBar" class="boot-fill"></div></div>
+      <div class="boot-steps">
+        <div id="stepP2P" class="boot-line active">
+          <span class="boot-step-lbl"><span class="material-symbols-rounded text-accent">encrypted</span> Custodia Local (AES-256 + HMAC)</span>
+          <span class="material-symbols-rounded spinner boot-step-ic" data-step-icon>refresh</span>
+        </div>
+        <div id="stepProxy" class="boot-line">
+          <span class="boot-step-lbl"><span class="material-symbols-rounded text-blue">hub</span> Tunel Serverless (/api/proxy)</span>
+          <span class="boot-step-txt" data-step-icon>Aguardando</span>
+        </div>
+        <div id="stepSig" class="boot-line">
+          <span class="boot-step-lbl"><span class="material-symbols-rounded text-gold">verified_user</span> Selo KIIK HACKING • SSRF Guard</span>
+          <span class="boot-step-txt" data-step-icon>Aguardando</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="backdrop"></div>
+
+  <!-- Mobile Navigation Drawer -->
+  <aside id="mobileDrawer" aria-label="Menu Mobile">
+    <div class="drawer-head">
+      <span class="font-crest brand-crest-sm">SHERLOCK 221B</span>
+      <button type="button" id="closeMobileBtn" class="btn-soft btn-icon-only" aria-label="Fechar Menu">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+    <div id="mobileNavBody" class="drawer-body"></div>
+  </aside>
+
+  <!-- Command Palette Modal (Ctrl+K) -->
+  <div id="cmdModal" role="dialog" aria-modal="true" aria-label="Busca Rapida de Modulos">
+    <div class="cmd-dialog">
+      <div class="cmd-head">
+        <span class="material-symbols-rounded text-accent">search</span>
+        <input type="text" id="cmdInput" class="cmd-input" placeholder="Buscar ferramenta (Proxy, VPN, VirusTotal, EXIF, ELA, CNPJ...)" autocomplete="off" />
+        <button type="button" id="cmdClose" class="btn-soft btn-xs font-mono-code">ESC</button>
+      </div>
+      <div id="cmdList" class="cmd-list"></div>
+    </div>
+  </div>
+
+  <!-- Slide-Over Case Dossier Drawer -->
+  <aside id="caseDrawer" aria-label="Dossie da Sessao">
+    <div class="drawer-head">
+      <div>
+        <h3 class="drawer-title">
+          <span class="material-symbols-rounded text-accent">folder_special</span>
+          Dossie da Sessao
+        </h3>
+        <span id="drawerCaseId" class="drawer-sub font-mono-code">CASE-221B</span>
+      </div>
+      <button type="button" id="closeDrawerBtn" class="btn-soft btn-icon-only" aria-label="Fechar Dossie">
+        <span class="material-symbols-rounded">close</span>
+      </button>
+    </div>
+    <div id="drawerBody" class="drawer-body"></div>
+    <div class="drawer-foot">
+      <button type="button" id="exportFullCaseBtn" class="btn-accent">
+        <span class="material-symbols-rounded">verified</span> Exportar Dossie Assinado
+      </button>
+      <div class="drawer-foot-row">
+        <button type="button" id="printCaseBtn" class="btn-soft flex-1 justify-center">
+          <span class="material-symbols-rounded">print</span> PDF
+        </button>
+        <button type="button" id="clearCaseBtn" class="btn-soft btn-danger-soft flex-1 justify-center">
+          <span class="material-symbols-rounded">delete_sweep</span> Limpar
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Deck Shell -->
+  <div class="deck-shell">
+    <!-- Compact Vector Icon Rail (Desktop) -->
+    <aside class="icon-rail" aria-label="Barra Lateral de Ferramentas">
+      <button type="button" data-nav="" class="rail-brand-btn" title="Central Sherlock 221B">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="6.8"></circle>
+          <path d="M20 20l-4-4"></path>
+          <circle cx="11" cy="11" r="2" fill="currentColor"></circle>
+        </svg>
+      </button>
+
+      <div id="railNav" class="rail-scroll"></div>
+
+      <div class="rail-divider"></div>
+      <button type="button" id="railSolidBtn" class="rail-btn" title="Alternar Paineis Solidos (Acessibilidade)">
+        <span class="material-symbols-rounded">contrast</span>
+      </button>
+      <button type="button" id="railThemeBtn" class="rail-btn" title="Alternar Aparencia (Prism / Ivory / Noir)">
+        <span class="material-symbols-rounded">palette</span>
+      </button>
+    </aside>
+
+    <!-- Main Work Column -->
+    <div class="deck-main">
+      <header class="top-ribbon">
+        <div class="ribbon-left">
+          <button type="button" id="openMobileBtn" class="btn-soft btn-icon-only mobile-only" aria-label="Abrir Menu">
+            <span class="material-symbols-rounded">menu</span>
+          </button>
+          <div class="ribbon-title-wrap">
+            <div class="ribbon-crumb">
+              <span class="font-crest brand-crest-xs hide-xs">SHERLOCK 221B</span>
+              <span class="crumb-sep hide-xs">/</span>
+              <h1 id="topTitle" class="top-title">Central de Inteligencia</h1>
+            </div>
+            <div class="ribbon-status">
+              <button type="button" id="proxyRetryBtn" class="proxy-inline-btn" title="Clique para reconectar /api/proxy">
+                <span id="proxyDot" class="proxy-dot"></span>
+                <span id="proxyLabel" class="font-mono-code">Conectando Proxy...</span>
+              </button>
+              <span class="hide-md status-sep">•</span>
+              <span class="hide-md font-mono-code text-gold">KIIK HACKING • E2EE</span>
+            </div>
           </div>
         </div>
-        <nav class="sidebar-nav" id="sidebar-nav"></nav>
-      </aside>
-    </div>
 
-    <div class="main-area">
-      <header class="topbar-glass">
-        <div class="topbar-left">
-          <button type="button" class="icon-btn menu-btn" id="menu-toggle" aria-label="Abrir Menu"></button>
-          <button type="button" class="proxy-pill" id="proxy-status" title="Clique para refazer o handshake do proxy remoto">
-            <span class="proxy-dot"></span>
-            <span id="proxy-label">Conectando...</span>
+        <!-- Sector Pill Switcher (Desktop) -->
+        <nav class="sector-pill-nav desktop-xl-only" aria-label="Filtro de Setores">
+          <button type="button" class="sector-pill active" data-home-sector="all">Todos (15)</button>
+          <button type="button" class="sector-pill" data-home-sector="forense">Forense</button>
+          <button type="button" class="sector-pill" data-home-sector="rede">Proxy &amp; VPN</button>
+          <button type="button" class="sector-pill" data-home-sector="sherlock">Sherlock</button>
+          <button type="button" class="sector-pill" data-home-sector="web">Web &amp; CNPJ</button>
+        </nav>
+
+        <div class="ribbon-right">
+          <button type="button" id="topThemeBtn" class="btn-soft" title="Alternar Aparencia (Prism / Ivory / Noir)">
+            <span class="material-symbols-rounded text-accent">palette</span>
+            <span id="themeNameLbl" class="hide-xs">Prism</span>
           </button>
-        </div>
-
-        <div class="command-lens" role="search">
-          <span id="cmd-icon" aria-hidden="true"></span>
-          <input type="search" id="command-input" class="command-input" placeholder="Ir para modulo ou ferramenta..." autocomplete="off" aria-label="Busca rapida de modulos" />
-          <span class="kbd-chip">⌘K</span>
-          <div class="command-results liquid-glass-elevated" id="command-results"></div>
-        </div>
-
-        <div class="topbar-right">
-          <button type="button" class="icon-btn" id="solid-toggle" title="Alternar Paineis Solidos (Acessibilidade)">
-            <span id="solid-icon"></span>
-            <span class="btn-label-hide">Solido</span>
+          <button type="button" id="openCmdBtn" class="btn-soft" title="Busca Rapida (Ctrl+K)">
+            <span class="material-symbols-rounded text-accent">search</span>
+            <span class="hide-md font-mono-code text-xs-muted">Ctrl K</span>
           </button>
-          <button type="button" class="icon-btn" id="theme-toggle" title="Alternar Noite em Baker Street / Pergaminho de Florenca">
-            <span id="theme-icon"></span>
-            <span class="btn-label-hide" id="theme-label">Pergaminho</span>
+          <button type="button" id="openDrawerBtn" class="btn-soft">
+            <span class="material-symbols-rounded text-gold">folder_special</span>
+            <span class="hide-xs">Dossie</span>
+            <span id="evidenceCountBadge" class="badge-count font-mono-code">0</span>
           </button>
         </div>
       </header>
 
-      <main class="workspace">
-        <div class="workspace-header">
-          <div class="stamp-chip" id="workspace-stamp">DOSSIE #221B</div>
-          <h1 class="workspace-title" id="workspace-title">Carregando gabinete...</h1>
-          <p class="workspace-desc" id="workspace-desc"></p>
-        </div>
-        <div id="workspace-body"></div>
-      </main>
+      <main id="workspace" class="deck-scroll"></main>
+
+      <!-- Dynamic Island GitHub Footer (iOS Liquid Glass) -->
+      <div class="gh-island-wrap">
+        <a href="https://github.com/jarodofc" target="_blank" rel="noopener noreferrer" class="gh-dynamic-island" aria-label="Abrir GitHub @jarodofc">
+          <span class="gh-island-avatar">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#F8FAFC" aria-hidden="true">
+              <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+            </svg>
+          </span>
+          <span class="gh-island-pulse"></span>
+          <span class="font-mono-code gh-island-user">github.com/jarodofc</span>
+          <span class="gh-island-sep hide-xs"></span>
+          <span class="font-mono-code gh-island-tag hide-xs">KIIK HACKING</span>
+          <span class="gh-island-expand font-mono-code">• Abrir Repo</span>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 17L17 7"></path>
+            <path d="M7 7h10v10"></path>
+          </svg>
+        </a>
+      </div>
     </div>
   </div>
 
-  <nav class="pill-dock" id="pill-dock" aria-label="Acesso rapido mobile"></nav>
-  <div class="toast-host" id="toast-host" aria-live="polite"></div>
+  <div id="toastHost" class="toast-host" aria-live="polite"></div>
   <script type="module" src="/assets/js/app.js"></script>
 </body>
 </html>

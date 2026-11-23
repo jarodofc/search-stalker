@@ -1,7 +1,7 @@
 {
-  "name": "zforense",
-  "version": "3.0.0",
-  "description": "zFORENSE v3.0 - Pericia Digital e OSINT (Sherlock com Alma Florence: Liquid Glass + Material UX)",
+  "name": "sherlock-221b-prism",
+  "version": "4.0.0",
+  "description": "SHERLOCK 221B Prism Intelligence Deck (zFORENSE Modular para GitHub + Vercel)",
   "private": true,
   "engines": {
     "node": ">=20.0.0"
