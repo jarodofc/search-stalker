@@ -10,7 +10,7 @@ import {
 
 const CASE_ID = `ZF-LMN-${new Date().toISOString().slice(2, 10).replace(/-/g, '')}`;
 const THEMES = [
-  { id: 'prism', label: 'Lúmen' },
+  { id: 'prism', label: 'Crimson Frost' },
   { id: 'ivory', label: 'Claro' },
   { id: 'noir', label: 'Alto contraste' }
 ];
