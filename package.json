@@ -10,5 +10,8 @@
     "dev": "vercel dev",
     "deploy": "vercel --prod",
     "check": "node --test tests/*.test.cjs"
+  },
+  "dependencies": {
+    "@vercel/functions": "3.11.3"
   }
 }
