@@ -1,31 +1,31 @@
 /* =========================================================
-   TEMAS ALTERNATIVOS (PRISM TACTICAL | IVORY LAB | NOIR 221B)
+   TEMAS ALTERNATIVOS (CRIMSON FROST | IVORY LAB | NOIR 221B)
    ========================================================= */
 :root, [data-theme="prism"] {
-  --bg-base: #06090F;
-  --bg-rail: rgba(10, 15, 25, 0.84);
-  --bg-bar: rgba(11, 16, 27, 0.76);
-  --surface: rgba(16, 23, 38, 0.68);
-  --surface-solid: #101726;
-  --surface-2: rgba(24, 34, 54, 0.72);
-  --input-bg: rgba(7, 11, 18, 0.72);
-  --kv-bg: rgba(8, 12, 20, 0.56);
-  --border: rgba(255, 255, 255, 0.09);
-  --border-strong: rgba(255, 255, 255, 0.16);
-  --accent: #2DD4BF;
-  --accent-2: #E2B354;
-  --accent-border: rgba(45, 212, 191, 0.34);
-  --accent-soft: rgba(45, 212, 191, 0.14);
-  --specular: rgba(186, 255, 245, 0.18);
-  --text-1: #F1F5F9;
-  --text-2: #94A3B8;
-  --text-3: #64748B;
-  --btn-text: #041214;
-  --code-bg: #05080F;
-  --code-text: #CBD5E1;
-  --orb-a: rgba(45, 212, 191, 0.24);
-  --orb-b: rgba(56, 189, 248, 0.20);
-  --orb-c: rgba(226, 179, 84, 0.14);
+  --bg-base: #080A0E;
+  --bg-rail: rgba(19,23,28,.91);
+  --bg-bar: rgba(19,23,28,.85);
+  --surface: rgba(19,23,28,.83);
+  --surface-solid: #13171C;
+  --surface-2: rgba(36,35,44,.78);
+  --input-bg: rgba(8,10,14,.85);
+  --kv-bg: rgba(8,10,14,.68);
+  --border: #333941;
+  --border-strong: #55515B;
+  --accent: #F03C55;
+  --accent-2: #FF85A0;
+  --accent-border: rgba(240,60,85,.45);
+  --accent-soft: rgba(240,60,85,.14);
+  --specular: rgba(255,133,160,.16);
+  --text-1: #F7F8FA;
+  --text-2: #B8C0CA;
+  --text-3: #A0A9B6;
+  --btn-text: #080A0E;
+  --code-bg: #080A0E;
+  --code-text: #F7F8FA;
+  --orb-a: rgba(188,21,71,.44);
+  --orb-b: rgba(120,16,47,.38);
+  --orb-c: rgba(240,60,85,.22);
   --green: #30D158;
   --red: #FF453A;
   --orange: #FF9F0A;
@@ -674,3 +674,16 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .top-ribbon { padding-top: max(10px, env(safe-area-inset-top)); }
   .gh-island-wrap { padding-bottom: env(safe-area-inset-bottom); }
 }
+
+/* JAROD.SYSTEM — Crimson Frost / LÚMEN */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+[data-theme="prism"] .glass-panel{background:linear-gradient(145deg,#24232cb8,#13171ccd);border-color:var(--border)}
+[data-theme="prism"] .hero-card{background:linear-gradient(120deg,#3e1425c9,#13171ce8 75%);border-color:var(--accent-border)}
+[data-theme="prism"] .btn-accent{background:linear-gradient(125deg,#F03C55,#FF85A0);color:#080A0E}
+[data-theme="prism"] .gh-island-avatar{background:linear-gradient(135deg,#F03C5538,#FF85A038)}
+[data-theme="prism"] .gh-island-tag{color:#FF85A0}
+[data-theme="prism"] .prism-orb{filter:blur(48px)}
+[data-solid-panels="true"] .glass-panel{background:var(--surface-solid)!important}
+@supports(height:100dvh){.deck-shell,.deck-main,.icon-rail{height:100dvh}}
+@media(pointer:coarse){input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{font-size:16px!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
